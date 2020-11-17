@@ -74,7 +74,7 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  image_annotation:
+  image_painter:
     dependency: "direct main"
     description:
       path: ".."

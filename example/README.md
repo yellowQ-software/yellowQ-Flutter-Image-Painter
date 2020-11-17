@@ -1,4 +1,4 @@
-# image_annotation_example
+# image_painter_example
 
 A new Flutter project.
 

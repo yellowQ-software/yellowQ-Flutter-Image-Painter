@@ -1,4 +1,4 @@
-# image_annotation
+# image_painter
 
 A new Flutter package project.
 

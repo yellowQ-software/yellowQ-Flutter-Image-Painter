@@ -1,4 +1,4 @@
-name: image_annotation_example
+name: image_painter_example
 description: A new Flutter project.
 
 # The following line prevents the package from being accidentally published to
@@ -23,7 +23,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  image_annotation:
+  image_painter:
     path: ../
   open_file: ^3.0.3
   path_provider: ^1.6.24

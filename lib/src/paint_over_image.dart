@@ -29,7 +29,7 @@ class ImagePainter extends StatefulWidget {
       Widget placeholderWidget,
       BoxFit fit,
       bool scalable,
-      Controller controller}) {
+      @required Controller controller}) {
     return ImagePainter._(
         key: key,
         networkUrl: url,
@@ -50,9 +50,7 @@ class ImagePainter extends StatefulWidget {
       BoxFit fit,
       bool scalable,
       Widget placeholderWidget,
-      Color color,
-      double strokeWidth,
-      Controller controller}) {
+      @required Controller controller}) {
     return ImagePainter._(
       key: key,
       assetPath: path,
@@ -74,7 +72,7 @@ class ImagePainter extends StatefulWidget {
       BoxFit fit,
       bool scalable,
       Widget placeholderWidget,
-      Controller controller}) {
+      @required Controller controller}) {
     return ImagePainter._(
         key: key,
         file: file,
@@ -88,15 +86,15 @@ class ImagePainter extends StatefulWidget {
             color: controller?.color ?? Colors.white));
   }
   //Incase you don't want to wait and load image instantly passing Image directly
-  //Caution: You'll need to convert image to [Image] class of dart:ui beforehand.
-  factory ImagePainter.image(ui.Image image,
+  //Caution: You'll need to convert image to [Image] class of dart:ui or memory beforehand.
+  factory ImagePainter.memory(ui.Image image,
       {Key key,
       double height,
       double width,
       BoxFit fit,
       bool scalable,
       Widget placeholderWidget,
-      Controller controller}) {
+      @required Controller controller}) {
     return ImagePainter._(
         key: key,
         image: image,

@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "image_annotation",
+            "name": "image_painter",
             "request": "launch",
             "type": "dart"
             
