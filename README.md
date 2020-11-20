@@ -2,6 +2,9 @@
 
 A flutter implementation of painting over image.
 
+# OverView
+![image](screenshots/image_painter_sample.gif)
+
 ## Features
 
 - Seven available paint modes. Line, Box/Rectangle, Circle, Freestyle/Signature, Dotted Line, Arrow and Text.
