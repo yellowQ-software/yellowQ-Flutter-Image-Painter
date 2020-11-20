@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Image;
 import 'dart:ui' as ui;
 import 'dart:async';
@@ -39,9 +40,9 @@ class ImagePainter extends StatefulWidget {
         isScalable: scalable ?? false,
         fit: fit ?? BoxFit.contain,
         controller: Controller(
-            strokeWidth: controller?.strokeWidth ?? 4.0,
-            color: controller?.color ?? Colors.white,
-            mode: controller?.mode ?? PaintMode.Line));
+            strokeWidth: controller.strokeWidth ?? 4.0,
+            color: controller.color ?? Colors.white,
+            mode: controller.mode ?? PaintMode.Line));
   }
   //Constructor for loading image from assetPath.
   factory ImagePainter.asset(String path,
@@ -61,9 +62,9 @@ class ImagePainter extends StatefulWidget {
       fit: fit ?? BoxFit.contain,
       placeHolder: placeholderWidget,
       controller: Controller(
-          strokeWidth: controller?.strokeWidth ?? 4.0,
-          color: controller?.color ?? Colors.white,
-          mode: controller?.mode ?? PaintMode.Line),
+          strokeWidth: controller.strokeWidth ?? 4.0,
+          color: controller.color ?? Colors.white,
+          mode: controller.mode ?? PaintMode.Line),
     );
   }
   //Constructor for loading image from file.
@@ -84,9 +85,9 @@ class ImagePainter extends StatefulWidget {
         isScalable: scalable ?? false,
         fit: fit ?? BoxFit.contain,
         controller: Controller(
-            strokeWidth: controller?.strokeWidth ?? 4.0,
-            color: controller?.color ?? Colors.white,
-            mode: controller?.mode ?? PaintMode.Line));
+            strokeWidth: controller.strokeWidth ?? 4.0,
+            color: controller.color ?? Colors.white,
+            mode: controller.mode ?? PaintMode.Line));
   }
   //Constructor for loading image from memory.
   factory ImagePainter.memory(ui.Image image,
@@ -106,9 +107,9 @@ class ImagePainter extends StatefulWidget {
         isScalable: scalable ?? false,
         fit: fit ?? BoxFit.contain,
         controller: Controller(
-            strokeWidth: controller?.strokeWidth ?? 4.0,
-            color: controller?.color ?? Colors.white,
-            mode: controller?.mode ?? PaintMode.Line));
+            strokeWidth: controller.strokeWidth ?? 4.0,
+            color: controller.color ?? Colors.white,
+            mode: controller.mode ?? PaintMode.Line));
   }
   //Only accessible through [Image.Network] constructor.
   final String networkUrl;
@@ -138,8 +139,9 @@ class ImagePainter extends StatefulWidget {
 class ImagePainterState extends State<ImagePainter> {
   ui.Image _image;
   bool _isLoaded = false;
-  Color _color;
   PaintMode _mode;
+  Color _color;
+  double _strokeWidth;
   Paint get _painter => Paint()
     ..color = _color
     ..strokeWidth = _strokeWidth
@@ -149,27 +151,26 @@ class ImagePainterState extends State<ImagePainter> {
   Offset start;
   Offset end;
   bool inDrag = false;
-  double _strokeWidth;
   int pointer = 0;
   @override
   void initState() {
     super.initState();
     _resolveAndConvertImage();
-    _strokeWidth = widget.controller.strokeWidth;
-    _color = widget.controller.color;
     _mode = widget.controller.mode;
+    _color = widget.controller.color;
+    _strokeWidth = widget.controller.strokeWidth;
   }
 
   @override
   void didUpdateWidget(ImagePainter oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller.color != widget.controller.color ||
-        oldWidget.controller.strokeWidth != widget.controller.strokeWidth ||
-        oldWidget.controller.mode != widget.controller.mode) {
+        oldWidget.controller.mode != widget.controller.mode ||
+        oldWidget.controller.strokeWidth != widget.controller.strokeWidth) {
       setState(() {
         _color = widget.controller.color;
-        _strokeWidth = widget.controller.strokeWidth;
         _mode = widget.controller.mode;
+        _strokeWidth = widget.controller.strokeWidth;
       });
     }
   }
@@ -361,16 +362,12 @@ class ImagePainterState extends State<ImagePainter> {
   }
 }
 
-class Controller extends ChangeNotifier {
+class Controller {
   double strokeWidth;
   Color color;
   PaintMode mode;
-  PaintHistory paintHistory;
-
   Controller(
       {this.color = Colors.red,
       this.strokeWidth = 4.0,
       this.mode = PaintMode.Line});
-  undo() {}
-  clear() {}
 }

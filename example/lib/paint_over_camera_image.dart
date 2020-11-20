@@ -1,14 +1,13 @@
 import 'dart:io';
 import 'dart:typed_data';
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 import 'package:image_painter/image_painter.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 
 class PaintOverImage extends StatefulWidget {
-  final String filePath;
-  PaintOverImage({this.filePath});
   @override
   _PaintOverImageState createState() => _PaintOverImageState();
 }
@@ -17,8 +16,8 @@ class _PaintOverImageState extends State<PaintOverImage> {
   final _imageKey = GlobalKey<ImagePainterState>();
   final _key = GlobalKey<ScaffoldState>();
   Controller imageController;
-  double strokeWidth = 4.0;
-  Color color = Colors.white;
+  Color _selectedColor = Colors.blue;
+  double _strokeWidth = 4.0;
   List<MapEntry<IconData, PaintMode>> options = [
     MapEntry(Icons.zoom_out_map, PaintMode.None),
     MapEntry(Icons.horizontal_rule, PaintMode.Line),
@@ -28,10 +27,11 @@ class _PaintOverImageState extends State<PaintOverImage> {
     MapEntry(Icons.arrow_right_alt_outlined, PaintMode.Arrow),
     MapEntry(Icons.power_input, PaintMode.DottedLine)
   ];
+  PaintMode _selectedMode = PaintMode.Line;
   @override
   void initState() {
-    imageController =
-        Controller(color: Colors.black, mode: PaintMode.Line, strokeWidth: 4);
+    imageController = Controller(
+        color: _selectedColor, mode: _selectedMode, strokeWidth: _strokeWidth);
     super.initState();
   }
 
@@ -60,21 +60,108 @@ class _PaintOverImageState extends State<PaintOverImage> {
     );
   }
 
+  void _openMainColorPicker() async {
+    await showDialog<Color>(
+      context: context,
+      builder: (_) {
+        return StatefulBuilder(
+          builder: (context, setstate) {
+            return AlertDialog(
+              contentPadding: const EdgeInsets.all(6.0),
+              title: Text("Pick a color"),
+              content: MaterialColorPicker(
+                shrinkWrap: true,
+                selectedColor: _selectedColor,
+                allowShades: false,
+                onMainColorChange: (color) =>
+                    setstate(() => _selectedColor = color),
+              ),
+              actions: [
+                FlatButton(
+                  child: Text('Done'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+    setState(() {
+      imageController.color = _selectedColor;
+    });
+  }
+
+  void _openStrokeDialog() async {
+    await showDialog<double>(
+      context: context,
+      builder: (_) {
+        return StatefulBuilder(
+          builder: (context, setstate) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AlertDialog(
+                  contentPadding: const EdgeInsets.all(6.0),
+                  title: Text("Set StrokeWidth"),
+                  content: Column(
+                    children: [
+                      CupertinoSlider(
+                        value: _strokeWidth,
+                        min: 2.0,
+                        max: 20.0,
+                        divisions: 9,
+                        onChanged: (value) {
+                          setstate(() {
+                            _strokeWidth = value;
+                          });
+                        },
+                      ),
+                      Text(
+                        "${_strokeWidth.toInt()}",
+                        style: TextStyle(fontSize: 20, color: Colors.blue),
+                      )
+                    ],
+                  ),
+                  actions: [
+                    FlatButton(
+                      child: Text('Done'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+    setState(() {
+      imageController.strokeWidth = _strokeWidth;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         key: _key,
         appBar: AppBar(
-          title: Text("Edit"),
+          title: Text("Image Painter Example"),
           actions: [
             IconButton(
-                icon: Icon(Icons.brush),
+                icon: Icon(Icons.brush_sharp),
                 onPressed: () {
-                  setState(() {
-                    imageController.color = Colors.green;
-                    imageController.mode = PaintMode.FreeStyle;
-                    imageController.strokeWidth = 10;
-                  });
+                  _openStrokeDialog();
+                }),
+            IconButton(
+                icon: Icon(Icons.color_lens),
+                onPressed: () {
+                  _openMainColorPicker();
                 }),
             IconButton(icon: Icon(Icons.save), onPressed: () => saveImage()),
           ],
@@ -107,16 +194,17 @@ class _PaintOverImageState extends State<PaintOverImage> {
                   children: options.map((item) {
                     return SelectionItems(
                         icon: item.key,
-                        isSelected: imageController.mode == item.value,
+                        isSelected: _selectedMode == item.value,
                         onTap: () {
                           setState(() {
+                            _selectedMode = item.value;
                             imageController.mode = item.value;
                           });
                         });
                   }).toList()),
             ),
             Expanded(
-              child: ImagePainter.file(File(widget.filePath),
+              child: ImagePainter.asset("assets/sample.jpg",
                   key: _imageKey, controller: imageController, scalable: true),
             ),
           ],
