@@ -21,7 +21,7 @@ class ImagePainter extends StatefulWidget {
       this.fit = BoxFit.contain,
       this.isScalable = false})
       : super(key: key);
-  //Load image from network url
+  //Constructor for loading image from network url.
   factory ImagePainter.network(String url,
       {Key key,
       double height,
@@ -40,9 +40,10 @@ class ImagePainter extends StatefulWidget {
         fit: fit ?? BoxFit.contain,
         controller: Controller(
             strokeWidth: controller?.strokeWidth ?? 4.0,
-            color: controller?.color ?? Colors.white));
+            color: controller?.color ?? Colors.white,
+            mode: controller?.mode ?? PaintMode.Line));
   }
-  //Load image from asset path
+  //Constructor for loading image from assetPath.
   factory ImagePainter.asset(String path,
       {Key key,
       double height,
@@ -61,10 +62,11 @@ class ImagePainter extends StatefulWidget {
       placeHolder: placeholderWidget,
       controller: Controller(
           strokeWidth: controller?.strokeWidth ?? 4.0,
-          color: controller?.color ?? Colors.white),
+          color: controller?.color ?? Colors.white,
+          mode: controller?.mode ?? PaintMode.Line),
     );
   }
-  //Load image from File from device
+  //Constructor for loading image from file.
   factory ImagePainter.file(File file,
       {Key key,
       double height,
@@ -83,10 +85,10 @@ class ImagePainter extends StatefulWidget {
         fit: fit ?? BoxFit.contain,
         controller: Controller(
             strokeWidth: controller?.strokeWidth ?? 4.0,
-            color: controller?.color ?? Colors.white));
+            color: controller?.color ?? Colors.white,
+            mode: controller?.mode ?? PaintMode.Line));
   }
-  //Incase you don't want to wait and load image instantly passing Image directly
-  //Caution: You'll need to convert image to [Image] class of dart:ui or memory beforehand.
+  //Constructor for loading image from memory.
   factory ImagePainter.memory(ui.Image image,
       {Key key,
       double height,
@@ -105,7 +107,8 @@ class ImagePainter extends StatefulWidget {
         fit: fit ?? BoxFit.contain,
         controller: Controller(
             strokeWidth: controller?.strokeWidth ?? 4.0,
-            color: controller?.color ?? Colors.white));
+            color: controller?.color ?? Colors.white,
+            mode: controller?.mode ?? PaintMode.Line));
   }
   //Only accessible through [Image.Network] constructor.
   final String networkUrl;
@@ -129,16 +132,13 @@ class ImagePainter extends StatefulWidget {
   final BoxFit fit;
 
   @override
-  ImagePainterState createState() {
-    return ImagePainterState();
-  }
+  ImagePainterState createState() => ImagePainterState();
 }
 
 class ImagePainterState extends State<ImagePainter> {
   ui.Image _image;
   bool _isLoaded = false;
   Color _color;
-  List<PaintHistory> pathHistory = List<PaintHistory>();
   PaintMode _mode;
   Paint get _painter => Paint()
     ..color = _color
@@ -172,18 +172,6 @@ class ImagePainterState extends State<ImagePainter> {
         _mode = widget.controller.mode;
       });
     }
-  }
-
-  changeStrokeWidth(double val) {
-    setState(() {
-      _strokeWidth = val;
-    });
-  }
-
-  changeColor(Color color) {
-    setState(() {
-      _color = color;
-    });
   }
 
   _resolveAndConvertImage() async {
@@ -246,45 +234,34 @@ class ImagePainterState extends State<ImagePainter> {
 
   Widget _paintImage() {
     return Container(
-      //[Height] and [Width] are
       height: widget.height ?? double.maxFinite,
       width: widget.width ?? double.maxFinite,
-      child: Column(
-        children: [
-          Expanded(
-            child: FittedBox(
-              alignment: FractionalOffset.center,
-              child: Listener(
-                onPointerDown: (event) => pointer++,
-                onPointerUp: (event) => pointer = 0,
-                child: InteractiveViewer(
-                  panEnabled: false,
-                  minScale: 0.4,
-                  maxScale: 2.4,
-                  scaleEnabled: widget.isScalable,
-                  onInteractionUpdate: _scaleUpdateGesture,
-                  onInteractionEnd: _scaleEndGesture,
-                  child: CustomPaint(
-                    size:
-                        Size(_image.width.toDouble(), _image.height.toDouble()),
-                    willChange: true,
-                    painter: DrawImage(
-                      image: _image,
-                      points: points,
-                      paintHistory: paintHistory,
-                      isDragging: inDrag,
-                      update: UpdatePoints(
-                          start: start,
-                          end: end,
-                          painter: _painter,
-                          mode: _mode),
-                    ),
-                  ),
-                ),
+      child: FittedBox(
+        alignment: FractionalOffset.center,
+        child: Listener(
+          onPointerDown: (event) => pointer++,
+          onPointerUp: (event) => pointer = 0,
+          child: InteractiveViewer(
+            panEnabled: false,
+            minScale: 0.4,
+            maxScale: 2.4,
+            scaleEnabled: widget.isScalable,
+            onInteractionUpdate: _scaleUpdateGesture,
+            onInteractionEnd: _scaleEndGesture,
+            child: CustomPaint(
+              size: Size(_image.width.toDouble(), _image.height.toDouble()),
+              willChange: true,
+              painter: DrawImage(
+                image: _image,
+                points: points,
+                paintHistory: paintHistory,
+                isDragging: inDrag,
+                update: UpdatePoints(
+                    start: start, end: end, painter: _painter, mode: _mode),
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }

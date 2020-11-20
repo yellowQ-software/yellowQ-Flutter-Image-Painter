@@ -25,6 +25,7 @@ dependencies:
     sdk: flutter
   image_painter:
     path: ../
+  image_picker: ^0.6.7+14
   open_file: ^3.0.3
   path_provider: ^1.6.24
 
