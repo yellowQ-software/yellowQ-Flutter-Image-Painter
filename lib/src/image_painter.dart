@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart' hide Image;
 import 'dart:ui';
 
+///Handles all the painting ongoing on the canvas.
 class DrawImage extends CustomPainter {
+  ///Converted image from [ImagePainter] constructor.
   final Image image;
+
+  ///Keeps track of all the units of [PaintHistory].
   final List<PaintHistory> paintHistory;
+
+  ///Keeps track of points on currently drawing state.
   final UpdatePoints update;
+
+  ///Keeps track of freestyle points on currently drawing state.
   final List<Offset> points;
+
+  ///Keeps track whether the paint action is running or not.F
   final bool isDragging;
 
   DrawImage(
@@ -17,11 +27,14 @@ class DrawImage extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    ///paints [Image] on the canvas for reference to draw over it.
     paintImage(
         canvas: canvas,
         image: image,
         filterQuality: FilterQuality.high,
         rect: Rect.fromPoints(Offset(0, 0), Offset(size.width, size.height)));
+
+    ///Draws ongoing action on the canvas.
     if (isDragging) {
       switch (update.mode) {
         case PaintMode.Box:
@@ -62,6 +75,8 @@ class DrawImage extends CustomPainter {
         default:
       }
     }
+
+    ///Draws all the completed actions of painting on the canvas.
     for (var item in paintHistory) {
       switch (item.map.key) {
         case PaintMode.Box:
@@ -135,7 +150,8 @@ class DrawImage extends CustomPainter {
     }
   }
 
-  //Drawing arrowhead and line.
+  ///Draws line as well as the arrowhead on top of it.
+  ///Uses [strokeWidth] of the painter for sizing.
   void drawArrow(Canvas canvas, Offset start, Offset end, Paint painter) {
     Paint arrowPainter = Paint()
       ..color = painter.color
@@ -154,7 +170,8 @@ class DrawImage extends CustomPainter {
     canvas.restore();
   }
 
-  //Drawing dashed path. It depends on [strokeWidth] for space to line proportion.
+  ///Draws dashed path.
+  ///It depends on [strokeWidth] for space to line proportion.
   Path _dashPath(Path path, double width) {
     Path dashPath = Path();
     double dashWidth = 10.0 * width / 5;
@@ -179,12 +196,27 @@ class DrawImage extends CustomPainter {
   }
 }
 
+///All the paint method available for use.
+///Prefer using [None] while doing scaling operations.
+///[FreeStyle] allows for drawing freehand shapes or text.
+///[Line] allows to draw line between two points.
+///[Box] or rectangle allows to draw rectangle.
+///[Arrow] allows us to draw line with arrow at the end point.
+///[Circle] allows to draw circle from a point.
+///[DottedLine] allows to draw dashed line between two point.
 enum PaintMode { None, FreeStyle, Line, Box, Text, Arrow, Circle, DottedLine }
 
+///[PaintInfo] keeps track of a single unit of shape, whichever selected.
 class PaintInfo {
+  ///Used to save specific paint utils used for the specific shape.
   Paint painter;
+
+  ///Used to save offsets. two point in case of other shapes and list of points for [FreeStyle].
   List<Offset> offset;
+
   String text;
+
+  ///In case of string, it is used to save string value entered.
   PaintInfo({this.offset, this.painter, this.text});
 }
 
@@ -196,6 +228,7 @@ class UpdatePoints {
   UpdatePoints({this.start, this.end, this.painter, this.mode});
 }
 
+///[PaintHistory] records the [PaintMode] as well as [PaintInfo] of that particular [PaintMode] in a map.
 class PaintHistory {
   MapEntry<PaintMode, PaintInfo> map;
   PaintHistory(this.map);

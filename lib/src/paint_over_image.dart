@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Image;
 import 'dart:ui' as ui;
 import 'dart:async';
@@ -19,16 +18,15 @@ class ImagePainter extends StatefulWidget {
       this.width,
       this.controller,
       this.placeHolder,
-      this.fit = BoxFit.contain,
       this.isScalable = false})
       : super(key: key);
-  //Constructor for loading image from network url.
+
+  ///Constructor for loading image from network url.
   factory ImagePainter.network(String url,
       {Key key,
       double height,
       double width,
       Widget placeholderWidget,
-      BoxFit fit,
       bool scalable,
       @required Controller controller}) {
     return ImagePainter._(
@@ -38,18 +36,17 @@ class ImagePainter extends StatefulWidget {
         width: width,
         placeHolder: placeholderWidget,
         isScalable: scalable ?? false,
-        fit: fit ?? BoxFit.contain,
         controller: Controller(
-            strokeWidth: controller.strokeWidth ?? 4.0,
-            color: controller.color ?? Colors.white,
-            mode: controller.mode ?? PaintMode.Line));
+            strokeWidth: controller?.strokeWidth ?? 4.0,
+            color: controller?.color ?? Colors.white,
+            mode: controller?.mode ?? PaintMode.Line));
   }
-  //Constructor for loading image from assetPath.
+
+  ///Constructor for loading image from assetPath.
   factory ImagePainter.asset(String path,
       {Key key,
       double height,
       double width,
-      BoxFit fit,
       bool scalable,
       Widget placeholderWidget,
       @required Controller controller}) {
@@ -59,20 +56,19 @@ class ImagePainter extends StatefulWidget {
       height: height,
       width: width,
       isScalable: scalable ?? false,
-      fit: fit ?? BoxFit.contain,
       placeHolder: placeholderWidget,
       controller: Controller(
-          strokeWidth: controller.strokeWidth ?? 4.0,
-          color: controller.color ?? Colors.white,
-          mode: controller.mode ?? PaintMode.Line),
+          strokeWidth: controller?.strokeWidth ?? 4.0,
+          color: controller?.color ?? Colors.white,
+          mode: controller?.mode ?? PaintMode.Line),
     );
   }
-  //Constructor for loading image from file.
+
+  ///Constructor for loading image from file.
   factory ImagePainter.file(File file,
       {Key key,
       double height,
       double width,
-      BoxFit fit,
       bool scalable,
       Widget placeholderWidget,
       @required Controller controller}) {
@@ -83,18 +79,17 @@ class ImagePainter extends StatefulWidget {
         width: width,
         placeHolder: placeholderWidget,
         isScalable: scalable ?? false,
-        fit: fit ?? BoxFit.contain,
         controller: Controller(
-            strokeWidth: controller.strokeWidth ?? 4.0,
-            color: controller.color ?? Colors.white,
-            mode: controller.mode ?? PaintMode.Line));
+            strokeWidth: controller?.strokeWidth ?? 4.0,
+            color: controller?.color ?? Colors.white,
+            mode: controller?.mode ?? PaintMode.Line));
   }
-  //Constructor for loading image from memory.
+
+  ///Constructor for loading image from memory.
   factory ImagePainter.memory(ui.Image image,
       {Key key,
       double height,
       double width,
-      BoxFit fit,
       bool scalable,
       Widget placeholderWidget,
       @required Controller controller}) {
@@ -105,32 +100,38 @@ class ImagePainter extends StatefulWidget {
         width: width,
         placeHolder: placeholderWidget,
         isScalable: scalable ?? false,
-        fit: fit ?? BoxFit.contain,
         controller: Controller(
-            strokeWidth: controller.strokeWidth ?? 4.0,
-            color: controller.color ?? Colors.white,
-            mode: controller.mode ?? PaintMode.Line));
+            strokeWidth: controller?.strokeWidth ?? 4.0,
+            color: controller?.color ?? Colors.white,
+            mode: controller?.mode ?? PaintMode.Line));
   }
-  //Only accessible through [Image.Network] constructor.
+
+  ///Only accessible through [ImagePainter.network] constructor.
   final String networkUrl;
-  //Only accessible through [Image.image] constructor.
+
+  ///Only accessible through [ImagePainter.memory] constructor.
   final ui.Image image;
-  //Only accessible through [Image.file] constructor.
+
+  ///Only accessible through [ImagePainter.file] constructor.
   final File file;
-  //Only accessible through [Image.asset] constructor.
+
+  ///Only accessible through [ImagePainter.asset] constructor.
   final String assetPath;
-  //Height of the Widget. Image is subjected to fit within the given height.
+
+  ///Height of the Widget. Image is subjected to fit within the given height.
   final double height;
-  //Width of the widget. Image is subjected to fit within the given width.
+
+  ///Width of the widget. Image is subjected to fit within the given width.
   final double width;
-  //Widget to be shown during the rendering and conversion of image.
+
+  ///Widget to be shown during the conversion of provided image to [ui.Image].
   final Widget placeHolder;
-  //Controller has properties like color and strokewidth required for the painter.
+
+  ///Controller has properties like [Color] and [strokeWidth] required for the painter.
   final Controller controller;
-  //Defines whether the widget should be scaled or not. Defaults to [false].
+
+  ///Defines whether the widget should be scaled or not. Defaults to [false].
   final bool isScalable;
-  //Defines the fit type of the image inside fittedbox. Defaults to [BoxFit.contain].
-  final BoxFit fit;
 
   @override
   ImagePainterState createState() => ImagePainterState();
@@ -175,6 +176,7 @@ class ImagePainterState extends State<ImagePainter> {
     }
   }
 
+  ///Converts the incoming image from constructor to [ui.Image]
   _resolveAndConvertImage() async {
     if (widget.networkUrl != null) {
       _image = await loadNetworkImage(widget.networkUrl);
@@ -190,7 +192,7 @@ class ImagePainterState extends State<ImagePainter> {
     }
   }
 
-  //Completer function to convert asset or file image to [ui.image] before drawing on custompainter.
+  ///Completer function to convert asset or file image to [ui.Image] before drawing on custompainter.
   Future<ui.Image> convertImage(List<int> img) async {
     final Completer<ui.Image> completer = Completer();
     ui.decodeImageFromList(img, (ui.Image img) {
@@ -202,7 +204,7 @@ class ImagePainterState extends State<ImagePainter> {
     return completer.future;
   }
 
-  //Completer function to convert network image to [ui.image] before drawing on custompainter.
+  ///Completer function to convert network image to [ui.Image] before drawing on custompainter.
   Future<ui.Image> loadNetworkImage(String path) async {
     Completer<ImageInfo> completer = Completer();
     var img = new NetworkImage(path);
@@ -233,6 +235,7 @@ class ImagePainterState extends State<ImagePainter> {
     }
   }
 
+  ///paints image on given constrains for drawing if image is not null.
   Widget _paintImage() {
     return Container(
       height: widget.height ?? double.maxFinite,
@@ -267,6 +270,7 @@ class ImagePainterState extends State<ImagePainter> {
     );
   }
 
+  ///Fires while user is interacting with the screen to record painting.
   void _scaleUpdateGesture(ScaleUpdateDetails onUpdate) {
     if (pointer < 2) {
       setState(() {
@@ -289,6 +293,7 @@ class ImagePainterState extends State<ImagePainter> {
     }
   }
 
+  ///Fires when user stops interacting with the screen.
   void _scaleEndGesture(ScaleEndDetails onEnd) {
     if (pointer < 2) {
       setState(() {
@@ -331,6 +336,7 @@ class ImagePainterState extends State<ImagePainter> {
     ));
   }
 
+  ///Provides [ui.Image] of the recorded canvas to perform action.
   Future<ui.Image> renderImage() async {
     ui.PictureRecorder recorder = ui.PictureRecorder();
     Canvas canvas = Canvas(recorder);
@@ -342,12 +348,15 @@ class ImagePainterState extends State<ImagePainter> {
         .toImage(size.width.floor(), size.height.floor());
   }
 
+  ///Generates [Uint8List] of the [ui.Image] generated by the [renderImage()] method.
+  ///Can be converted to image file by writing as bytes.
   Future<Uint8List> exportImage() async {
     ui.Image image = await renderImage();
     ByteData byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     return byteData.buffer.asUint8List();
   }
 
+  ///Cancels or removes the last [PaintHistory].
   void undo() {
     if (paintHistory.length > 0)
       setState(() {
@@ -355,6 +364,7 @@ class ImagePainterState extends State<ImagePainter> {
       });
   }
 
+  ///Cancels or clears all the previous [PaintHistory].
   void clearAll() {
     setState(() {
       paintHistory.clear();
@@ -362,10 +372,18 @@ class ImagePainterState extends State<ImagePainter> {
   }
 }
 
+///Gives access to manipulate the essential components like [strokeWidth], [Color] and [PaintMode].
 class Controller {
+  ///Tracks [strokeWidth] of the [Paint] class.
   double strokeWidth;
+
+  ///Tracks [Color] of the [Paint] class.
   Color color;
+
+  ///Tracks [PaintMode] of the current paint method.
   PaintMode mode;
+
+  ///Constructor of the [Controller] class.
   Controller(
       {this.color = Colors.red,
       this.strokeWidth = 4.0,

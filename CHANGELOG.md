@@ -1,3 +1,8 @@
+# 0.1.1
+
+- Added documentation to the class and functions.
+- Improved docs and readMe.
+
 # 0.1.0
 
 Initial version of image_painter library.
