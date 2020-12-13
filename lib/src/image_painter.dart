@@ -18,21 +18,35 @@ class DrawImage extends CustomPainter {
   ///Keeps track whether the paint action is running or not.F
   final bool isDragging;
 
+  final bool isSignature;
+
+  final Color backgroundColor;
+
   DrawImage(
       {this.image,
       this.isDragging = false,
       this.update,
       this.points,
+      this.isSignature = false,
+      this.backgroundColor,
       this.paintHistory});
 
   @override
   void paint(Canvas canvas, Size size) {
     ///paints [Image] on the canvas for reference to draw over it.
-    paintImage(
-        canvas: canvas,
-        image: image,
-        filterQuality: FilterQuality.high,
-        rect: Rect.fromPoints(Offset(0, 0), Offset(size.width, size.height)));
+    if (isSignature) {
+      canvas.drawRect(
+          Rect.fromPoints(Offset(0, 0), Offset(size.width, size.height)),
+          Paint()
+            ..style = PaintingStyle.fill
+            ..color = backgroundColor);
+    } else {
+      paintImage(
+          canvas: canvas,
+          image: image,
+          filterQuality: FilterQuality.high,
+          rect: Rect.fromPoints(Offset(0, 0), Offset(size.width, size.height)));
+    }
 
     ///Draws ongoing action on the canvas.
     if (isDragging) {
@@ -197,14 +211,32 @@ class DrawImage extends CustomPainter {
 }
 
 ///All the paint method available for use.
-///Prefer using [None] while doing scaling operations.
-///[FreeStyle] allows for drawing freehand shapes or text.
-///[Line] allows to draw line between two points.
-///[Box] or rectangle allows to draw rectangle.
-///[Arrow] allows us to draw line with arrow at the end point.
-///[Circle] allows to draw circle from a point.
-///[DottedLine] allows to draw dashed line between two point.
-enum PaintMode { None, FreeStyle, Line, Box, Text, Arrow, Circle, DottedLine }
+
+enum PaintMode {
+  ///Prefer using [None] while doing scaling operations.
+  None,
+
+  ///Allows for drawing freehand shapes or text.
+  FreeStyle,
+
+  ///Allows to draw line between two points.
+  Line,
+
+  ///Allows to draw rectangle.
+  Box,
+
+  ///Allows to write texts over an image.
+  Text,
+
+  ///Allows us to draw line with arrow at the end point.
+  Arrow,
+
+  ///Allows to draw circle from a point.
+  Circle,
+
+  ///Allows to draw dashed line between two point.
+  DottedLine
+}
 
 ///[PaintInfo] keeps track of a single unit of shape, whichever selected.
 class PaintInfo {
@@ -220,6 +252,7 @@ class PaintInfo {
   PaintInfo({this.offset, this.painter, this.text});
 }
 
+///Records realtime updates of unfinished [PaintInfo].
 class UpdatePoints {
   Offset start;
   Offset end;
@@ -228,7 +261,7 @@ class UpdatePoints {
   UpdatePoints({this.start, this.end, this.painter, this.mode});
 }
 
-///[PaintHistory] records the [PaintMode] as well as [PaintInfo] of that particular [PaintMode] in a map.
+///Records the [PaintMode] as well as [PaintInfo] of that particular [PaintMode] in a map.
 class PaintHistory {
   MapEntry<PaintMode, PaintInfo> map;
   PaintHistory(this.map);

@@ -1,3 +1,9 @@
+# 0.1.3
+
+- Added signature field. 
+- Fixed scaling issues.
+- Added example for signature field. 
+
 # 0.1.1
 
 - Added documentation to the class and functions.

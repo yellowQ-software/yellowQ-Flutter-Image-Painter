@@ -4,37 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 import 'package:image_painter/image_painter.dart';
-import 'package:image_painter_example/signature_example.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 
-void main() => runApp(ExampleApp());
-
-class ExampleApp extends StatelessWidget {
+class SignatureExample extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Image Painter Example',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: SignatureExample(),
-    );
-  }
+  _SignatureExampleState createState() => _SignatureExampleState();
 }
 
-class ImagePainterExample extends StatefulWidget {
-  @override
-  _ImagePainterExampleState createState() => _ImagePainterExampleState();
-}
-
-class _ImagePainterExampleState extends State<ImagePainterExample> {
+class _SignatureExampleState extends State<SignatureExample> {
   final _imageKey = GlobalKey<ImagePainterState>();
   final _key = GlobalKey<ScaffoldState>();
   Controller imageController;
-  Color _selectedColor = Colors.blue;
-  double _strokeWidth = 4.0;
+  Color _selectedColor = Colors.black;
+  double _strokeWidth = 2.0;
   List<MapEntry<IconData, PaintMode>> options = [
     MapEntry(Icons.zoom_out_map, PaintMode.None),
     MapEntry(Icons.horizontal_rule, PaintMode.Line),
@@ -56,7 +39,7 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
     Uint8List image = await _imageKey.currentState.exportImage();
     final directory = (await getApplicationDocumentsDirectory()).path;
     await Directory('$directory/sample').create(recursive: true);
-    String fullPath = '$directory/${DateTime.now().millisecondsSinceEpoch}.png';
+    String fullPath = '$directory/sample/image.png';
     File imgFile = new File('$fullPath');
     imgFile.writeAsBytesSync(image);
     _key.currentState.showSnackBar(
@@ -199,71 +182,17 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
             ),
           ),
         ),
-        body: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(10),
-              color: Colors.black54,
-              child: Wrap(
-                  alignment: WrapAlignment.center,
-                  spacing: 5,
-                  children: options.map((item) {
-                    return SelectionItems(
-                        icon: item.key,
-                        isSelected: _selectedMode == item.value,
-                        onTap: () {
-                          setState(() {
-                            _selectedMode = item.value;
-                            imageController.mode = item.value;
-                          });
-                        });
-                  }).toList()),
+        body: Center(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: ImagePainter.signature(
+              height: 200,
+              width: 300,
+              key: _imageKey,
+              controller: imageController,
+              signatureBgColor: Colors.grey[200],
             ),
-            Expanded(
-              child: ImagePainter.asset("assets/sample.jpg",
-                  key: _imageKey, controller: imageController, scalable: true),
-            ),
-          ],
-        ));
-  }
-}
-
-class SelectionItems extends StatelessWidget {
-  final bool isSelected;
-  final IconData icon;
-  final VoidCallback onTap;
-
-  const SelectionItems({Key key, this.isSelected, this.icon, this.onTap})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        GestureDetector(
-          onTap: onTap,
-          child: Container(
-            padding: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-                color: isSelected ? Colors.white70 : Colors.transparent,
-                shape: BoxShape.circle),
-            child: Icon(icon,
-                color: isSelected ? Colors.blue : Colors.white, size: 20),
           ),
-        ),
-        if (isSelected)
-          Positioned(
-            top: 0,
-            right: 0,
-            child: Container(
-              decoration:
-                  BoxDecoration(shape: BoxShape.circle, color: Colors.green),
-              child: Icon(Icons.check, color: Colors.white, size: 10),
-            ),
-          )
-      ],
-    );
+        ));
   }
 }

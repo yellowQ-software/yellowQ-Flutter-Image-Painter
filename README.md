@@ -2,7 +2,7 @@
 
 A flutter implementation of painting over image.
 
-# OverView
+# Overview
 ![demo!](https://raw.githubusercontent.com/yellowQ-software/yellowQ-Flutter-Image-Painter/main/screenshots/image_painter_sample.gif)
 
 ## Features
@@ -13,6 +13,8 @@ A flutter implementation of painting over image.
 - Export image as memory bytes which can be converted to image. [Implementation provided on example](./example)
 - Ability to undo and clear drawings.
 
+[Note]
+
 ## Getting started
 
 In the `pubspec.yaml` of your flutter project, add the following dependency:
@@ -20,7 +22,7 @@ In the `pubspec.yaml` of your flutter project, add the following dependency:
 ```yaml
 dependencies:
   ...
-  image_painter:
+  image_painter: latest
 ```
 
 In your library add the following import:
@@ -37,7 +39,7 @@ For help getting started with Flutter, view the online [documentation](https://f
 
 Basic usage of the libary:
 
-- `ImagePainter.network`: Painting over url from network.
+- `ImagePainter.network`: Painting over image from network url.
 
 ```dart
 ///Initialize the controller
@@ -53,7 +55,7 @@ setState((){
 })
 ///Export the image:
 Uint8List image = await _imageKey.currentState.exportImage();
-///Now you use [Uint8List] image to convert it to file.
-File imgFile = new File('myFilePath/sample.png');
+///Now you use [Uint8List] data and convert it to file.
+File imgFile = new File('directory/sample.png');
     imgFile.writeAsBytesSync(image);
 ```

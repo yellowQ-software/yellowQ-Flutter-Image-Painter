@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart' hide Image;
+import 'package:flutter/rendering.dart';
 import 'dart:ui' as ui;
 import 'dart:async';
 import 'package:flutter/services.dart';
@@ -18,7 +19,9 @@ class ImagePainter extends StatefulWidget {
       this.width,
       this.controller,
       this.placeHolder,
-      this.isScalable = false})
+      this.isScalable = false,
+      this.isSignature = false,
+      this.signatureBackgroundColor})
       : super(key: key);
 
   ///Constructor for loading image from network url.
@@ -106,6 +109,26 @@ class ImagePainter extends StatefulWidget {
             mode: controller?.mode ?? PaintMode.Line));
   }
 
+  ///Constructor for signature painting.
+  factory ImagePainter.signature({
+    Key key,
+    Color signatureBgColor,
+    double height,
+    double width,
+    @required Controller controller,
+  }) {
+    return ImagePainter._(
+        key: key,
+        height: height,
+        width: width,
+        isSignature: true,
+        signatureBackgroundColor: signatureBgColor ?? Colors.white,
+        controller: Controller(
+            strokeWidth: controller?.strokeWidth ?? 4.0,
+            color: controller?.color ?? Colors.black,
+            mode: PaintMode.FreeStyle));
+  }
+
   ///Only accessible through [ImagePainter.network] constructor.
   final String networkUrl;
 
@@ -133,13 +156,18 @@ class ImagePainter extends StatefulWidget {
   ///Defines whether the widget should be scaled or not. Defaults to [false].
   final bool isScalable;
 
+  final bool isSignature;
+
+  final Color signatureBackgroundColor;
+
   @override
   ImagePainterState createState() => ImagePainterState();
 }
 
 class ImagePainterState extends State<ImagePainter> {
+  final _repaintKey = GlobalKey();
   ui.Image _image;
-  bool _isLoaded = false;
+  bool _isLoaded = false, inDrag = false;
   PaintMode _mode;
   Color _color;
   double _strokeWidth;
@@ -149,9 +177,7 @@ class ImagePainterState extends State<ImagePainter> {
     ..style = PaintingStyle.stroke;
   List<PaintHistory> paintHistory = List<PaintHistory>();
   List<Offset> points = List<Offset>();
-  Offset start;
-  Offset end;
-  bool inDrag = false;
+  Offset start, end;
   int pointer = 0;
   @override
   void initState() {
@@ -176,7 +202,7 @@ class ImagePainterState extends State<ImagePainter> {
     }
   }
 
-  ///Converts the incoming image from constructor to [ui.Image]
+  ///Converts the incoming image type from constructor to [ui.Image]
   _resolveAndConvertImage() async {
     if (widget.networkUrl != null) {
       _image = await loadNetworkImage(widget.networkUrl);
@@ -186,9 +212,11 @@ class ImagePainterState extends State<ImagePainter> {
     } else if (widget.file != null) {
       Uint8List img = await widget.file.readAsBytes();
       _image = await convertImage(img);
-    } else {
+    } else if (widget.image != null) {
       _isLoaded = true;
       _image = widget.image;
+    } else {
+      _isLoaded = true;
     }
   }
 
@@ -223,7 +251,7 @@ class ImagePainterState extends State<ImagePainter> {
   @override
   Widget build(BuildContext context) {
     if (this._isLoaded) {
-      return _paintImage();
+      return widget.isSignature ? _paintSignature() : _paintImage();
     } else {
       return widget.placeHolder ??
           Container(
@@ -245,18 +273,49 @@ class ImagePainterState extends State<ImagePainter> {
         child: Listener(
           onPointerDown: (event) => pointer++,
           onPointerUp: (event) => pointer = 0,
+          child: ClipRect(
+            child: InteractiveViewer(
+              maxScale: 2.4,
+              panEnabled: false,
+              minScale: 0.4,
+              onInteractionUpdate: _scaleUpdateGesture,
+              onInteractionEnd: _scaleEndGesture,
+              child: CustomPaint(
+                size: Size(_image.width.toDouble(), _image.height.toDouble()),
+                willChange: true,
+                painter: DrawImage(
+                  image: _image,
+                  points: points,
+                  paintHistory: paintHistory,
+                  isDragging: inDrag,
+                  update: UpdatePoints(
+                      start: start, end: end, painter: _painter, mode: _mode),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _paintSignature() {
+    return RepaintBoundary(
+      key: _repaintKey,
+      child: ClipRect(
+        child: Container(
+          width: widget.width ?? double.maxFinite,
+          height: widget.height ?? double.maxFinite,
           child: InteractiveViewer(
             panEnabled: false,
-            minScale: 0.4,
-            maxScale: 2.4,
-            scaleEnabled: widget.isScalable,
+            scaleEnabled: false,
             onInteractionUpdate: _scaleUpdateGesture,
             onInteractionEnd: _scaleEndGesture,
             child: CustomPaint(
-              size: Size(_image.width.toDouble(), _image.height.toDouble()),
               willChange: true,
               painter: DrawImage(
-                image: _image,
+                isSignature: true,
+                backgroundColor: widget.signatureBackgroundColor,
                 points: points,
                 paintHistory: paintHistory,
                 isDragging: inDrag,
@@ -279,7 +338,7 @@ class ImagePainterState extends State<ImagePainter> {
           start = onUpdate.focalPoint;
         }
         end = onUpdate.focalPoint;
-        if (_mode == PaintMode.FreeStyle) {
+        if (_mode == PaintMode.FreeStyle || widget.isSignature) {
           points.add(end);
         } else if (_mode == PaintMode.Text &&
             paintHistory.any((element) => element.map.value.text != null)) {
@@ -304,8 +363,9 @@ class ImagePainterState extends State<ImagePainter> {
             _mode != PaintMode.FreeStyle) {
           addEndPoints(start, end);
         } else if (start != null &&
-            end != null &&
-            _mode == PaintMode.FreeStyle) {
+                end != null &&
+                _mode == PaintMode.FreeStyle ||
+            widget.isSignature) {
           points.add(null);
           addFreeStylePoints();
         }
@@ -328,20 +388,40 @@ class ImagePainterState extends State<ImagePainter> {
   }
 
   void addFreeStylePoints() {
-    paintHistory.add(PaintHistory(
-      MapEntry<PaintMode, PaintInfo>(
-        _mode,
-        PaintInfo(offset: List<Offset>()..addAll(points), painter: _painter),
-      ),
-    ));
+    if (widget.isSignature) {
+      paintHistory.add(PaintHistory(
+        MapEntry<PaintMode, PaintInfo>(
+          PaintMode.FreeStyle,
+          PaintInfo(
+              offset: List<Offset>()..addAll(points),
+              painter: Paint()
+                ..color = _color
+                ..strokeWidth = _strokeWidth),
+        ),
+      ));
+    } else {
+      paintHistory.add(PaintHistory(
+        MapEntry<PaintMode, PaintInfo>(
+          _mode,
+          PaintInfo(offset: List<Offset>()..addAll(points), painter: _painter),
+        ),
+      ));
+    }
   }
 
   ///Provides [ui.Image] of the recorded canvas to perform action.
   Future<ui.Image> renderImage() async {
     ui.PictureRecorder recorder = ui.PictureRecorder();
     Canvas canvas = Canvas(recorder);
-    DrawImage painter = DrawImage(image: _image, paintHistory: paintHistory);
-    var size = Size(_image.width.toDouble(), _image.height.toDouble());
+    DrawImage painter = DrawImage(
+        image: _image,
+        backgroundColor: widget.signatureBackgroundColor,
+        paintHistory: paintHistory,
+        isSignature: widget.isSignature);
+    Size size = widget.isSignature
+        ? Size(widget.width ?? MediaQuery.of(context).size.width,
+            widget.height ?? MediaQuery.of(context).size.height)
+        : Size(_image.width.toDouble(), _image.height.toDouble());
     painter.paint(canvas, size);
     return recorder
         .endRecording()
@@ -351,8 +431,15 @@ class ImagePainterState extends State<ImagePainter> {
   ///Generates [Uint8List] of the [ui.Image] generated by the [renderImage()] method.
   ///Can be converted to image file by writing as bytes.
   Future<Uint8List> exportImage() async {
-    ui.Image image = await renderImage();
-    ByteData byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    ui.Image _image;
+    if (widget.isSignature) {
+      RenderRepaintBoundary _boundary =
+          _repaintKey.currentContext.findRenderObject();
+      _image = await _boundary.toImage(pixelRatio: 3);
+    } else {
+      _image = await renderImage();
+    }
+    ByteData byteData = await _image.toByteData(format: ui.ImageByteFormat.png);
     return byteData.buffer.asUint8List();
   }
 
