@@ -1,3 +1,7 @@
+# 0.1.4
+
+- Fixed ImagePainter.memory constructor taking ui.Image while it should be taking Uint8List. 
+
 # 0.1.3
 
 - Added signature field. 
