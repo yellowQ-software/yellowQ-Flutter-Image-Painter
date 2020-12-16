@@ -13,7 +13,7 @@ class ImagePainter extends StatefulWidget {
       {Key key,
       this.assetPath,
       this.networkUrl,
-      this.image,
+      this.byteArray,
       this.file,
       this.height,
       this.width,
@@ -89,7 +89,7 @@ class ImagePainter extends StatefulWidget {
   }
 
   ///Constructor for loading image from memory.
-  factory ImagePainter.memory(ui.Image image,
+  factory ImagePainter.memory(Uint8List byteArray,
       {Key key,
       double height,
       double width,
@@ -98,7 +98,7 @@ class ImagePainter extends StatefulWidget {
       @required Controller controller}) {
     return ImagePainter._(
         key: key,
-        image: image,
+        byteArray: byteArray,
         height: height,
         width: width,
         placeHolder: placeholderWidget,
@@ -133,7 +133,7 @@ class ImagePainter extends StatefulWidget {
   final String networkUrl;
 
   ///Only accessible through [ImagePainter.memory] constructor.
-  final ui.Image image;
+  final Uint8List byteArray;
 
   ///Only accessible through [ImagePainter.file] constructor.
   final File file;
@@ -205,23 +205,22 @@ class ImagePainterState extends State<ImagePainter> {
   ///Converts the incoming image type from constructor to [ui.Image]
   _resolveAndConvertImage() async {
     if (widget.networkUrl != null) {
-      _image = await loadNetworkImage(widget.networkUrl);
+      _image = await _loadNetworkImage(widget.networkUrl);
     } else if (widget.assetPath != null) {
       ByteData img = await rootBundle.load(widget.assetPath);
-      _image = await convertImage(Uint8List.view(img.buffer));
+      _image = await _convertImage(Uint8List.view(img.buffer));
     } else if (widget.file != null) {
       Uint8List img = await widget.file.readAsBytes();
-      _image = await convertImage(img);
-    } else if (widget.image != null) {
-      _isLoaded = true;
-      _image = widget.image;
+      _image = await _convertImage(img);
+    } else if (widget.byteArray != null) {
+      _image = await _convertImage(widget.byteArray);
     } else {
       _isLoaded = true;
     }
   }
 
   ///Completer function to convert asset or file image to [ui.Image] before drawing on custompainter.
-  Future<ui.Image> convertImage(List<int> img) async {
+  Future<ui.Image> _convertImage(List<int> img) async {
     final Completer<ui.Image> completer = Completer();
     ui.decodeImageFromList(img, (ui.Image img) {
       setState(() {
@@ -233,7 +232,7 @@ class ImagePainterState extends State<ImagePainter> {
   }
 
   ///Completer function to convert network image to [ui.Image] before drawing on custompainter.
-  Future<ui.Image> loadNetworkImage(String path) async {
+  Future<ui.Image> _loadNetworkImage(String path) async {
     Completer<ImageInfo> completer = Completer();
     var img = new NetworkImage(path);
     img
@@ -361,13 +360,13 @@ class ImagePainterState extends State<ImagePainter> {
         } else if (start != null &&
             end != null &&
             _mode != PaintMode.FreeStyle) {
-          addEndPoints(start, end);
+          _addEndPoints(start, end);
         } else if (start != null &&
                 end != null &&
                 _mode == PaintMode.FreeStyle ||
             widget.isSignature) {
           points.add(null);
-          addFreeStylePoints();
+          _addFreeStylePoints();
         }
         start = null;
         end = null;
@@ -376,7 +375,7 @@ class ImagePainterState extends State<ImagePainter> {
     }
   }
 
-  void addEndPoints(dx, dy) {
+  void _addEndPoints(dx, dy) {
     paintHistory.add(
       PaintHistory(
         MapEntry<PaintMode, PaintInfo>(
@@ -387,7 +386,7 @@ class ImagePainterState extends State<ImagePainter> {
     );
   }
 
-  void addFreeStylePoints() {
+  void _addFreeStylePoints() {
     if (widget.isSignature) {
       paintHistory.add(PaintHistory(
         MapEntry<PaintMode, PaintInfo>(
@@ -410,7 +409,7 @@ class ImagePainterState extends State<ImagePainter> {
   }
 
   ///Provides [ui.Image] of the recorded canvas to perform action.
-  Future<ui.Image> renderImage() async {
+  Future<ui.Image> _renderImage() async {
     ui.PictureRecorder recorder = ui.PictureRecorder();
     Canvas canvas = Canvas(recorder);
     DrawImage painter = DrawImage(
@@ -437,7 +436,7 @@ class ImagePainterState extends State<ImagePainter> {
           _repaintKey.currentContext.findRenderObject();
       _image = await _boundary.toImage(pixelRatio: 3);
     } else {
-      _image = await renderImage();
+      _image = await _renderImage();
     }
     ByteData byteData = await _image.toByteData(format: ui.ImageByteFormat.png);
     return byteData.buffer.asUint8List();

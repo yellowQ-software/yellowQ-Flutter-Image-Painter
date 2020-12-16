@@ -14,6 +14,7 @@ A flutter implementation of painting over image.
 - Ability to undo and clear drawings.
 
 [Note]
+  Tested and working only on flutter stable channel. Please make sure you are on stable channel of flutter before using the package.
 
 ## Getting started
 
