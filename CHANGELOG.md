@@ -1,3 +1,9 @@
+# 0.1.5
+
+- Breaking Change: Controller is immutable and can only be overridden with copyWith Constructor.
+- Added PaintStyle in constructor.
+- Code refactor.
+
 # 0.1.4
 
 - Fixed ImagePainter.memory constructor taking ui.Image while it should be taking Uint8List. 
