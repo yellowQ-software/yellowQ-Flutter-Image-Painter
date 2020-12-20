@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 import 'package:image_painter/image_painter.dart';
-import 'package:image_painter_example/signature_example.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -19,7 +18,7 @@ class ExampleApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: SignatureExample(),
+      home: ImagePainterExample(),
     );
   }
 }
@@ -33,8 +32,6 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
   final _imageKey = GlobalKey<ImagePainterState>();
   final _key = GlobalKey<ScaffoldState>();
   Controller imageController;
-  Color _selectedColor = Colors.blue;
-  double _strokeWidth = 4.0;
   List<MapEntry<IconData, PaintMode>> options = [
     MapEntry(Icons.zoom_out_map, PaintMode.None),
     MapEntry(Icons.horizontal_rule, PaintMode.Line),
@@ -44,11 +41,10 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
     MapEntry(Icons.arrow_right_alt_outlined, PaintMode.Arrow),
     MapEntry(Icons.power_input, PaintMode.DottedLine)
   ];
-  PaintMode _selectedMode = PaintMode.Line;
   @override
   void initState() {
-    imageController = Controller(
-        color: _selectedColor, mode: _selectedMode, strokeWidth: _strokeWidth);
+    imageController =
+        Controller(color: Colors.blue, mode: PaintMode.Line, strokeWidth: 4.0);
     super.initState();
   }
 
@@ -87,28 +83,27 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
               contentPadding: const EdgeInsets.all(6.0),
               title: Text("Pick a color"),
               content: MaterialColorPicker(
-                shrinkWrap: true,
-                selectedColor: _selectedColor,
-                allowShades: false,
-                onMainColorChange: (color) =>
-                    setstate(() => _selectedColor = color),
-              ),
+                  shrinkWrap: true,
+                  selectedColor: imageController.color,
+                  allowShades: false,
+                  onMainColorChange: (color) {
+                    setstate(() {
+                      imageController = imageController.copyWith(color: color);
+                    });
+                  }),
               actions: [
                 FlatButton(
-                  child: Text('Done'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
+                    child: Text('Done'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      setState(() {});
+                    }),
               ],
             );
           },
         );
       },
     );
-    setState(() {
-      imageController.color = _selectedColor;
-    });
   }
 
   void _openStrokeDialog() async {
@@ -127,29 +122,30 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
                   content: Column(
                     children: [
                       CupertinoSlider(
-                        value: _strokeWidth,
+                        value: imageController.strokeWidth,
                         min: 2.0,
                         max: 20.0,
                         divisions: 9,
                         onChanged: (value) {
                           setstate(() {
-                            _strokeWidth = value;
+                            imageController =
+                                imageController.copyWith(strokeWidth: value);
                           });
                         },
                       ),
                       Text(
-                        "${_strokeWidth.toInt()}",
+                        "${imageController.strokeWidth.toInt()}",
                         style: TextStyle(fontSize: 20, color: Colors.blue),
                       )
                     ],
                   ),
                   actions: [
                     FlatButton(
-                      child: Text('Done'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
+                        child: Text('Done'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          setState(() {});
+                        }),
                   ],
                 ),
               ],
@@ -158,9 +154,6 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
         );
       },
     );
-    setState(() {
-      imageController.strokeWidth = _strokeWidth;
-    });
   }
 
   @override
@@ -211,18 +204,18 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
                   children: options.map((item) {
                     return SelectionItems(
                         icon: item.key,
-                        isSelected: _selectedMode == item.value,
+                        isSelected: imageController.mode == item.value,
                         onTap: () {
                           setState(() {
-                            _selectedMode = item.value;
-                            imageController.mode = item.value;
+                            imageController =
+                                imageController.copyWith(mode: item.value);
                           });
                         });
                   }).toList()),
             ),
             Expanded(
               child: ImagePainter.asset("assets/sample.jpg",
-                  key: _imageKey, controller: imageController, scalable: true),
+                  key: _imageKey, controller: imageController),
             ),
           ],
         ));

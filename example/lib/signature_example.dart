@@ -16,8 +16,6 @@ class _SignatureExampleState extends State<SignatureExample> {
   final _imageKey = GlobalKey<ImagePainterState>();
   final _key = GlobalKey<ScaffoldState>();
   Controller imageController;
-  Color _selectedColor = Colors.black;
-  double _strokeWidth = 2.0;
   List<MapEntry<IconData, PaintMode>> options = [
     MapEntry(Icons.zoom_out_map, PaintMode.None),
     MapEntry(Icons.horizontal_rule, PaintMode.Line),
@@ -27,11 +25,10 @@ class _SignatureExampleState extends State<SignatureExample> {
     MapEntry(Icons.arrow_right_alt_outlined, PaintMode.Arrow),
     MapEntry(Icons.power_input, PaintMode.DottedLine)
   ];
-  PaintMode _selectedMode = PaintMode.Line;
   @override
   void initState() {
-    imageController = Controller(
-        color: _selectedColor, mode: _selectedMode, strokeWidth: _strokeWidth);
+    imageController =
+        Controller(color: Colors.black, mode: PaintMode.Line, strokeWidth: 4.0);
     super.initState();
   }
 
@@ -71,16 +68,17 @@ class _SignatureExampleState extends State<SignatureExample> {
               title: Text("Pick a color"),
               content: MaterialColorPicker(
                 shrinkWrap: true,
-                selectedColor: _selectedColor,
+                selectedColor: imageController.color,
                 allowShades: false,
-                onMainColorChange: (color) =>
-                    setstate(() => _selectedColor = color),
+                onMainColorChange: (color) => setstate(() =>
+                    imageController = imageController.copyWith(color: color)),
               ),
               actions: [
                 FlatButton(
                   child: Text('Done'),
                   onPressed: () {
                     Navigator.of(context).pop();
+                    setState(() {});
                   },
                 ),
               ],
@@ -89,9 +87,6 @@ class _SignatureExampleState extends State<SignatureExample> {
         );
       },
     );
-    setState(() {
-      imageController.color = _selectedColor;
-    });
   }
 
   void _openStrokeDialog() async {
@@ -110,18 +105,18 @@ class _SignatureExampleState extends State<SignatureExample> {
                   content: Column(
                     children: [
                       CupertinoSlider(
-                        value: _strokeWidth,
+                        value: imageController.strokeWidth,
                         min: 2.0,
                         max: 20.0,
                         divisions: 9,
                         onChanged: (value) {
-                          setstate(() {
-                            _strokeWidth = value;
-                          });
+                          setState(() {});
+                          imageController =
+                              imageController.copyWith(strokeWidth: value);
                         },
                       ),
                       Text(
-                        "${_strokeWidth.toInt()}",
+                        "${imageController.strokeWidth.toInt()}",
                         style: TextStyle(fontSize: 20, color: Colors.blue),
                       )
                     ],
@@ -131,6 +126,7 @@ class _SignatureExampleState extends State<SignatureExample> {
                       child: Text('Done'),
                       onPressed: () {
                         Navigator.of(context).pop();
+                        setState(() {});
                       },
                     ),
                   ],
@@ -141,9 +137,6 @@ class _SignatureExampleState extends State<SignatureExample> {
         );
       },
     );
-    setState(() {
-      imageController.strokeWidth = _strokeWidth;
-    });
   }
 
   @override
