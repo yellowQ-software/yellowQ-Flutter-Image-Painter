@@ -7,7 +7,8 @@
         {
             "name": "image_painter",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "flutterMode":"profile"
             
         }
     ]

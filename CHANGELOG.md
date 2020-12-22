@@ -1,3 +1,8 @@
+# 0.1.6
+
+- ByteArray on memory constructor now returns itself without conversion back if no action is performed on it.
+- Code refactors.
+
 # 0.1.5
 
 - Breaking Change: Controller is immutable and can only be overridden with copyWith Constructor.

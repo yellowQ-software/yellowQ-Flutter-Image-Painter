@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart' hide Image;
 import 'dart:ui';
+import 'package:flutter/material.dart' hide Image;
 
 ///Handles all the painting ongoing on the canvas.
 class DrawImage extends CustomPainter {
@@ -15,7 +15,7 @@ class DrawImage extends CustomPainter {
   ///Keeps track of freestyle points on currently drawing state.
   final List<Offset> points;
 
-  ///Keeps track whether the paint action is running or not.F
+  ///Keeps track whether the paint action is running or not.
   final bool isDragging;
 
   final bool isSignature;
@@ -33,7 +33,6 @@ class DrawImage extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    ///paints [Image] on the canvas for reference to draw over it.
     if (isSignature) {
       canvas.drawRect(
           Rect.fromPoints(Offset(0, 0), Offset(size.width, size.height)),
@@ -41,6 +40,7 @@ class DrawImage extends CustomPainter {
             ..style = PaintingStyle.fill
             ..color = backgroundColor);
     } else {
+      ///paints [ui.Image] on the canvas for reference to draw over it.
       paintImage(
           canvas: canvas,
           image: image,
@@ -48,41 +48,105 @@ class DrawImage extends CustomPainter {
           rect: Rect.fromPoints(Offset(0, 0), Offset(size.width, size.height)));
     }
 
-    ///Draws ongoing action on the canvas.
-    if (isDragging) {
-      switch (update.mode) {
+    ///paints all the previoud paintInfo history recorded on [PaintHistory]
+    for (var item in paintHistory) {
+      final _offset = item.map.value.offset;
+      final _painter = item.map.value.painter;
+      switch (item.map.key) {
         case PaintMode.Box:
-          canvas.drawRect(
-              Rect.fromPoints(update.start, update.end), update.painter);
+          canvas.drawRect(Rect.fromPoints(_offset[0], _offset[1]), _painter);
           break;
         case PaintMode.Line:
-          canvas.drawLine(update.start, update.end, update.painter);
+          canvas.drawLine(_offset[0], _offset[1], _painter);
           break;
         case PaintMode.Circle:
           Path path = new Path();
           path.addOval(Rect.fromCircle(
-              center: update.end,
-              radius: (update.end - update.start).distance));
-          canvas.drawPath(path, update.painter);
+              center: _offset[1], radius: (_offset[0] - _offset[1]).distance));
+          canvas.drawPath(path, _painter);
           break;
         case PaintMode.Arrow:
-          drawArrow(canvas, update.start, update.end, update.painter);
+          drawArrow(canvas, _offset[0], _offset[1], _painter);
           break;
         case PaintMode.DottedLine:
           Path path = Path()
-            ..moveTo(update.start.dx, update.start.dy)
-            ..lineTo(update.end.dx, update.end.dy);
-          canvas.drawPath(
-              _dashPath(path, update.painter.strokeWidth), update.painter);
+            ..moveTo(_offset[0].dx, _offset[0].dy)
+            ..lineTo(_offset[1].dx, _offset[1].dy);
+          canvas.drawPath(_dashPath(path, _painter.strokeWidth), _painter);
+          break;
+        case PaintMode.FreeStyle:
+          for (int i = 0; i < _offset.length - 1; i++) {
+            if (_offset[i] != null && _offset[i + 1] != null) {
+              Path _path = Path()
+                ..moveTo(_offset[i].dx, _offset[i].dy)
+                ..lineTo(_offset[i + 1].dx, _offset[i + 1].dy);
+              canvas.drawPath(_path, _painter);
+            } else if (_offset[i] != null && _offset[i + 1] == null) {
+              canvas.drawPoints(
+                  PointMode.points, [_offset[i]], item.map.value.painter);
+            }
+          }
+          break;
+        case PaintMode.Text:
+          final textSpan = TextSpan(
+            text: item.map.value.text,
+            style: TextStyle(
+                color: _painter.color,
+                fontSize: 12 * _painter.strokeWidth / 2,
+                fontWeight: FontWeight.bold),
+          );
+          final textPainter = TextPainter(
+            text: textSpan,
+            textAlign: TextAlign.center,
+            textDirection: TextDirection.ltr,
+          );
+          textPainter.layout(minWidth: 0, maxWidth: size.width);
+          final textOffset = _offset.length < 1
+              ? Offset(size.width / 2 - textPainter.width / 2,
+                  size.height / 2 - textPainter.height / 2)
+              : Offset(_offset[0].dx - textPainter.width / 2,
+                  _offset[0].dy - textPainter.height / 2);
+          textPainter.paint(canvas, textOffset);
+          break;
+        default:
+      }
+    }
+
+    ///Draws ongoing action on the canvas while indrag.
+    if (isDragging) {
+      final _start = update.start;
+      final _end = update.end;
+      final _painter = update.painter;
+      switch (update.mode) {
+        case PaintMode.Box:
+          canvas.drawRect(Rect.fromPoints(_start, _end), _painter);
+          break;
+        case PaintMode.Line:
+          canvas.drawLine(_start, _end, _painter);
+          break;
+        case PaintMode.Circle:
+          Path path = new Path();
+          path.addOval(
+              Rect.fromCircle(center: _end, radius: (_end - _start).distance));
+          canvas.drawPath(path, _painter);
+          break;
+        case PaintMode.Arrow:
+          drawArrow(canvas, _start, _end, _painter);
+          break;
+        case PaintMode.DottedLine:
+          Path path = Path()
+            ..moveTo(_start.dx, _start.dy)
+            ..lineTo(_end.dx, _end.dy);
+          canvas.drawPath(_dashPath(path, _painter.strokeWidth), _painter);
           break;
         case PaintMode.FreeStyle:
           for (int i = 0; i < points.length - 1; i++) {
             if (points[i] != null && points[i + 1] != null) {
               canvas.drawLine(Offset(points[i].dx, points[i].dy),
-                  Offset(points[i + 1].dx, points[i + 1].dy), update.painter);
+                  Offset(points[i + 1].dx, points[i + 1].dy), _painter);
             } else if (points[i] != null && points[i + 1] == null) {
               canvas.drawPoints(PointMode.points,
-                  [Offset(points[i].dx, points[i].dy)], update.painter);
+                  [Offset(points[i].dx, points[i].dy)], _painter);
             }
           }
           break;
@@ -91,77 +155,6 @@ class DrawImage extends CustomPainter {
     }
 
     ///Draws all the completed actions of painting on the canvas.
-    for (var item in paintHistory) {
-      switch (item.map.key) {
-        case PaintMode.Box:
-          canvas.drawRect(
-              Rect.fromPoints(
-                  item.map.value.offset[0], item.map.value.offset[1]),
-              item.map.value.painter);
-          break;
-        case PaintMode.Line:
-          canvas.drawLine(item.map.value.offset[0], item.map.value.offset[1],
-              item.map.value.painter);
-          break;
-        case PaintMode.Circle:
-          Path path = new Path();
-          path.addOval(Rect.fromCircle(
-              center: item.map.value.offset[1],
-              radius: (item.map.value.offset[0] - item.map.value.offset[1])
-                  .distance));
-          canvas.drawPath(path, item.map.value.painter);
-          break;
-        case PaintMode.Arrow:
-          drawArrow(canvas, item.map.value.offset[0], item.map.value.offset[1],
-              item.map.value.painter);
-          break;
-        case PaintMode.DottedLine:
-          Path path = Path()
-            ..moveTo(item.map.value.offset[0].dx, item.map.value.offset[0].dy)
-            ..lineTo(item.map.value.offset[1].dx, item.map.value.offset[1].dy);
-          canvas.drawPath(_dashPath(path, item.map.value.painter.strokeWidth),
-              item.map.value.painter);
-          break;
-        case PaintMode.FreeStyle:
-          for (int i = 0; i < item.map.value.offset.length - 1; i++) {
-            if (item.map.value.offset[i] != null &&
-                item.map.value.offset[i + 1] != null) {
-              canvas.drawLine(item.map.value.offset[i],
-                  item.map.value.offset[i + 1], item.map.value.painter);
-            } else if (item.map.value.offset[i] != null &&
-                item.map.value.offset[i + 1] == null) {
-              canvas.drawPoints(PointMode.points, [item.map.value.offset[i]],
-                  item.map.value.painter);
-            }
-          }
-          break;
-        case PaintMode.Text:
-          final textSpan = TextSpan(
-            text: item.map.value.text,
-            style: TextStyle(
-                color: item.map.value.painter.color,
-                fontSize: 12 * item.map.value.painter.strokeWidth / 2,
-                fontWeight: FontWeight.bold),
-          );
-          final textPainter = TextPainter(
-            text: textSpan,
-            textAlign: TextAlign.center,
-            textDirection: TextDirection.ltr,
-          );
-          textPainter.layout(
-            minWidth: 0,
-            maxWidth: size.width,
-          );
-          final textOffset = item.map.value.offset.length < 1
-              ? Offset(size.width / 2 - textPainter.width / 2,
-                  size.height / 2 - textPainter.height / 2)
-              : Offset(item.map.value.offset[0].dx - textPainter.width / 2,
-                  item.map.value.offset[0].dy - textPainter.height / 2);
-          textPainter.paint(canvas, textOffset);
-          break;
-        default:
-      }
-    }
   }
 
   ///Draws line as well as the arrowhead on top of it.
@@ -206,7 +199,8 @@ class DrawImage extends CustomPainter {
 
   @override
   bool shouldRepaint(DrawImage oldInfo) {
-    return true;
+    return (oldInfo.update != update ||
+        oldInfo.paintHistory.length == paintHistory.length);
   }
 }
 
@@ -246,19 +240,36 @@ class PaintInfo {
   ///Used to save offsets. two point in case of other shapes and list of points for [FreeStyle].
   List<Offset> offset;
 
+  ///Used to save text in case of text type.
   String text;
 
   ///In case of string, it is used to save string value entered.
   PaintInfo({this.offset, this.painter, this.text});
 }
 
-///Records realtime updates of unfinished [PaintInfo].
+///Records realtime updates of ongoing [PaintInfo] when inDrag.
 class UpdatePoints {
   Offset start;
   Offset end;
   Paint painter;
   PaintMode mode;
   UpdatePoints({this.start, this.end, this.painter, this.mode});
+
+  @override
+  bool operator ==(Object o) {
+    if (identical(this, o)) return true;
+
+    return o is UpdatePoints &&
+        o.start == start &&
+        o.end == end &&
+        o.painter == painter &&
+        o.mode == mode;
+  }
+
+  @override
+  int get hashCode {
+    return start.hashCode ^ end.hashCode ^ painter.hashCode ^ mode.hashCode;
+  }
 }
 
 ///Records the [PaintMode] as well as [PaintInfo] of that particular [PaintMode] in a map.

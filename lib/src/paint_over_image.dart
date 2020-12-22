@@ -157,10 +157,9 @@ class ImagePainterState extends State<ImagePainter> {
   ui.Image _image;
   bool _isLoaded = false, _inDrag = false;
   Controller _controller;
-  List<PaintHistory> _paintHistory = List<PaintHistory>();
-  List<Offset> _points = List<Offset>();
+  List<PaintHistory> _paintHistory = <PaintHistory>[];
+  List<Offset> _points = <Offset>[];
   Offset _start, _end;
-  int _pointer = 0;
   @override
   void initState() {
     super.initState();
@@ -251,31 +250,27 @@ class ImagePainterState extends State<ImagePainter> {
       width: widget.width ?? double.maxFinite,
       child: FittedBox(
         alignment: FractionalOffset.center,
-        child: Listener(
-          onPointerDown: (event) => _pointer++,
-          onPointerUp: (event) => _pointer = 0,
-          child: ClipRect(
-            child: InteractiveViewer(
-              maxScale: 2.4,
-              panEnabled: false,
-              scaleEnabled: widget.isScalable,
-              minScale: 0.4,
-              onInteractionUpdate: _scaleUpdateGesture,
-              onInteractionEnd: _scaleEndGesture,
-              child: CustomPaint(
-                size: Size(_image.width.toDouble(), _image.height.toDouble()),
-                willChange: true,
-                painter: DrawImage(
-                  image: _image,
-                  points: _points,
-                  paintHistory: _paintHistory,
-                  isDragging: _inDrag,
-                  update: UpdatePoints(
-                      start: _start,
-                      end: _end,
-                      painter: _painter,
-                      mode: _controller.mode),
-                ),
+        child: ClipRect(
+          child: InteractiveViewer(
+            maxScale: 2.4,
+            panEnabled: false,
+            scaleEnabled: widget.isScalable,
+            minScale: 0.4,
+            onInteractionUpdate: _scaleUpdateGesture,
+            onInteractionEnd: _scaleEndGesture,
+            child: CustomPaint(
+              size: Size(_image.width.toDouble(), _image.height.toDouble()),
+              willChange: true,
+              painter: DrawImage(
+                image: _image,
+                points: _points,
+                paintHistory: _paintHistory,
+                isDragging: _inDrag,
+                update: UpdatePoints(
+                    start: _start,
+                    end: _end,
+                    painter: _painter,
+                    mode: _controller.mode),
               ),
             ),
           ),
@@ -319,49 +314,45 @@ class ImagePainterState extends State<ImagePainter> {
 
   ///Fires while user is interacting with the screen to record painting.
   void _scaleUpdateGesture(ScaleUpdateDetails onUpdate) {
-    if (_pointer < 2) {
-      setState(() {
-        _inDrag = true;
-        if (_start == null) {
-          _start = onUpdate.focalPoint;
-        }
-        _end = onUpdate.focalPoint;
-        if (_controller.mode == PaintMode.FreeStyle || widget.isSignature) {
-          _points.add(_end);
-        } else if (_controller.mode == PaintMode.Text &&
-            _paintHistory.any((element) => element.map.value.text != null)) {
-          _paintHistory
-              .lastWhere((element) => element.map.value.text != null)
-              .map
-              .value
-              .offset = [_end];
-        }
-      });
-    }
+    setState(() {
+      _inDrag = true;
+      if (_start == null) {
+        _start = onUpdate.focalPoint;
+      }
+      _end = onUpdate.focalPoint;
+      if (_controller.mode == PaintMode.FreeStyle || widget.isSignature) {
+        _points.add(_end);
+      } else if (_controller.mode == PaintMode.Text &&
+          _paintHistory.any((element) => element.map.value.text != null)) {
+        _paintHistory
+            .lastWhere((element) => element.map.value.text != null)
+            .map
+            .value
+            .offset = [_end];
+      }
+    });
   }
 
   ///Fires when user stops interacting with the screen.
   void _scaleEndGesture(ScaleEndDetails onEnd) {
-    if (_pointer < 2) {
-      setState(() {
-        _inDrag = false;
-        if (_controller.mode == PaintMode.None) {
-        } else if (_start != null &&
-            _end != null &&
-            _controller.mode != PaintMode.FreeStyle) {
-          _addEndPoints(_start, _end);
-        } else if (_start != null &&
-                _end != null &&
-                _controller.mode == PaintMode.FreeStyle ||
-            widget.isSignature) {
-          _points.add(null);
-          _addFreeStylePoints();
-        }
-        _start = null;
-        _end = null;
-      });
-      _points.clear();
-    }
+    setState(() {
+      _inDrag = false;
+      if (_controller.mode == PaintMode.None) {
+      } else if (_start != null &&
+          _end != null &&
+          _controller.mode != PaintMode.FreeStyle) {
+        _addEndPoints(_start, _end);
+      } else if (_start != null &&
+              _end != null &&
+              _controller.mode == PaintMode.FreeStyle ||
+          widget.isSignature) {
+        _points.add(null);
+        _addFreeStylePoints();
+      }
+      _start = null;
+      _end = null;
+    });
+    _points.clear();
   }
 
   void _addEndPoints(dx, dy) {
@@ -381,7 +372,7 @@ class ImagePainterState extends State<ImagePainter> {
         MapEntry<PaintMode, PaintInfo>(
           PaintMode.FreeStyle,
           PaintInfo(
-              offset: List<Offset>()..addAll(_points),
+              offset: <Offset>[]..addAll(_points),
               painter: Paint()
                 ..color = _controller.color
                 ..strokeWidth = _controller.strokeWidth),
@@ -391,7 +382,7 @@ class ImagePainterState extends State<ImagePainter> {
       _paintHistory.add(PaintHistory(
         MapEntry<PaintMode, PaintInfo>(
           _controller.mode,
-          PaintInfo(offset: List<Offset>()..addAll(_points), painter: _painter),
+          PaintInfo(offset: <Offset>[]..addAll(_points), painter: _painter),
         ),
       ));
     }
@@ -424,10 +415,12 @@ class ImagePainterState extends State<ImagePainter> {
       RenderRepaintBoundary _boundary =
           _repaintKey.currentContext.findRenderObject();
       _image = await _boundary.toImage(pixelRatio: 3);
+    } else if (widget.byteArray != null && _paintHistory.isEmpty) {
+      return widget.byteArray;
     } else {
       _image = await _renderImage();
     }
-    ByteData byteData = await _image.toByteData(format: ui.ImageByteFormat.png);
+    final byteData = await _image.toByteData(format: ui.ImageByteFormat.png);
     return byteData.buffer.asUint8List();
   }
 
