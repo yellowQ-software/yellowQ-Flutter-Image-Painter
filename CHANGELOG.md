@@ -1,3 +1,10 @@
+# 0.1.8
+
+- Added dynamic strokeMultiplier to compensate strokewidth for high resolution image.
+- Pan or moving around image is available to use when mode is `PaintMode.None`. 
+- Performance improvements and lint fixes. 
+- Improved example. 
+
 # 0.1.6
 
 - ByteArray on memory constructor now returns itself without conversion back if no action is performed on it.

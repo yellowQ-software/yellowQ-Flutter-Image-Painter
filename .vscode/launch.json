@@ -8,8 +8,6 @@
             "name": "image_painter",
             "request": "launch",
             "type": "dart",
-            "flutterMode":"profile"
-            
         }
     ]
 }

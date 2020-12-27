@@ -45,14 +45,15 @@ Basic usage of the libary:
 ```dart
 ///Initialize the controller
 Controller imageController = Controller();
+GlobalKey<ImagePainterState> _imageKey = GlobalKey<ImagePainterState>();
 ///Provide controller to the painter.
 ImagePainter.network("https://sample_image.png",
                   key: _imageKey, controller: imageController, scalable: true),
 ///To change color, strokewidth or paint mode: 
 setState((){
-    imageController.color = Colors.red;
-    imageController.mode = PaintMode.Arrow;
-    imageController.strokeWidth = 10.0;
+    imageController = imageController.copyWith(color:Colors.red);
+    imageController = imageController.copyWith(mode:PaintMode.Arrow);
+    imageController = imageController.copyWith(strokeWidth:10.0);
 })
 ///Export the image:
 Uint8List image = await _imageKey.currentState.exportImage();
