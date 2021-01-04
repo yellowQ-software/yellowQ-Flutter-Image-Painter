@@ -34,6 +34,7 @@ class DrawImage extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (isSignature) {
+      ///Paints background for signature.
       canvas.drawRect(
           Rect.fromPoints(const Offset(0, 0), Offset(size.width, size.height)),
           Paint()
@@ -86,10 +87,10 @@ class DrawImage extends CustomPainter {
               final _path = Path()
                 ..moveTo(_offset[i].dx, _offset[i].dy)
                 ..lineTo(_offset[i + 1].dx, _offset[i + 1].dy);
-              canvas.drawPath(_path, _painter);
+              canvas.drawPath(_path, _painter..strokeCap = StrokeCap.round);
             } else if (_offset[i] != null && _offset[i + 1] == null) {
-              canvas.drawPoints(
-                  PointMode.points, [_offset[i]], item.map.value.painter);
+              canvas.drawPoints(PointMode.points, [_offset[i]],
+                  _painter..strokeCap = StrokeCap.round);
             }
           }
           break;
@@ -122,7 +123,7 @@ class DrawImage extends CustomPainter {
     if (isDragging) {
       final _start = update.start;
       final _end = update.end;
-      final _painter = update.painter..strokeWidth = update.painter.strokeWidth;
+      final _painter = update.painter;
       switch (update.mode) {
         case PaintMode.Box:
           canvas.drawRect(Rect.fromPoints(_start, _end), _painter);
@@ -148,8 +149,10 @@ class DrawImage extends CustomPainter {
         case PaintMode.FreeStyle:
           for (var i = 0; i < points.length - 1; i++) {
             if (points[i] != null && points[i + 1] != null) {
-              canvas.drawLine(Offset(points[i].dx, points[i].dy),
-                  Offset(points[i + 1].dx, points[i + 1].dy), _painter);
+              canvas.drawLine(
+                  Offset(points[i].dx, points[i].dy),
+                  Offset(points[i + 1].dx, points[i + 1].dy),
+                  _painter..strokeCap = StrokeCap.round);
             } else if (points[i] != null && points[i + 1] == null) {
               canvas.drawPoints(PointMode.points,
                   [Offset(points[i].dx, points[i].dy)], _painter);

@@ -2,15 +2,16 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:image_painter/src/ported_interactive_viewer.dart';
 
 import 'image_painter.dart';
 
 export 'image_painter.dart';
 
+@immutable
 class ImagePainter extends StatefulWidget {
   const ImagePainter._(
       {Key key,
@@ -181,7 +182,11 @@ class ImagePainterState extends State<ImagePainter> {
   void didUpdateWidget(ImagePainter oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller != widget.controller) {
-      _controller.value = widget.controller;
+      _controller.value = _controller.value.copyWith(
+          color: widget.controller.color,
+          strokeWidth: widget.controller.strokeWidth,
+          mode: widget.controller.mode,
+          paintingStyle: widget.controller.paintStyle);
     }
   }
 
@@ -214,10 +219,8 @@ class ImagePainterState extends State<ImagePainter> {
   }
 
   setStrokeMultiplier() {
-    if (_image.height + _image.width > 1000) {
-      _strokeMultiplier = 2;
-    } else {
-      _strokeMultiplier = 1;
+    if ((_image.height + _image.width) > 1000) {
+      _strokeMultiplier = (_image.height + _image.width) ~/ 1000;
     }
   }
 
@@ -275,7 +278,7 @@ class ImagePainterState extends State<ImagePainter> {
           child: ValueListenableBuilder(
             valueListenable: _controller,
             builder: (_, Controller controller, __) {
-              return InteractiveViewer(
+              return InteractiveViewerPorted(
                 maxScale: 2.4,
                 panEnabled: controller.mode == PaintMode.None,
                 scaleEnabled: widget.isScalable,
@@ -382,7 +385,7 @@ class ImagePainterState extends State<ImagePainter> {
           widget.isSignature) {
         _points.add(null);
         _addFreeStylePoints(controller);
-      }
+      } else {}
       _start = null;
       _end = null;
     });
@@ -473,6 +476,7 @@ class ImagePainterState extends State<ImagePainter> {
 }
 
 ///Gives access to manipulate the essential components like [strokeWidth], [Color] and [PaintMode].
+@immutable
 class Controller {
   ///Tracks [strokeWidth] of the [Paint] method.
   final double strokeWidth;
