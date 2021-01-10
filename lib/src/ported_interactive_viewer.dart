@@ -6,11 +6,11 @@ import 'package:flutter/physics.dart';
 import 'package:vector_math/vector_math_64.dart' show Quad, Vector3, Matrix4;
 
 @immutable
-class InteractiveViewerPorted extends StatefulWidget {
+class ImageTransformer extends StatefulWidget {
   /// Create an InteractiveViewer.
   ///
   /// The [child] parameter must not be null.
-  InteractiveViewerPorted({
+  ImageTransformer({
     Key key,
     this.alignPanAxis = false,
     this.boundaryMargin = EdgeInsets.zero,
@@ -421,14 +421,10 @@ class InteractiveViewerPorted extends StatefulWidget {
 
     // Otherwise, return the nearest point on the quad.
     final List<Vector3> closestPoints = <Vector3>[
-      InteractiveViewerPorted.getNearestPointOnLine(
-          point, quad.point0, quad.point1),
-      InteractiveViewerPorted.getNearestPointOnLine(
-          point, quad.point1, quad.point2),
-      InteractiveViewerPorted.getNearestPointOnLine(
-          point, quad.point2, quad.point3),
-      InteractiveViewerPorted.getNearestPointOnLine(
-          point, quad.point3, quad.point0),
+      ImageTransformer.getNearestPointOnLine(point, quad.point0, quad.point1),
+      ImageTransformer.getNearestPointOnLine(point, quad.point1, quad.point2),
+      ImageTransformer.getNearestPointOnLine(point, quad.point2, quad.point3),
+      ImageTransformer.getNearestPointOnLine(point, quad.point3, quad.point0),
     ];
     double minDistance = double.infinity;
     Vector3 closestOverall;
@@ -446,11 +442,10 @@ class InteractiveViewerPorted extends StatefulWidget {
   }
 
   @override
-  _InteractiveViewerPortedState createState() =>
-      _InteractiveViewerPortedState();
+  _ImageTransformerState createState() => _ImageTransformerState();
 }
 
-class _InteractiveViewerPortedState extends State<InteractiveViewerPorted>
+class _ImageTransformerState extends State<ImageTransformer>
     with TickerProviderStateMixin {
   TransformationController _transformationController;
 
@@ -934,7 +929,7 @@ class _InteractiveViewerPortedState extends State<InteractiveViewerPorted>
   }
 
   @override
-  void didUpdateWidget(InteractiveViewerPorted oldWidget) {
+  void didUpdateWidget(ImageTransformer oldWidget) {
     super.didUpdateWidget(oldWidget);
     // Handle all cases of needing to dispose and initialize
     // transformationControllers.
@@ -1139,7 +1134,7 @@ Quad _getAxisAlignedBoundingBoxWithRotation(Rect rect, double rotation) {
     rotationMatrix.transform3(Vector3(rect.right, rect.bottom, 0.0)),
     rotationMatrix.transform3(Vector3(rect.left, rect.bottom, 0.0)),
   );
-  return InteractiveViewerPorted.getAxisAlignedBoundingBox(boundariesRotated);
+  return ImageTransformer.getAxisAlignedBoundingBox(boundariesRotated);
 }
 
 // Return the amount that viewport lies outside of boundary. If the viewport
@@ -1155,7 +1150,7 @@ Offset _exceedsBy(Quad boundary, Quad viewport) {
   Offset largestExcess = Offset.zero;
   for (final Vector3 point in viewportPoints) {
     final Vector3 pointInside =
-        InteractiveViewerPorted.getNearestPointInside(point, boundary);
+        ImageTransformer.getNearestPointInside(point, boundary);
     final Offset excess = Offset(
       pointInside.x - point.x,
       pointInside.y - point.y,

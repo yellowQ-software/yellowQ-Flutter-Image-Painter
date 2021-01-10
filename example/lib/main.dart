@@ -56,7 +56,7 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
         '$directory/sample/${DateTime.now().millisecondsSinceEpoch}.png';
     final imgFile = File('$fullPath');
     imgFile.writeAsBytesSync(image);
-    ScaffoldMessenger.of(context).showSnackBar(
+    _key.currentState.showSnackBar(
       SnackBar(
         backgroundColor: Colors.grey[700],
         padding: const EdgeInsets.only(left: 10),

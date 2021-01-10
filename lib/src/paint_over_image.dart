@@ -68,7 +68,7 @@ class ImagePainter extends StatefulWidget {
         controller: controller);
   }
 
-  ///Constructor for loading image from file.
+  ///Constructor for loading image from [File].
   factory ImagePainter.file(
     File file, {
     @required Controller controller,
@@ -278,11 +278,11 @@ class ImagePainterState extends State<ImagePainter> {
           child: ValueListenableBuilder(
             valueListenable: _controller,
             builder: (_, Controller controller, __) {
-              return InteractiveViewerPorted(
+              return ImageTransformer(
                 maxScale: 2.4,
+                minScale: 1,
                 panEnabled: controller.mode == PaintMode.None,
                 scaleEnabled: widget.isScalable,
-                minScale: 1,
                 onInteractionUpdate: (ScaleUpdateDetails details) =>
                     _scaleUpdateGesture(details, controller),
                 onInteractionEnd: (ScaleEndDetails details) =>
