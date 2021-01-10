@@ -1,3 +1,8 @@
+# 0.1.9
+
+- Smoother look for signature mode.
+- Local InteractiveViewer for future flutter version issues. 
+
 # 0.1.8
 
 - Added dynamic strokeMultiplier to compensate strokewidth for high resolution image.

@@ -6,11 +6,11 @@ import 'package:flutter/physics.dart';
 import 'package:vector_math/vector_math_64.dart' show Quad, Vector3, Matrix4;
 
 @immutable
-class ImageTransformer extends StatefulWidget {
+class ImagePainterTransformer extends StatefulWidget {
   /// Create an InteractiveViewer.
   ///
   /// The [child] parameter must not be null.
-  ImageTransformer({
+  ImagePainterTransformer({
     Key key,
     this.alignPanAxis = false,
     this.boundaryMargin = EdgeInsets.zero,
@@ -421,10 +421,14 @@ class ImageTransformer extends StatefulWidget {
 
     // Otherwise, return the nearest point on the quad.
     final List<Vector3> closestPoints = <Vector3>[
-      ImageTransformer.getNearestPointOnLine(point, quad.point0, quad.point1),
-      ImageTransformer.getNearestPointOnLine(point, quad.point1, quad.point2),
-      ImageTransformer.getNearestPointOnLine(point, quad.point2, quad.point3),
-      ImageTransformer.getNearestPointOnLine(point, quad.point3, quad.point0),
+      ImagePainterTransformer.getNearestPointOnLine(
+          point, quad.point0, quad.point1),
+      ImagePainterTransformer.getNearestPointOnLine(
+          point, quad.point1, quad.point2),
+      ImagePainterTransformer.getNearestPointOnLine(
+          point, quad.point2, quad.point3),
+      ImagePainterTransformer.getNearestPointOnLine(
+          point, quad.point3, quad.point0),
     ];
     double minDistance = double.infinity;
     Vector3 closestOverall;
@@ -442,10 +446,11 @@ class ImageTransformer extends StatefulWidget {
   }
 
   @override
-  _ImageTransformerState createState() => _ImageTransformerState();
+  _ImagePainterTransformerState createState() =>
+      _ImagePainterTransformerState();
 }
 
-class _ImageTransformerState extends State<ImageTransformer>
+class _ImagePainterTransformerState extends State<ImagePainterTransformer>
     with TickerProviderStateMixin {
   TransformationController _transformationController;
 
@@ -929,7 +934,7 @@ class _ImageTransformerState extends State<ImageTransformer>
   }
 
   @override
-  void didUpdateWidget(ImageTransformer oldWidget) {
+  void didUpdateWidget(ImagePainterTransformer oldWidget) {
     super.didUpdateWidget(oldWidget);
     // Handle all cases of needing to dispose and initialize
     // transformationControllers.
@@ -1134,7 +1139,7 @@ Quad _getAxisAlignedBoundingBoxWithRotation(Rect rect, double rotation) {
     rotationMatrix.transform3(Vector3(rect.right, rect.bottom, 0.0)),
     rotationMatrix.transform3(Vector3(rect.left, rect.bottom, 0.0)),
   );
-  return ImageTransformer.getAxisAlignedBoundingBox(boundariesRotated);
+  return ImagePainterTransformer.getAxisAlignedBoundingBox(boundariesRotated);
 }
 
 // Return the amount that viewport lies outside of boundary. If the viewport
@@ -1150,7 +1155,7 @@ Offset _exceedsBy(Quad boundary, Quad viewport) {
   Offset largestExcess = Offset.zero;
   for (final Vector3 point in viewportPoints) {
     final Vector3 pointInside =
-        ImageTransformer.getNearestPointInside(point, boundary);
+        ImagePainterTransformer.getNearestPointInside(point, boundary);
     final Offset excess = Offset(
       pointInside.x - point.x,
       pointInside.y - point.y,

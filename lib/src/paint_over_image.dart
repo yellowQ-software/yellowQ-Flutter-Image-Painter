@@ -278,7 +278,7 @@ class ImagePainterState extends State<ImagePainter> {
           child: ValueListenableBuilder(
             valueListenable: _controller,
             builder: (_, Controller controller, __) {
-              return ImageTransformer(
+              return ImagePainterTransformer(
                 maxScale: 2.4,
                 minScale: 1,
                 panEnabled: controller.mode == PaintMode.None,
@@ -321,7 +321,7 @@ class ImagePainterState extends State<ImagePainter> {
           child: ValueListenableBuilder(
             valueListenable: _controller,
             builder: (_, Controller controller, __) {
-              return InteractiveViewer(
+              return ImagePainterTransformer(
                   panEnabled: false,
                   scaleEnabled: false,
                   onInteractionUpdate: (ScaleUpdateDetails details) =>
