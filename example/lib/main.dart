@@ -78,7 +78,7 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
     );
   }
 
-  void _updateController(Controller? controller) {
+  _updateController(Controller? controller) {
     _controller.value = controller;
   }
 
@@ -86,18 +86,18 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
     await showDialog<Color>(
         context: context,
         builder: (_) {
-          return ValueListenableBuilder(
+          return ValueListenableBuilder<Controller?>(
             valueListenable: _controller,
-            builder: (BuildContext context, dynamic value, Widget? child) {
+            builder: (_, value, __) {
               return AlertDialog(
                 contentPadding: const EdgeInsets.all(6.0),
                 title: const Text("Pick a color"),
                 content: MaterialColorPicker(
                   shrinkWrap: true,
-                  selectedColor: value.color,
+                  selectedColor: value?.color,
                   allowShades: false,
                   onMainColorChange: (color) => _updateController(
-                    value.copyWith(color: color),
+                    value?.copyWith(color: color),
                   ),
                 ),
                 actions: [
@@ -115,9 +115,9 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
     await showDialog<double>(
         context: context,
         builder: (_) {
-          return ValueListenableBuilder(
+          return ValueListenableBuilder<Controller?>(
             valueListenable: _controller,
-            builder: (_, dynamic ctrl, __) {
+            builder: (_, ctrl, __) {
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -128,16 +128,16 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
                     content: Column(
                       children: [
                         CupertinoSlider(
-                            value: ctrl.strokeWidth,
+                            value: ctrl == null ? 1.0 : ctrl.strokeWidth,
                             min: 2.0,
                             max: 20.0,
                             divisions: 9,
                             onChanged: (value) {
                               _updateController(
-                                  ctrl.copyWith(strokeWidth: value));
+                                  ctrl?.copyWith(strokeWidth: value));
                             }),
                         Text(
-                          "${ctrl.strokeWidth.toInt()}",
+                          "${ctrl?.strokeWidth.toInt()}",
                           style:
                               const TextStyle(fontSize: 20, color: Colors.blue),
                         )
@@ -166,15 +166,15 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
         actions: [
           IconButton(
             icon: const Icon(Icons.brush_sharp),
-            onPressed: () => _openStrokeDialog(),
+            onPressed: _openStrokeDialog,
           ),
           IconButton(
             icon: const Icon(Icons.color_lens),
-            onPressed: () => _openMainColorPicker(),
+            onPressed: _openMainColorPicker,
           ),
           IconButton(
             icon: const Icon(Icons.save),
-            onPressed: () => saveImage(),
+            onPressed: saveImage,
           ),
         ],
         bottom: PreferredSize(
@@ -193,9 +193,9 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
           ),
         ),
       ),
-      body: ValueListenableBuilder(
+      body: ValueListenableBuilder<Controller?>(
         valueListenable: _controller,
-        builder: (_, dynamic ctrl, __) {
+        builder: (_, ctrl, __) {
           return Column(
             children: [
               Container(
@@ -207,16 +207,16 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
                   children: options.entries.map((item) {
                     return SelectionItems(
                       icon: item.key,
-                      isSelected: ctrl.mode == item.value,
+                      isSelected: ctrl?.mode == item.value,
                       onTap: () =>
-                          _updateController(ctrl.copyWith(mode: item.value)),
+                          _updateController(ctrl?.copyWith(mode: item.value)),
                     );
                   }).toList(),
                 ),
               ),
               Expanded(
                 child: ImagePainter.asset("assets/sample.jpg",
-                    key: _imageKey, controller: ctrl, scalable: true),
+                    key: _imageKey, controller: ctrl!, scalable: true),
               ),
             ],
           );

@@ -2,12 +2,13 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:image_painter/src/ported_interactive_viewer.dart';
 
 import 'image_painter.dart';
+import 'ported_interactive_viewer.dart';
 
 export 'image_painter.dart';
 
@@ -23,9 +24,9 @@ class ImagePainter extends StatefulWidget {
       this.width,
       this.controller,
       this.placeHolder,
-      this.isScalable,
-      this.isSignature: false,
-      this.signatureBackgroundColor})
+      this.isScalable = false,
+      this.isSignature = false,
+      this.signatureBackgroundColor = Colors.white})
       : super(key: key);
 
   ///Constructor for loading image from network url.
@@ -151,11 +152,11 @@ class ImagePainter extends StatefulWidget {
   final Controller? controller;
 
   ///Defines whether the widget should be scaled or not. Defaults to [false].
-  final bool? isScalable;
+  final bool isScalable;
 
   final bool isSignature;
 
-  final Color? signatureBackgroundColor;
+  final Color signatureBackgroundColor;
 
   @override
   ImagePainterState createState() => ImagePainterState();
@@ -201,24 +202,24 @@ class ImagePainterState extends State<ImagePainter> {
   Future<void> _resolveAndConvertImage() async {
     if (widget.networkUrl != null) {
       _image = await _loadNetworkImage(widget.networkUrl!);
-      setStrokeMultiplier();
+      _setStrokeMultiplier();
     } else if (widget.assetPath != null) {
       final img = await rootBundle.load(widget.assetPath!);
       _image = await _convertImage(Uint8List.view(img.buffer));
-      setStrokeMultiplier();
+      _setStrokeMultiplier();
     } else if (widget.file != null) {
       final img = await widget.file!.readAsBytes();
       _image = await _convertImage(img);
-      setStrokeMultiplier();
+      _setStrokeMultiplier();
     } else if (widget.byteArray != null) {
       _image = await _convertImage(widget.byteArray!);
-      setStrokeMultiplier();
+      _setStrokeMultiplier();
     } else {
       _isLoaded.value = true;
     }
   }
 
-  setStrokeMultiplier() {
+  void _setStrokeMultiplier() {
     if ((_image!.height + _image!.width) > 1000) {
       _strokeMultiplier = (_image!.height + _image!.width) ~/ 1000;
     }
@@ -227,7 +228,7 @@ class ImagePainterState extends State<ImagePainter> {
   ///Completer function to convert asset or file image to [ui.Image] before drawing on custompainter.
   Future<ui.Image> _convertImage(List<int> img) async {
     final completer = Completer<ui.Image>();
-    ui.decodeImageFromList(img as Uint8List, (ui.Image img) {
+    ui.decodeImageFromList(img as Uint8List, (img) {
       _isLoaded.value = true;
       return completer.complete(img);
     });
@@ -239,7 +240,7 @@ class ImagePainterState extends State<ImagePainter> {
     final completer = Completer<ImageInfo>();
     var img = NetworkImage(path);
     img.resolve(const ImageConfiguration()).addListener(
-        ImageStreamListener((ImageInfo info, _) => completer.complete(info)));
+        ImageStreamListener((info, _) => completer.complete(info)));
     final imageInfo = await completer.future;
     _isLoaded.value = true;
     return imageInfo.image;
@@ -247,9 +248,9 @@ class ImagePainterState extends State<ImagePainter> {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
+    return ValueListenableBuilder<bool>(
       valueListenable: _isLoaded,
-      builder: (_, bool loaded, __) {
+      builder: (_, loaded, __) {
         if (loaded) {
           return widget.isSignature ? _paintSignature() : _paintImage();
         } else {
@@ -275,20 +276,21 @@ class ImagePainterState extends State<ImagePainter> {
       child: FittedBox(
         alignment: FractionalOffset.center,
         child: ClipRect(
-          child: ValueListenableBuilder(
+          child: ValueListenableBuilder<Controller?>(
             valueListenable: _controller,
-            builder: (_, Controller? controller, __) {
+            builder: (_, controller, __) {
               return ImagePainterTransformer(
                 maxScale: 2.4,
                 minScale: 1,
                 panEnabled: controller!.mode == PaintMode.None,
-                scaleEnabled: widget.isScalable!,
-                onInteractionUpdate: (ScaleUpdateDetails details) =>
+                scaleEnabled: widget.isScalable,
+                onInteractionUpdate: (details) =>
                     _scaleUpdateGesture(details, controller),
-                onInteractionEnd: (ScaleEndDetails details) =>
+                onInteractionEnd: (details) =>
                     _scaleEndGesture(details, controller),
                 child: CustomPaint(
-                  size: Size(_image!.width.toDouble(), _image!.height.toDouble()),
+                  size:
+                      Size(_image!.width.toDouble(), _image!.height.toDouble()),
                   willChange: true,
                   isComplex: true,
                   painter: DrawImage(
@@ -318,15 +320,15 @@ class ImagePainterState extends State<ImagePainter> {
         child: Container(
           width: widget.width ?? double.maxFinite,
           height: widget.height ?? double.maxFinite,
-          child: ValueListenableBuilder(
+          child: ValueListenableBuilder<Controller?>(
             valueListenable: _controller,
-            builder: (_, Controller? controller, __) {
+            builder: (_, controller, __) {
               return ImagePainterTransformer(
                   panEnabled: false,
                   scaleEnabled: false,
-                  onInteractionUpdate: (ScaleUpdateDetails details) =>
+                  onInteractionUpdate: (details) =>
                       _scaleUpdateGesture(details, controller),
-                  onInteractionEnd: (ScaleEndDetails details) =>
+                  onInteractionEnd: (details) =>
                       _scaleEndGesture(details, controller),
                   child: CustomPaint(
                     willChange: true,
@@ -352,7 +354,8 @@ class ImagePainterState extends State<ImagePainter> {
   }
 
   ///Fires while user is interacting with the screen to record painting.
-  void _scaleUpdateGesture(ScaleUpdateDetails onUpdate, Controller? controller) {
+  void _scaleUpdateGesture(
+      ScaleUpdateDetails onUpdate, Controller? controller) {
     setState(() {
       _inDrag = true;
       _start ??= onUpdate.focalPoint;
@@ -392,7 +395,7 @@ class ImagePainterState extends State<ImagePainter> {
     _points.clear();
   }
 
-  void _addEndPoints(dx, dy, Controller controller) {
+  void _addEndPoints(Offset? dx, Offset? dy, Controller controller) {
     _paintHistory.add(
       PaintHistory(
         MapEntry<PaintMode, PaintInfo>(
@@ -446,32 +449,29 @@ class ImagePainterState extends State<ImagePainter> {
   Future<Uint8List?> exportImage() async {
     ui.Image _image;
     if (widget.isSignature) {
-      RenderRepaintBoundary _boundary =
-          _repaintKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      final _boundary = _repaintKey.currentContext!.findRenderObject()
+          as RenderRepaintBoundary;
       _image = await _boundary.toImage(pixelRatio: 3);
     } else if (widget.byteArray != null && _paintHistory.isEmpty) {
       return widget.byteArray;
     } else {
       _image = await _renderImage();
     }
-    final byteData = await (_image.toByteData(format: ui.ImageByteFormat.png) as FutureOr<ByteData>);
+    final byteData = await (_image.toByteData(format: ui.ImageByteFormat.png)
+        as FutureOr<ByteData>);
     return byteData.buffer.asUint8List();
   }
 
   ///Cancels or removes the last [PaintHistory].
   void undo() {
     if (_paintHistory.isNotEmpty) {
-      setState(() {
-        _paintHistory.removeLast();
-      });
+      setState(_paintHistory.removeLast);
     }
   }
 
   ///Cancels or clears all the previous [PaintHistory].
   void clearAll() {
-    setState(() {
-      _paintHistory.clear();
-    });
+    setState(_paintHistory.clear);
   }
 }
 

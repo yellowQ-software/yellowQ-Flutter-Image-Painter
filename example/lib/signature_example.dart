@@ -33,15 +33,12 @@ class _SignatureExampleState extends State<SignatureExample> {
         actions: [
           IconButton(
             icon: const Icon(Icons.brush_sharp),
-            onPressed: () => _openStrokeDialog(),
+            onPressed: _openStrokeDialog,
           ),
           IconButton(
               icon: const Icon(Icons.color_lens),
-              onPressed: () {
-                _openMainColorPicker();
-              }),
-          IconButton(
-              icon: const Icon(Icons.save), onPressed: () => saveImage()),
+              onPressed: _openMainColorPicker),
+          IconButton(icon: const Icon(Icons.save), onPressed: saveImage),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(40),
@@ -63,7 +60,7 @@ class _SignatureExampleState extends State<SignatureExample> {
           borderRadius: BorderRadius.circular(8),
           child: ValueListenableBuilder<Controller?>(
               valueListenable: _controller,
-              builder: (_, Controller? controller, __) {
+              builder: (_, controller, __) {
                 return ImagePainter.signature(
                   height: 200,
                   width: 300,
@@ -77,25 +74,24 @@ class _SignatureExampleState extends State<SignatureExample> {
     );
   }
 
-  void _updateController(Controller? controller) =>
-      _controller.value = controller;
+  _updateController(Controller? controller) => _controller.value = controller;
 
   void _openMainColorPicker() {
     showDialog(
       context: context,
       builder: (_) {
-        return ValueListenableBuilder(
+        return ValueListenableBuilder<Controller?>(
           valueListenable: _controller,
-          builder: (BuildContext context, dynamic value, Widget? child) {
+          builder: (_, value, __) {
             return AlertDialog(
               contentPadding: const EdgeInsets.all(6.0),
               title: const Text("Pick a color"),
               content: MaterialColorPicker(
                   shrinkWrap: true,
-                  selectedColor: value.color,
+                  selectedColor: value?.color,
                   allowShades: false,
                   onMainColorChange: (color) =>
-                      _updateController(value.copyWith(color: color))),
+                      _updateController(value?.copyWith(color: color))),
               actions: [
                 FlatButton(
                     child: const Text('Done'),
@@ -112,9 +108,9 @@ class _SignatureExampleState extends State<SignatureExample> {
     showDialog(
         context: context,
         builder: (_) {
-          return ValueListenableBuilder(
+          return ValueListenableBuilder<Controller?>(
               valueListenable: _controller,
-              builder: (_, dynamic ctrl, __) {
+              builder: (_, ctrl, __) {
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -125,15 +121,15 @@ class _SignatureExampleState extends State<SignatureExample> {
                       content: Column(
                         children: [
                           CupertinoSlider(
-                            value: ctrl.strokeWidth,
+                            value: (ctrl == null) ? 2.0 : ctrl.strokeWidth,
                             min: 2.0,
                             max: 20.0,
                             divisions: 9,
                             onChanged: (value) => _updateController(
-                                ctrl.copyWith(strokeWidth: value)),
+                                ctrl?.copyWith(strokeWidth: value)),
                           ),
                           Text(
-                            "${ctrl.strokeWidth.toInt()}",
+                            "${ctrl?.strokeWidth.toInt()}",
                             style: const TextStyle(
                                 fontSize: 20, color: Colors.blue),
                           )

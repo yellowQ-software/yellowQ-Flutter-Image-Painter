@@ -7,13 +7,13 @@ class DrawImage extends CustomPainter {
   final Image? image;
 
   ///Keeps track of all the units of [PaintHistory].
-  final List<PaintHistory>? paintHistory;
+  final List<PaintHistory> paintHistory;
 
   ///Keeps track of points on currently drawing state.
   final UpdatePoints? update;
 
   ///Keeps track of freestyle points on currently drawing state.
-  final List<Offset?>? points;
+  final List<Offset?> points;
 
   ///Keeps track whether the paint action is running or not.
   final bool isDragging;
@@ -26,10 +26,10 @@ class DrawImage extends CustomPainter {
       {this.image,
       this.isDragging = false,
       this.update,
-      this.points,
+      this.points = const [],
       this.isSignature = false,
       this.backgroundColor,
-      this.paintHistory});
+      this.paintHistory = const []});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -54,35 +54,36 @@ class DrawImage extends CustomPainter {
     }
 
     ///paints all the previoud paintInfo history recorded on [PaintHistory]
-    for (var item in paintHistory!) {
+    for (var item in paintHistory) {
       final _offset = item.map.value.offset;
       final _painter = item.map.value.painter;
       switch (item.map.key) {
         case PaintMode.Box:
-          canvas.drawRect(Rect.fromPoints(_offset![0]!, _offset[1]!), _painter!);
+          canvas.drawRect(Rect.fromPoints(_offset[0]!, _offset[1]!), _painter!);
           break;
         case PaintMode.Line:
-          canvas.drawLine(_offset![0]!, _offset[1]!, _painter!);
+          canvas.drawLine(_offset[0]!, _offset[1]!, _painter!);
           break;
         case PaintMode.Circle:
           final path = Path();
           path.addOval(
             Rect.fromCircle(
-                center: _offset![1]!, radius: (_offset[0]! - _offset[1]!).distance),
+                center: _offset[1]!,
+                radius: (_offset[0]! - _offset[1]!).distance),
           );
           canvas.drawPath(path, _painter!);
           break;
         case PaintMode.Arrow:
-          drawArrow(canvas, _offset![0]!, _offset[1]!, _painter!);
+          drawArrow(canvas, _offset[0]!, _offset[1]!, _painter!);
           break;
         case PaintMode.DottedLine:
           final path = Path()
-            ..moveTo(_offset![0]!.dx, _offset[0]!.dy)
+            ..moveTo(_offset[0]!.dx, _offset[0]!.dy)
             ..lineTo(_offset[1]!.dx, _offset[1]!.dy);
           canvas.drawPath(_dashPath(path, _painter!.strokeWidth), _painter);
           break;
         case PaintMode.FreeStyle:
-          for (var i = 0; i < _offset!.length - 1; i++) {
+          for (var i = 0; i < _offset.length - 1; i++) {
             if (_offset[i] != null && _offset[i + 1] != null) {
               final _path = Path()
                 ..moveTo(_offset[i]!.dx, _offset[i]!.dy)
@@ -108,7 +109,7 @@ class DrawImage extends CustomPainter {
             textDirection: TextDirection.ltr,
           );
           textPainter.layout(minWidth: 0, maxWidth: size.width);
-          final textOffset = _offset!.isEmpty
+          final textOffset = _offset.isEmpty
               ? Offset(size.width / 2 - textPainter.width / 2,
                   size.height / 2 - textPainter.height / 2)
               : Offset(_offset[0]!.dx - textPainter.width / 2,
@@ -133,8 +134,8 @@ class DrawImage extends CustomPainter {
           break;
         case PaintMode.Circle:
           final path = Path();
-          path.addOval(
-              Rect.fromCircle(center: _end!, radius: (_end - _start!).distance));
+          path.addOval(Rect.fromCircle(
+              center: _end!, radius: (_end - _start!).distance));
           canvas.drawPath(path, _painter!);
           break;
         case PaintMode.Arrow:
@@ -147,15 +148,15 @@ class DrawImage extends CustomPainter {
           canvas.drawPath(_dashPath(path, _painter!.strokeWidth), _painter);
           break;
         case PaintMode.FreeStyle:
-          for (var i = 0; i < points!.length - 1; i++) {
-            if (points![i] != null && points![i + 1] != null) {
+          for (var i = 0; i < points.length - 1; i++) {
+            if (points[i] != null && points[i + 1] != null) {
               canvas.drawLine(
-                  Offset(points![i]!.dx, points![i]!.dy),
-                  Offset(points![i + 1]!.dx, points![i + 1]!.dy),
+                  Offset(points[i]!.dx, points[i]!.dy),
+                  Offset(points[i + 1]!.dx, points[i + 1]!.dy),
                   _painter!..strokeCap = StrokeCap.round);
-            } else if (points![i] != null && points![i + 1] == null) {
+            } else if (points[i] != null && points[i + 1] == null) {
               canvas.drawPoints(PointMode.points,
-                  [Offset(points![i]!.dx, points![i]!.dy)], _painter!);
+                  [Offset(points[i]!.dx, points[i]!.dy)], _painter!);
             }
           }
           break;
@@ -193,7 +194,7 @@ class DrawImage extends CustomPainter {
     final dashWidth = 10.0 * width / 5;
     final dashSpace = 10.0 * width / 5;
     var distance = 0.0;
-    for (PathMetric pathMetric in path.computeMetrics()) {
+    for (final pathMetric in path.computeMetrics()) {
       while (distance < pathMetric.length) {
         dashPath.addPath(
           pathMetric.extractPath(distance, distance + dashWidth),
@@ -209,7 +210,7 @@ class DrawImage extends CustomPainter {
   @override
   bool shouldRepaint(DrawImage oldInfo) {
     return (oldInfo.update != update ||
-        oldInfo.paintHistory!.length == paintHistory!.length);
+        oldInfo.paintHistory.length != paintHistory.length);
   }
 }
 
@@ -247,21 +248,22 @@ class PaintInfo {
   Paint? painter;
 
   ///Used to save offsets. two point in case of other shapes and list of points for [FreeStyle].
-  List<Offset?>? offset;
+  List<Offset?> offset;
 
   ///Used to save text in case of text type.
   String? text;
 
   ///In case of string, it is used to save string value entered.
-  PaintInfo({this.offset, this.painter, this.text});
+  PaintInfo({this.offset = const [], this.painter, this.text});
 }
 
 ///Records realtime updates of ongoing [PaintInfo] when inDrag.
+@immutable
 class UpdatePoints {
-  Offset? start;
-  Offset? end;
-  Paint? painter;
-  PaintMode? mode;
+  final Offset? start;
+  final Offset? end;
+  final Paint? painter;
+  final PaintMode? mode;
   UpdatePoints({this.start, this.end, this.painter, this.mode});
 
   @override
