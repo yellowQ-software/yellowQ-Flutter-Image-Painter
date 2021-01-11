@@ -1,10 +1,13 @@
+import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
+import 'package:flutter/cupertino.dart' show CupertinoSlider;
 import 'package:image_painter/image_painter.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 
 void main() => runApp(ExampleApp());
 
@@ -28,9 +31,9 @@ class ImagePainterExample extends StatefulWidget {
 }
 
 class _ImagePainterExampleState extends State<ImagePainterExample> {
-  GlobalKey<ImagePainterState> _imageKey;
+  GlobalKey<ImagePainterState>? _imageKey;
   final _key = GlobalKey<ScaffoldState>();
-  final _controller = ValueNotifier<Controller>(null);
+  final _controller = ValueNotifier<Controller?>(null);
   Map<IconData, PaintMode> options = {
     Icons.zoom_out_map: PaintMode.None,
     Icons.horizontal_rule: PaintMode.Line,
@@ -49,14 +52,15 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
   }
 
   void saveImage() async {
-    final image = await _imageKey.currentState.exportImage();
+    final image =
+        await (_imageKey!.currentState!.exportImage() as FutureOr<Uint8List>);
     final directory = (await getApplicationDocumentsDirectory()).path;
     await Directory('$directory/sample').create(recursive: true);
     final fullPath =
         '$directory/sample/${DateTime.now().millisecondsSinceEpoch}.png';
     final imgFile = File('$fullPath');
     imgFile.writeAsBytesSync(image);
-    _key.currentState.showSnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: Colors.grey[700],
         padding: const EdgeInsets.only(left: 10),
@@ -74,7 +78,7 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
     );
   }
 
-  void _updateController(Controller controller) {
+  void _updateController(Controller? controller) {
     _controller.value = controller;
   }
 
@@ -84,7 +88,7 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
         builder: (_) {
           return ValueListenableBuilder(
             valueListenable: _controller,
-            builder: (BuildContext context, value, Widget child) {
+            builder: (BuildContext context, dynamic value, Widget? child) {
               return AlertDialog(
                 contentPadding: const EdgeInsets.all(6.0),
                 title: const Text("Pick a color"),
@@ -113,7 +117,7 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
         builder: (_) {
           return ValueListenableBuilder(
             valueListenable: _controller,
-            builder: (_, ctrl, __) {
+            builder: (_, dynamic ctrl, __) {
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -180,10 +184,10 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
             children: [
               IconButton(
                   icon: const Icon(Icons.reply, color: Colors.white),
-                  onPressed: () => _imageKey.currentState.undo()),
+                  onPressed: () => _imageKey!.currentState!.undo()),
               IconButton(
                 icon: const Icon(Icons.clear, color: Colors.white),
-                onPressed: () => _imageKey.currentState.clearAll(),
+                onPressed: () => _imageKey!.currentState!.clearAll(),
               ),
             ],
           ),
@@ -191,7 +195,7 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
       ),
       body: ValueListenableBuilder(
         valueListenable: _controller,
-        builder: (_, ctrl, __) {
+        builder: (_, dynamic ctrl, __) {
           return Column(
             children: [
               Container(
@@ -223,11 +227,11 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
 }
 
 class SelectionItems extends StatelessWidget {
-  final bool isSelected;
-  final IconData icon;
-  final VoidCallback onTap;
+  final bool? isSelected;
+  final IconData? icon;
+  final VoidCallback? onTap;
 
-  const SelectionItems({Key key, this.isSelected, this.icon, this.onTap})
+  const SelectionItems({Key? key, this.isSelected, this.icon, this.onTap})
       : super(key: key);
 
   @override
@@ -240,13 +244,13 @@ class SelectionItems extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-                color: isSelected ? Colors.white70 : Colors.transparent,
+                color: isSelected! ? Colors.white70 : Colors.transparent,
                 shape: BoxShape.circle),
             child: Icon(icon,
-                color: isSelected ? Colors.blue : Colors.white, size: 20),
+                color: isSelected! ? Colors.blue : Colors.white, size: 20),
           ),
         ),
-        if (isSelected)
+        if (isSelected!)
           Positioned(
             top: 0,
             right: 0,

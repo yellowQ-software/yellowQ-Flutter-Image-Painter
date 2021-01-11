@@ -11,7 +11,7 @@ class ImagePainterTransformer extends StatefulWidget {
   ///
   /// The [child] parameter must not be null.
   ImagePainterTransformer({
-    Key key,
+    Key? key,
     this.alignPanAxis = false,
     this.boundaryMargin = EdgeInsets.zero,
     this.constrained = true,
@@ -25,19 +25,12 @@ class ImagePainterTransformer extends StatefulWidget {
     this.panEnabled = true,
     this.scaleEnabled = true,
     this.transformationController,
-    @required this.child,
-  })  : assert(alignPanAxis != null),
-        assert(child != null),
-        assert(constrained != null),
-        assert(minScale != null),
-        assert(minScale > 0),
+    required this.child,
+  })   : assert(minScale > 0),
         assert(minScale.isFinite),
-        assert(maxScale != null),
         assert(maxScale > 0),
         assert(!maxScale.isNaN),
         assert(maxScale >= minScale),
-        assert(panEnabled != null),
-        assert(scaleEnabled != null),
         // boundaryMargin must be either fully infinite or fully finite, but not
         // a mix of both.
         assert((boundaryMargin.horizontal.isInfinite &&
@@ -187,7 +180,7 @@ class ImagePainterTransformer extends StatefulWidget {
   ///
   ///  * [onInteractionStart], which handles the start of the same interaction.
   ///  * [onInteractionUpdate], which handles an update to the same interaction.
-  final GestureScaleEndCallback onInteractionEnd;
+  final GestureScaleEndCallback? onInteractionEnd;
 
   /// Called when the user begins a pan or scale gesture on the widget.
   ///
@@ -197,7 +190,7 @@ class ImagePainterTransformer extends StatefulWidget {
   ///
   ///  * [onInteractionUpdate], which handles an update to the same interaction.
   ///  * [onInteractionEnd], which handles the end of the same interaction.
-  final GestureScaleStartCallback onInteractionStart;
+  final GestureScaleStartCallback? onInteractionStart;
 
   /// Called when the user updates a pan or scale gesture on the widget.
   ///
@@ -207,7 +200,7 @@ class ImagePainterTransformer extends StatefulWidget {
   ///
   ///  * [onInteractionStart], which handles the start of the same interaction.
   ///  * [onInteractionEnd], which handles the end of the same interaction.
-  final GestureScaleUpdateCallback onInteractionUpdate;
+  final GestureScaleUpdateCallback? onInteractionUpdate;
 
   /// A [TransformationController] for the transformation performed on the
   /// child.
@@ -319,7 +312,7 @@ class ImagePainterTransformer extends StatefulWidget {
   ///
   ///  * [ValueNotifier], the parent class of TransformationController.
   ///  * [TextEditingController] for an example of another similar pattern.
-  final TransformationController transformationController;
+  final TransformationController? transformationController;
 
   /// Returns the closest point to the given point on the given line segment.
   @visibleForTesting
@@ -412,7 +405,7 @@ class ImagePainterTransformer extends StatefulWidget {
   /// Get the point inside (inclusively) the given Quad that is nearest to the
   /// given Vector3.
   @visibleForTesting
-  static Vector3 getNearestPointInside(Vector3 point, Quad quad) {
+  static Vector3? getNearestPointInside(Vector3 point, Quad quad) {
     // If the point is inside the axis aligned bounding box, then it's ok where
     // it is.
     if (pointIsInside(point, quad)) {
@@ -431,7 +424,7 @@ class ImagePainterTransformer extends StatefulWidget {
           point, quad.point3, quad.point0),
     ];
     double minDistance = double.infinity;
-    Vector3 closestOverall;
+    Vector3? closestOverall;
     for (final Vector3 closePoint in closestPoints) {
       final double distance = math.sqrt(
         math.pow(point.x - closePoint.x, 2) +
@@ -452,18 +445,18 @@ class ImagePainterTransformer extends StatefulWidget {
 
 class _ImagePainterTransformerState extends State<ImagePainterTransformer>
     with TickerProviderStateMixin {
-  TransformationController _transformationController;
+  TransformationController? _transformationController;
 
   final GlobalKey _childKey = GlobalKey();
   final GlobalKey _parentKey = GlobalKey();
-  Animation<Offset> _animation;
-  AnimationController _controller;
-  Axis _panAxis; // Used with alignPanAxis.
-  Offset _referenceFocalPoint; // Point where the current gesture began.
-  double _scaleStart; // Scale value at start of scaling gesture.
-  double _rotationStart = 0.0; // Rotation at start of rotation gesture.
+  Animation<Offset>? _animation;
+  late AnimationController _controller;
+  Axis? _panAxis; // Used with alignPanAxis.
+  Offset? _referenceFocalPoint; // Point where the current gesture began.
+  double? _scaleStart; // Scale value at start of scaling gesture.
+  double? _rotationStart = 0.0; // Rotation at start of rotation gesture.
   double _currentRotation = 0.0; // Rotation of _transformationController.value.
-  _GestureType _gestureType;
+  _GestureType? _gestureType;
 
   final bool _rotateEnabled = false;
 
@@ -481,7 +474,7 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
     assert(!widget.boundaryMargin.bottom.isNaN);
 
     final RenderBox childRenderBox =
-        _childKey.currentContext.findRenderObject() as RenderBox;
+        _childKey.currentContext!.findRenderObject() as RenderBox;
     final Size childSize = childRenderBox.size;
     final Rect boundaryRect =
         widget.boundaryMargin.inflateRect(Offset.zero & childSize);
@@ -501,7 +494,7 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
   Rect get _viewport {
     assert(_parentKey.currentContext != null);
     final RenderBox parentRenderBox =
-        _parentKey.currentContext.findRenderObject() as RenderBox;
+        _parentKey.currentContext!.findRenderObject() as RenderBox;
     return Offset.zero & parentRenderBox.size;
   }
 
@@ -606,12 +599,12 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
     // Don't allow a scale that results in an overall scale beyond min/max
     // scale.
     final double currentScale =
-        _transformationController.value.getMaxScaleOnAxis();
+        _transformationController!.value.getMaxScaleOnAxis();
     final double totalScale = currentScale * scale;
     final double clampedTotalScale = totalScale.clamp(
       widget.minScale,
       widget.maxScale,
-    ) as double;
+    );
     final double clampedScale = clampedTotalScale / currentScale;
     final Matrix4 nextMatrix = matrix.clone()..scale(clampedScale);
 
@@ -635,7 +628,7 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
     if (rotation == 0) {
       return matrix.clone();
     }
-    final Offset focalPointScene = _transformationController.toScene(
+    final Offset focalPointScene = _transformationController!.toScene(
       focalPoint,
     );
     return matrix.clone()
@@ -645,7 +638,7 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
   }
 
   // Returns true iff the given _GestureType is enabled.
-  bool _gestureIsSupported(_GestureType gestureType) {
+  bool _gestureIsSupported(_GestureType? gestureType) {
     switch (gestureType) {
       case _GestureType.rotate:
         return _rotateEnabled;
@@ -679,7 +672,7 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
   // with GestureDetector's scale gesture.
   void _onScaleStart(ScaleStartDetails details) {
     if (widget.onInteractionStart != null) {
-      widget.onInteractionStart(details);
+      widget.onInteractionStart!(details);
     }
 
     if (_controller.isAnimating) {
@@ -691,8 +684,8 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
 
     _gestureType = null;
     _panAxis = null;
-    _scaleStart = _transformationController.value.getMaxScaleOnAxis();
-    _referenceFocalPoint = _transformationController.toScene(
+    _scaleStart = _transformationController!.value.getMaxScaleOnAxis();
+    _referenceFocalPoint = _transformationController!.toScene(
       details.localFocalPoint,
     );
     _rotationStart = _currentRotation;
@@ -701,17 +694,17 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
   // Handle an update to an ongoing gesture. All of pan, scale, and rotate are
   // handled with GestureDetector's scale gesture.
   void _onScaleUpdate(ScaleUpdateDetails details) {
-    final double scale = _transformationController.value.getMaxScaleOnAxis();
+    final double scale = _transformationController!.value.getMaxScaleOnAxis();
     if (widget.onInteractionUpdate != null) {
-      widget.onInteractionUpdate(ScaleUpdateDetails(
-        focalPoint: _transformationController.toScene(
+      widget.onInteractionUpdate!(ScaleUpdateDetails(
+        focalPoint: _transformationController!.toScene(
           details.localFocalPoint,
         ),
         scale: details.scale,
         rotation: details.rotation,
       ));
     }
-    final Offset focalPointScene = _transformationController.toScene(
+    final Offset focalPointScene = _transformationController!.toScene(
       details.localFocalPoint,
     );
 
@@ -734,10 +727,10 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
         // details.scale gives us the amount to change the scale as of the
         // start of this gesture, so calculate the amount to scale as of the
         // previous call to _onScaleUpdate.
-        final double desiredScale = _scaleStart * details.scale;
+        final double desiredScale = _scaleStart! * details.scale;
         final double scaleChange = desiredScale / scale;
-        _transformationController.value = _matrixScale(
-          _transformationController.value,
+        _transformationController!.value = _matrixScale(
+          _transformationController!.value,
           scaleChange,
         );
 
@@ -745,12 +738,12 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
         // the same places in the scene. That means that the focal point of
         // the scale should be on the same place in the scene before and after
         // the scale.
-        final Offset focalPointSceneScaled = _transformationController.toScene(
+        final Offset focalPointSceneScaled = _transformationController!.toScene(
           details.localFocalPoint,
         );
-        _transformationController.value = _matrixTranslate(
-          _transformationController.value,
-          focalPointSceneScaled - _referenceFocalPoint,
+        _transformationController!.value = _matrixTranslate(
+          _transformationController!.value,
+          focalPointSceneScaled - _referenceFocalPoint!,
         );
 
         // details.localFocalPoint should now be at the same location as the
@@ -758,10 +751,10 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
         // the translate came in contact with a boundary. In that case, update
         // _referenceFocalPoint so subsequent updates happen in relation to
         // the new effective focal point.
-        final Offset focalPointSceneCheck = _transformationController.toScene(
+        final Offset focalPointSceneCheck = _transformationController!.toScene(
           details.localFocalPoint,
         );
-        if (_round(_referenceFocalPoint) != _round(focalPointSceneCheck)) {
+        if (_round(_referenceFocalPoint!) != _round(focalPointSceneCheck)) {
           _referenceFocalPoint = focalPointSceneCheck;
         }
         return;
@@ -770,9 +763,9 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
         if (details.rotation == 0.0) {
           return;
         }
-        final double desiredRotation = _rotationStart + details.rotation;
-        _transformationController.value = _matrixRotate(
-          _transformationController.value,
+        final double desiredRotation = _rotationStart! + details.rotation;
+        _transformationController!.value = _matrixRotate(
+          _transformationController!.value,
           _currentRotation - desiredRotation,
           details.localFocalPoint,
         );
@@ -790,14 +783,17 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
         _panAxis ??= _getPanAxis(_referenceFocalPoint, focalPointScene);
         // Translate so that the same point in the scene is underneath the
         // focal point before and after the movement.
-        final Offset translationChange = focalPointScene - _referenceFocalPoint;
-        _transformationController.value = _matrixTranslate(
-          _transformationController.value,
+        final Offset translationChange =
+            focalPointScene - _referenceFocalPoint!;
+        _transformationController!.value = _matrixTranslate(
+          _transformationController!.value,
           translationChange,
         );
-        _referenceFocalPoint = _transformationController.toScene(
+        _referenceFocalPoint = _transformationController!.toScene(
           details.localFocalPoint,
         );
+        return;
+      default:
         return;
     }
   }
@@ -806,7 +802,7 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
   // are handled with GestureDetector's scale gesture.
   void _onScaleEnd(ScaleEndDetails details) {
     if (widget.onInteractionEnd != null) {
-      widget.onInteractionEnd(details);
+      widget.onInteractionEnd!(details);
     }
     _scaleStart = null;
     _rotationStart = null;
@@ -828,7 +824,7 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
     }
 
     final Vector3 translationVector =
-        _transformationController.value.getTranslation();
+        _transformationController!.value.getTranslation();
     final Offset translation = Offset(translationVector.x, translationVector.y);
     final FrictionSimulation frictionSimulationX = FrictionSimulation(
       _kDrag,
@@ -852,7 +848,7 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
       curve: Curves.decelerate,
     ));
     _controller.duration = Duration(milliseconds: (tFinal * 1000).round());
-    _animation.addListener(_onAnimate);
+    _animation!.addListener(_onAnimate);
     _controller.forward();
   }
 
@@ -863,27 +859,27 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
     }
     if (event is PointerScrollEvent) {
       final RenderBox childRenderBox =
-          _childKey.currentContext.findRenderObject() as RenderBox;
+          _childKey.currentContext!.findRenderObject() as RenderBox;
       final Size childSize = childRenderBox.size;
       final double scaleChange = 1.0 - event.scrollDelta.dy / childSize.height;
       if (scaleChange == 0.0) {
         return;
       }
-      final Offset focalPointScene = _transformationController.toScene(
+      final Offset focalPointScene = _transformationController!.toScene(
         event.localPosition,
       );
-      _transformationController.value = _matrixScale(
-        _transformationController.value,
+      _transformationController!.value = _matrixScale(
+        _transformationController!.value,
         scaleChange,
       );
 
       // After scaling, translate such that the event's position is at the
       // same scene point before and after the scale.
-      final Offset focalPointSceneScaled = _transformationController.toScene(
+      final Offset focalPointSceneScaled = _transformationController!.toScene(
         event.localPosition,
       );
-      _transformationController.value = _matrixTranslate(
-        _transformationController.value,
+      _transformationController!.value = _matrixTranslate(
+        _transformationController!.value,
         focalPointSceneScaled - focalPointScene,
       );
     }
@@ -900,17 +896,17 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
     }
     // Translate such that the resulting translation is _animation.value.
     final Vector3 translationVector =
-        _transformationController.value.getTranslation();
+        _transformationController!.value.getTranslation();
     final Offset translation = Offset(translationVector.x, translationVector.y);
-    final Offset translationScene = _transformationController.toScene(
+    final Offset translationScene = _transformationController!.toScene(
       translation,
     );
-    final Offset animationScene = _transformationController.toScene(
-      _animation.value,
+    final Offset animationScene = _transformationController!.toScene(
+      _animation!.value,
     );
     final Offset translationChangeScene = animationScene - translationScene;
-    _transformationController.value = _matrixTranslate(
-      _transformationController.value,
+    _transformationController!.value = _matrixTranslate(
+      _transformationController!.value,
       translationChangeScene,
     );
   }
@@ -927,7 +923,7 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
 
     _transformationController =
         widget.transformationController ?? TransformationController();
-    _transformationController.addListener(_onTransformationControllerChange);
+    _transformationController!.addListener(_onTransformationControllerChange);
     _controller = AnimationController(
       vsync: this,
     );
@@ -940,26 +936,26 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
     // transformationControllers.
     if (oldWidget.transformationController == null) {
       if (widget.transformationController != null) {
-        _transformationController
+        _transformationController!
             .removeListener(_onTransformationControllerChange);
-        _transformationController.dispose();
+        _transformationController!.dispose();
         _transformationController = widget.transformationController;
-        _transformationController
+        _transformationController!
             .addListener(_onTransformationControllerChange);
       }
     } else {
       if (widget.transformationController == null) {
-        _transformationController
+        _transformationController!
             .removeListener(_onTransformationControllerChange);
         _transformationController = TransformationController();
-        _transformationController
+        _transformationController!
             .addListener(_onTransformationControllerChange);
       } else if (widget.transformationController !=
           oldWidget.transformationController) {
-        _transformationController
+        _transformationController!
             .removeListener(_onTransformationControllerChange);
         _transformationController = widget.transformationController;
-        _transformationController
+        _transformationController!
             .addListener(_onTransformationControllerChange);
       }
     }
@@ -968,9 +964,10 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
   @override
   void dispose() {
     _controller.dispose();
-    _transformationController.removeListener(_onTransformationControllerChange);
+    _transformationController!
+        .removeListener(_onTransformationControllerChange);
     if (widget.transformationController == null) {
-      _transformationController.dispose();
+      _transformationController!.dispose();
     }
     super.dispose();
   }
@@ -978,7 +975,7 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
   @override
   Widget build(BuildContext context) {
     Widget child = Transform(
-      transform: _transformationController.value,
+      transform: _transformationController!.value,
       child: KeyedSubtree(
         key: _childKey,
         child: widget.child,
@@ -1029,7 +1026,7 @@ class TransformationController extends ValueNotifier<Matrix4> {
   ///
   /// The [value] defaults to the identity matrix, which corresponds to no
   /// transformation.
-  TransformationController([Matrix4 value])
+  TransformationController([Matrix4? value])
       : super(value ?? Matrix4.identity());
 
   /// Return the scene point at the given viewport point.
@@ -1155,7 +1152,7 @@ Offset _exceedsBy(Quad boundary, Quad viewport) {
   Offset largestExcess = Offset.zero;
   for (final Vector3 point in viewportPoints) {
     final Vector3 pointInside =
-        ImagePainterTransformer.getNearestPointInside(point, boundary);
+        ImagePainterTransformer.getNearestPointInside(point, boundary)!;
     final Offset excess = Offset(
       pointInside.x - point.x,
       pointInside.y - point.y,
@@ -1182,7 +1179,7 @@ Offset _round(Offset offset) {
 
 // Align the given offset to the given axis by allowing movement only in the
 // axis direction.
-Offset _alignAxis(Offset offset, Axis axis) {
+Offset _alignAxis(Offset offset, Axis? axis) {
   switch (axis) {
     case Axis.horizontal:
       return Offset(offset.dx, 0.0);
@@ -1194,11 +1191,11 @@ Offset _alignAxis(Offset offset, Axis axis) {
 
 // Given two points, return the axis where the distance between the points is
 // greatest. If they are equal, return null.
-Axis _getPanAxis(Offset point1, Offset point2) {
+Axis? _getPanAxis(Offset? point1, Offset point2) {
   if (point1 == point2) {
     return null;
   }
-  final double x = point2.dx - point1.dx;
+  final double x = point2.dx - point1!.dx;
   final double y = point2.dy - point1.dy;
   return x.abs() > y.abs() ? Axis.horizontal : Axis.vertical;
 }

@@ -1,10 +1,12 @@
+import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 import 'package:image_painter/image_painter.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 
 class SignatureExample extends StatefulWidget {
   @override
@@ -14,7 +16,7 @@ class SignatureExample extends StatefulWidget {
 class _SignatureExampleState extends State<SignatureExample> {
   final _imageKey = GlobalKey<ImagePainterState>();
   final _key = GlobalKey<ScaffoldState>();
-  final _controller = ValueNotifier<Controller>(null);
+  final _controller = ValueNotifier<Controller?>(null);
   @override
   void initState() {
     _controller.value =
@@ -48,10 +50,10 @@ class _SignatureExampleState extends State<SignatureExample> {
             children: [
               IconButton(
                   icon: const Icon(Icons.reply, color: Colors.white),
-                  onPressed: () => _imageKey.currentState.undo()),
+                  onPressed: () => _imageKey.currentState!.undo()),
               IconButton(
                   icon: const Icon(Icons.clear, color: Colors.white),
-                  onPressed: () => _imageKey.currentState.clearAll()),
+                  onPressed: () => _imageKey.currentState!.clearAll()),
             ],
           ),
         ),
@@ -59,14 +61,14 @@ class _SignatureExampleState extends State<SignatureExample> {
       body: Center(
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8),
-          child: ValueListenableBuilder<Controller>(
+          child: ValueListenableBuilder<Controller?>(
               valueListenable: _controller,
-              builder: (_, Controller controller, __) {
+              builder: (_, Controller? controller, __) {
                 return ImagePainter.signature(
                   height: 200,
                   width: 300,
                   key: _imageKey,
-                  controller: controller,
+                  controller: controller!,
                   signatureBgColor: Colors.grey[200],
                 );
               }),
@@ -75,7 +77,7 @@ class _SignatureExampleState extends State<SignatureExample> {
     );
   }
 
-  void _updateController(Controller controller) =>
+  void _updateController(Controller? controller) =>
       _controller.value = controller;
 
   void _openMainColorPicker() {
@@ -84,7 +86,7 @@ class _SignatureExampleState extends State<SignatureExample> {
       builder: (_) {
         return ValueListenableBuilder(
           valueListenable: _controller,
-          builder: (BuildContext context, value, Widget child) {
+          builder: (BuildContext context, dynamic value, Widget? child) {
             return AlertDialog(
               contentPadding: const EdgeInsets.all(6.0),
               title: const Text("Pick a color"),
@@ -112,7 +114,7 @@ class _SignatureExampleState extends State<SignatureExample> {
         builder: (_) {
           return ValueListenableBuilder(
               valueListenable: _controller,
-              builder: (_, ctrl, __) {
+              builder: (_, dynamic ctrl, __) {
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -151,13 +153,14 @@ class _SignatureExampleState extends State<SignatureExample> {
   }
 
   void saveImage() async {
-    final image = await _imageKey.currentState.exportImage();
+    final image =
+        await (_imageKey.currentState!.exportImage() as FutureOr<Uint8List>);
     final directory = (await getApplicationDocumentsDirectory()).path;
     await Directory('$directory/sample').create(recursive: true);
     final fullPath = '$directory/sample/image.png';
     final imgFile = File('$fullPath');
     imgFile.writeAsBytesSync(image);
-    _key.currentState.showSnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: Colors.grey[700],
         padding: const EdgeInsets.only(left: 10),

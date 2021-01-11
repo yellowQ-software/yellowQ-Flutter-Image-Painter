@@ -14,7 +14,7 @@ export 'image_painter.dart';
 @immutable
 class ImagePainter extends StatefulWidget {
   const ImagePainter._(
-      {Key key,
+      {Key? key,
       this.assetPath,
       this.networkUrl,
       this.byteArray,
@@ -31,12 +31,12 @@ class ImagePainter extends StatefulWidget {
   ///Constructor for loading image from network url.
   factory ImagePainter.network(
     String url, {
-    @required Controller controller,
-    Key key,
-    double height,
-    double width,
-    Widget placeholderWidget,
-    bool scalable,
+    required Controller controller,
+    Key? key,
+    double? height,
+    double? width,
+    Widget? placeholderWidget,
+    bool? scalable,
   }) {
     return ImagePainter._(
         key: key,
@@ -51,12 +51,12 @@ class ImagePainter extends StatefulWidget {
   ///Constructor for loading image from assetPath.
   factory ImagePainter.asset(
     String path, {
-    @required Controller controller,
-    Key key,
-    double height,
-    double width,
-    bool scalable,
-    Widget placeholderWidget,
+    required Controller controller,
+    Key? key,
+    double? height,
+    double? width,
+    bool? scalable,
+    Widget? placeholderWidget,
   }) {
     return ImagePainter._(
         key: key,
@@ -71,12 +71,12 @@ class ImagePainter extends StatefulWidget {
   ///Constructor for loading image from [File].
   factory ImagePainter.file(
     File file, {
-    @required Controller controller,
-    Key key,
-    double height,
-    double width,
-    bool scalable,
-    Widget placeholderWidget,
+    required Controller controller,
+    Key? key,
+    double? height,
+    double? width,
+    bool? scalable,
+    Widget? placeholderWidget,
   }) {
     return ImagePainter._(
         key: key,
@@ -91,12 +91,12 @@ class ImagePainter extends StatefulWidget {
   ///Constructor for loading image from memory.
   factory ImagePainter.memory(
     Uint8List byteArray, {
-    @required Controller controller,
-    Key key,
-    double height,
-    double width,
-    bool scalable,
-    Widget placeholderWidget,
+    required Controller controller,
+    Key? key,
+    double? height,
+    double? width,
+    bool? scalable,
+    Widget? placeholderWidget,
   }) {
     return ImagePainter._(
         key: key,
@@ -110,11 +110,11 @@ class ImagePainter extends StatefulWidget {
 
   ///Constructor for signature painting.
   factory ImagePainter.signature({
-    @required Controller controller,
-    Key key,
-    Color signatureBgColor,
-    double height,
-    double width,
+    required Controller controller,
+    Key? key,
+    Color? signatureBgColor,
+    double? height,
+    double? width,
   }) {
     return ImagePainter._(
         key: key,
@@ -127,35 +127,35 @@ class ImagePainter extends StatefulWidget {
   }
 
   ///Only accessible through [ImagePainter.network] constructor.
-  final String networkUrl;
+  final String? networkUrl;
 
   ///Only accessible through [ImagePainter.memory] constructor.
-  final Uint8List byteArray;
+  final Uint8List? byteArray;
 
   ///Only accessible through [ImagePainter.file] constructor.
-  final File file;
+  final File? file;
 
   ///Only accessible through [ImagePainter.asset] constructor.
-  final String assetPath;
+  final String? assetPath;
 
   ///Height of the Widget. Image is subjected to fit within the given height.
-  final double height;
+  final double? height;
 
   ///Width of the widget. Image is subjected to fit within the given width.
-  final double width;
+  final double? width;
 
   ///Widget to be shown during the conversion of provided image to [ui.Image].
-  final Widget placeHolder;
+  final Widget? placeHolder;
 
   ///Controller has properties like [Color] and [strokeWidth] required for the painter.
-  final Controller controller;
+  final Controller? controller;
 
   ///Defines whether the widget should be scaled or not. Defaults to [false].
-  final bool isScalable;
+  final bool? isScalable;
 
   final bool isSignature;
 
-  final Color signatureBackgroundColor;
+  final Color? signatureBackgroundColor;
 
   @override
   ImagePainterState createState() => ImagePainterState();
@@ -163,13 +163,13 @@ class ImagePainter extends StatefulWidget {
 
 class ImagePainterState extends State<ImagePainter> {
   final _repaintKey = GlobalKey();
-  ui.Image _image;
+  ui.Image? _image;
   final _isLoaded = ValueNotifier<bool>(false);
   bool _inDrag = false;
-  final _controller = ValueNotifier<Controller>(null);
+  final _controller = ValueNotifier<Controller?>(null);
   final _paintHistory = <PaintHistory>[];
-  final _points = <Offset>[];
-  Offset _start, _end;
+  final _points = <Offset?>[];
+  Offset? _start, _end;
   int _strokeMultiplier = 1;
   @override
   void initState() {
@@ -182,36 +182,36 @@ class ImagePainterState extends State<ImagePainter> {
   void didUpdateWidget(ImagePainter oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller != widget.controller) {
-      _controller.value = _controller.value.copyWith(
-          color: widget.controller.color,
-          strokeWidth: widget.controller.strokeWidth,
-          mode: widget.controller.mode,
-          paintingStyle: widget.controller.paintStyle);
+      _controller.value = _controller.value!.copyWith(
+          color: widget.controller!.color,
+          strokeWidth: widget.controller!.strokeWidth,
+          mode: widget.controller!.mode,
+          paintingStyle: widget.controller!.paintStyle);
     }
   }
 
   Paint get _painter => Paint()
-    ..color = _controller.value.color
-    ..strokeWidth = _controller.value.strokeWidth * _strokeMultiplier
-    ..style = _controller.value.mode == PaintMode.DottedLine
+    ..color = _controller.value!.color
+    ..strokeWidth = _controller.value!.strokeWidth * _strokeMultiplier
+    ..style = _controller.value!.mode == PaintMode.DottedLine
         ? PaintingStyle.stroke
-        : _controller.value.paintStyle;
+        : _controller.value!.paintStyle;
 
   ///Converts the incoming image type from constructor to [ui.Image]
   Future<void> _resolveAndConvertImage() async {
     if (widget.networkUrl != null) {
-      _image = await _loadNetworkImage(widget.networkUrl);
+      _image = await _loadNetworkImage(widget.networkUrl!);
       setStrokeMultiplier();
     } else if (widget.assetPath != null) {
-      final img = await rootBundle.load(widget.assetPath);
+      final img = await rootBundle.load(widget.assetPath!);
       _image = await _convertImage(Uint8List.view(img.buffer));
       setStrokeMultiplier();
     } else if (widget.file != null) {
-      final img = await widget.file.readAsBytes();
+      final img = await widget.file!.readAsBytes();
       _image = await _convertImage(img);
       setStrokeMultiplier();
     } else if (widget.byteArray != null) {
-      _image = await _convertImage(widget.byteArray);
+      _image = await _convertImage(widget.byteArray!);
       setStrokeMultiplier();
     } else {
       _isLoaded.value = true;
@@ -219,15 +219,15 @@ class ImagePainterState extends State<ImagePainter> {
   }
 
   setStrokeMultiplier() {
-    if ((_image.height + _image.width) > 1000) {
-      _strokeMultiplier = (_image.height + _image.width) ~/ 1000;
+    if ((_image!.height + _image!.width) > 1000) {
+      _strokeMultiplier = (_image!.height + _image!.width) ~/ 1000;
     }
   }
 
   ///Completer function to convert asset or file image to [ui.Image] before drawing on custompainter.
   Future<ui.Image> _convertImage(List<int> img) async {
     final completer = Completer<ui.Image>();
-    ui.decodeImageFromList(img, (ui.Image img) {
+    ui.decodeImageFromList(img as Uint8List, (ui.Image img) {
       _isLoaded.value = true;
       return completer.complete(img);
     });
@@ -277,18 +277,18 @@ class ImagePainterState extends State<ImagePainter> {
         child: ClipRect(
           child: ValueListenableBuilder(
             valueListenable: _controller,
-            builder: (_, Controller controller, __) {
+            builder: (_, Controller? controller, __) {
               return ImagePainterTransformer(
                 maxScale: 2.4,
                 minScale: 1,
-                panEnabled: controller.mode == PaintMode.None,
-                scaleEnabled: widget.isScalable,
+                panEnabled: controller!.mode == PaintMode.None,
+                scaleEnabled: widget.isScalable!,
                 onInteractionUpdate: (ScaleUpdateDetails details) =>
                     _scaleUpdateGesture(details, controller),
                 onInteractionEnd: (ScaleEndDetails details) =>
                     _scaleEndGesture(details, controller),
                 child: CustomPaint(
-                  size: Size(_image.width.toDouble(), _image.height.toDouble()),
+                  size: Size(_image!.width.toDouble(), _image!.height.toDouble()),
                   willChange: true,
                   isComplex: true,
                   painter: DrawImage(
@@ -320,7 +320,7 @@ class ImagePainterState extends State<ImagePainter> {
           height: widget.height ?? double.maxFinite,
           child: ValueListenableBuilder(
             valueListenable: _controller,
-            builder: (_, Controller controller, __) {
+            builder: (_, Controller? controller, __) {
               return ImagePainterTransformer(
                   panEnabled: false,
                   scaleEnabled: false,
@@ -341,7 +341,7 @@ class ImagePainterState extends State<ImagePainter> {
                           start: _start,
                           end: _end,
                           painter: _painter,
-                          mode: controller.mode),
+                          mode: controller!.mode),
                     ),
                   ));
             },
@@ -352,12 +352,12 @@ class ImagePainterState extends State<ImagePainter> {
   }
 
   ///Fires while user is interacting with the screen to record painting.
-  void _scaleUpdateGesture(ScaleUpdateDetails onUpdate, Controller controller) {
+  void _scaleUpdateGesture(ScaleUpdateDetails onUpdate, Controller? controller) {
     setState(() {
       _inDrag = true;
       _start ??= onUpdate.focalPoint;
       _end = onUpdate.focalPoint;
-      if (controller.mode == PaintMode.FreeStyle || widget.isSignature) {
+      if (controller!.mode == PaintMode.FreeStyle || widget.isSignature) {
         _points.add(_end);
       } else if (controller.mode == PaintMode.Text &&
           _paintHistory.any((element) => element.map.value.text != null)) {
@@ -371,10 +371,10 @@ class ImagePainterState extends State<ImagePainter> {
   }
 
   ///Fires when user stops interacting with the screen.
-  void _scaleEndGesture(ScaleEndDetails onEnd, Controller controller) {
+  void _scaleEndGesture(ScaleEndDetails onEnd, Controller? controller) {
     setState(() {
       _inDrag = false;
-      if (controller.mode == PaintMode.None) {
+      if (controller!.mode == PaintMode.None) {
       } else if (_start != null &&
           _end != null &&
           controller.mode != PaintMode.FreeStyle) {
@@ -403,16 +403,16 @@ class ImagePainterState extends State<ImagePainter> {
     );
   }
 
-  void _addFreeStylePoints(Controller controller) {
+  void _addFreeStylePoints(Controller? controller) {
     if (widget.isSignature) {
       _paintHistory.add(
         PaintHistory(
           MapEntry<PaintMode, PaintInfo>(
             PaintMode.FreeStyle,
             PaintInfo(
-                offset: <Offset>[..._points],
+                offset: <Offset?>[..._points],
                 painter: Paint()
-                  ..color = controller.color
+                  ..color = controller!.color
                   ..strokeWidth = controller.strokeWidth),
           ),
         ),
@@ -421,8 +421,8 @@ class ImagePainterState extends State<ImagePainter> {
       _paintHistory.add(
         PaintHistory(
           MapEntry<PaintMode, PaintInfo>(
-            controller.mode,
-            PaintInfo(offset: <Offset>[..._points], painter: _painter),
+            controller!.mode,
+            PaintInfo(offset: <Offset?>[..._points], painter: _painter),
           ),
         ),
       );
@@ -434,7 +434,7 @@ class ImagePainterState extends State<ImagePainter> {
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
     final painter = DrawImage(image: _image, paintHistory: _paintHistory);
-    final size = Size(_image.width.toDouble(), _image.height.toDouble());
+    final size = Size(_image!.width.toDouble(), _image!.height.toDouble());
     painter.paint(canvas, size);
     return recorder
         .endRecording()
@@ -443,18 +443,18 @@ class ImagePainterState extends State<ImagePainter> {
 
   ///Generates [Uint8List] of the [ui.Image] generated by the [renderImage()] method.
   ///Can be converted to image file by writing as bytes.
-  Future<Uint8List> exportImage() async {
+  Future<Uint8List?> exportImage() async {
     ui.Image _image;
     if (widget.isSignature) {
       RenderRepaintBoundary _boundary =
-          _repaintKey.currentContext.findRenderObject();
+          _repaintKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
       _image = await _boundary.toImage(pixelRatio: 3);
     } else if (widget.byteArray != null && _paintHistory.isEmpty) {
       return widget.byteArray;
     } else {
       _image = await _renderImage();
     }
-    final byteData = await _image.toByteData(format: ui.ImageByteFormat.png);
+    final byteData = await (_image.toByteData(format: ui.ImageByteFormat.png) as FutureOr<ByteData>);
     return byteData.buffer.asUint8List();
   }
 
@@ -517,10 +517,10 @@ class Controller {
   }
 
   Controller copyWith({
-    double strokeWidth,
-    Color color,
-    PaintMode mode,
-    PaintingStyle paintingStyle,
+    double? strokeWidth,
+    Color? color,
+    PaintMode? mode,
+    PaintingStyle? paintingStyle,
   }) {
     return Controller(
         strokeWidth: strokeWidth ?? this.strokeWidth,
