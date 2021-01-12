@@ -1,6 +1,12 @@
 # 1.0.0-nullsafety.0
 - Migrated Package to null safety. 
 
+# 0.2.0
+
+- Fixed issue with image parsing failing when used with file. 
+- Added exceptions to the image conversion failures.
+- Fixed lint issues.
+
 # 0.1.9
 
 - Smoother look for signature mode.
