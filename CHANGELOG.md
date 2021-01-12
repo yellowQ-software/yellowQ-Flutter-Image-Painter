@@ -1,7 +1,10 @@
+# 1.0.0-nullsafety.0
+- Migrated Package to null safety. 
+
 # 0.1.9
 
 - Smoother look for signature mode.
-- Local InteractiveViewer for future flutter version issues. 
+- Local `InteractiveViewer` for future flutter version issues. 
 
 # 0.1.8
 
@@ -12,22 +15,22 @@
 
 # 0.1.6
 
-- ByteArray on memory constructor now returns itself without conversion back if no action is performed on it.
+- ByteArray on `Image.memory` constructor now returns itself without conversion back if no action is performed on it.
 - Code refactors.
 
 # 0.1.5
 
-- Breaking Change: Controller is immutable and can only be overridden with copyWith Constructor.
-- Added PaintStyle in constructor.
+- Breaking Change: Controller is immutable and can only be overridden with `.copyWith` Constructor.
+- Added `PaintStyle` in constructor.
 - Code refactor.
 
 # 0.1.4
 
-- Fixed ImagePainter.memory constructor taking ui.Image while it should be taking Uint8List. 
+- Fixed `ImagePainter.memory` constructor taking `ui.Image` while it should be taking `Uint8List`. 
 
 # 0.1.3
 
-- Added signature field. 
+- Added `ImagePainter.signature` constructor for signature field. 
 - Fixed scaling issues.
 - Added example for signature field. 
 
@@ -38,6 +41,6 @@
 
 # 0.1.0
 
-Initial version of image_painter library.
+Initial version of `image_painter` library.
  - Includes 7 modes of paint styles i.e. Line, Box/Rectangle, Circle, FreeStyle or Signature, Arrow, Dash/Dotted Lines and Text 
- - Includes controls for color and StrokeWidth.
+ - Includes controls for `Color` and `StrokeWidth`.

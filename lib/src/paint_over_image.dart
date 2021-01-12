@@ -15,14 +15,14 @@ export 'image_painter.dart';
 @immutable
 class ImagePainter extends StatefulWidget {
   const ImagePainter._(
-      {Key? key,
+      {required this.controller,
+      required Key key,
       this.assetPath,
       this.networkUrl,
       this.byteArray,
       this.file,
       this.height,
       this.width,
-      this.controller,
       this.placeHolder,
       this.isScalable = false,
       this.isSignature = false,
@@ -33,7 +33,7 @@ class ImagePainter extends StatefulWidget {
   factory ImagePainter.network(
     String url, {
     required Controller controller,
-    Key? key,
+    required Key key,
     double? height,
     double? width,
     Widget? placeholderWidget,
@@ -53,7 +53,7 @@ class ImagePainter extends StatefulWidget {
   factory ImagePainter.asset(
     String path, {
     required Controller controller,
-    Key? key,
+    required Key key,
     double? height,
     double? width,
     bool? scalable,
@@ -73,7 +73,7 @@ class ImagePainter extends StatefulWidget {
   factory ImagePainter.file(
     File file, {
     required Controller controller,
-    Key? key,
+    required Key key,
     double? height,
     double? width,
     bool? scalable,
@@ -93,7 +93,7 @@ class ImagePainter extends StatefulWidget {
   factory ImagePainter.memory(
     Uint8List byteArray, {
     required Controller controller,
-    Key? key,
+    required Key key,
     double? height,
     double? width,
     bool? scalable,
@@ -112,7 +112,7 @@ class ImagePainter extends StatefulWidget {
   ///Constructor for signature painting.
   factory ImagePainter.signature({
     required Controller controller,
-    Key? key,
+    required Key key,
     Color? signatureBgColor,
     double? height,
     double? width,
@@ -149,7 +149,7 @@ class ImagePainter extends StatefulWidget {
   final Widget? placeHolder;
 
   ///Controller has properties like [Color] and [strokeWidth] required for the painter.
-  final Controller? controller;
+  final Controller controller;
 
   ///Defines whether the widget should be scaled or not. Defaults to [false].
   final bool isScalable;
@@ -167,7 +167,7 @@ class ImagePainterState extends State<ImagePainter> {
   ui.Image? _image;
   final _isLoaded = ValueNotifier<bool>(false);
   bool _inDrag = false;
-  final _controller = ValueNotifier<Controller?>(null);
+  late final ValueNotifier<Controller> _controller;
   final _paintHistory = <PaintHistory>[];
   final _points = <Offset?>[];
   Offset? _start, _end;
@@ -176,44 +176,60 @@ class ImagePainterState extends State<ImagePainter> {
   void initState() {
     super.initState();
     _resolveAndConvertImage();
-    _controller.value = widget.controller;
+    _controller = ValueNotifier<Controller>(widget.controller);
   }
 
   @override
   void didUpdateWidget(ImagePainter oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller != widget.controller) {
-      _controller.value = _controller.value!.copyWith(
-          color: widget.controller!.color,
-          strokeWidth: widget.controller!.strokeWidth,
-          mode: widget.controller!.mode,
-          paintingStyle: widget.controller!.paintStyle);
+      _controller.value = _controller.value.copyWith(
+          color: widget.controller.color,
+          strokeWidth: widget.controller.strokeWidth,
+          mode: widget.controller.mode,
+          paintingStyle: widget.controller.paintStyle);
     }
   }
 
   Paint get _painter => Paint()
-    ..color = _controller.value!.color
-    ..strokeWidth = _controller.value!.strokeWidth * _strokeMultiplier
-    ..style = _controller.value!.mode == PaintMode.DottedLine
+    ..color = _controller.value.color
+    ..strokeWidth = _controller.value.strokeWidth * _strokeMultiplier
+    ..style = _controller.value.mode == PaintMode.DottedLine
         ? PaintingStyle.stroke
-        : _controller.value!.paintStyle;
+        : _controller.value.paintStyle;
 
   ///Converts the incoming image type from constructor to [ui.Image]
   Future<void> _resolveAndConvertImage() async {
     if (widget.networkUrl != null) {
       _image = await _loadNetworkImage(widget.networkUrl!);
-      _setStrokeMultiplier();
+      if (_image == null) {
+        throw ("${widget.networkUrl} couldn't be resolved.");
+      } else {
+        _setStrokeMultiplier();
+      }
     } else if (widget.assetPath != null) {
       final img = await rootBundle.load(widget.assetPath!);
       _image = await _convertImage(Uint8List.view(img.buffer));
-      _setStrokeMultiplier();
+      if (_image == null) {
+        throw ("${widget.assetPath} couldn't be resolved.");
+      } else {
+        _setStrokeMultiplier();
+      }
     } else if (widget.file != null) {
       final img = await widget.file!.readAsBytes();
       _image = await _convertImage(img);
-      _setStrokeMultiplier();
+      if (_image == null) {
+        throw ("Image couldn't be resolved from provided file.");
+      } else {
+        _setStrokeMultiplier();
+      }
     } else if (widget.byteArray != null) {
       _image = await _convertImage(widget.byteArray!);
-      _setStrokeMultiplier();
+      if (_image == null) {
+        throw ("Image couldn't be resolved from provided byteArray.");
+      } else {
+        _setStrokeMultiplier();
+      }
     } else {
       _isLoaded.value = true;
     }
@@ -320,7 +336,7 @@ class ImagePainterState extends State<ImagePainter> {
         child: Container(
           width: widget.width ?? double.maxFinite,
           height: widget.height ?? double.maxFinite,
-          child: ValueListenableBuilder<Controller?>(
+          child: ValueListenableBuilder<Controller>(
             valueListenable: _controller,
             builder: (_, controller, __) {
               return ImagePainterTransformer(
@@ -343,7 +359,7 @@ class ImagePainterState extends State<ImagePainter> {
                           start: _start,
                           end: _end,
                           painter: _painter,
-                          mode: controller!.mode),
+                          mode: controller.mode),
                     ),
                   ));
             },
@@ -354,13 +370,12 @@ class ImagePainterState extends State<ImagePainter> {
   }
 
   ///Fires while user is interacting with the screen to record painting.
-  void _scaleUpdateGesture(
-      ScaleUpdateDetails onUpdate, Controller? controller) {
+  void _scaleUpdateGesture(ScaleUpdateDetails onUpdate, Controller controller) {
     setState(() {
       _inDrag = true;
       _start ??= onUpdate.focalPoint;
       _end = onUpdate.focalPoint;
-      if (controller!.mode == PaintMode.FreeStyle || widget.isSignature) {
+      if (controller.mode == PaintMode.FreeStyle || widget.isSignature) {
         _points.add(_end);
       } else if (controller.mode == PaintMode.Text &&
           _paintHistory.any((element) => element.map.value.text != null)) {
@@ -374,10 +389,10 @@ class ImagePainterState extends State<ImagePainter> {
   }
 
   ///Fires when user stops interacting with the screen.
-  void _scaleEndGesture(ScaleEndDetails onEnd, Controller? controller) {
+  void _scaleEndGesture(ScaleEndDetails onEnd, Controller controller) {
     setState(() {
       _inDrag = false;
-      if (controller!.mode == PaintMode.None) {
+      if (controller.mode == PaintMode.None) {
       } else if (_start != null &&
           _end != null &&
           controller.mode != PaintMode.FreeStyle) {
@@ -406,30 +421,18 @@ class ImagePainterState extends State<ImagePainter> {
     );
   }
 
-  void _addFreeStylePoints(Controller? controller) {
-    if (widget.isSignature) {
-      _paintHistory.add(
-        PaintHistory(
-          MapEntry<PaintMode, PaintInfo>(
-            PaintMode.FreeStyle,
-            PaintInfo(
-                offset: <Offset?>[..._points],
-                painter: Paint()
-                  ..color = controller!.color
-                  ..strokeWidth = controller.strokeWidth),
+  void _addFreeStylePoints(Controller controller) {
+    _paintHistory.add(
+      PaintHistory(
+        MapEntry<PaintMode, PaintInfo>(
+          widget.isSignature ? PaintMode.FreeStyle : controller.mode,
+          PaintInfo(
+            offset: <Offset?>[..._points],
+            painter: _painter,
           ),
         ),
-      );
-    } else {
-      _paintHistory.add(
-        PaintHistory(
-          MapEntry<PaintMode, PaintInfo>(
-            controller!.mode,
-            PaintInfo(offset: <Offset?>[..._points], painter: _painter),
-          ),
-        ),
-      );
-    }
+      ),
+    );
   }
 
   ///Provides [ui.Image] of the recorded canvas to perform action.

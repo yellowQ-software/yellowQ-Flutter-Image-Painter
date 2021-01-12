@@ -16,11 +16,11 @@ class SignatureExample extends StatefulWidget {
 class _SignatureExampleState extends State<SignatureExample> {
   final _imageKey = GlobalKey<ImagePainterState>();
   final _key = GlobalKey<ScaffoldState>();
-  final _controller = ValueNotifier<Controller?>(null);
+  late final ValueNotifier<Controller> _controller;
   @override
   void initState() {
-    _controller.value =
-        Controller(color: Colors.black, mode: PaintMode.Line, strokeWidth: 4.0);
+    _controller = ValueNotifier<Controller>(Controller(
+        color: Colors.black, mode: PaintMode.Line, strokeWidth: 4.0));
     super.initState();
   }
 
@@ -74,13 +74,13 @@ class _SignatureExampleState extends State<SignatureExample> {
     );
   }
 
-  _updateController(Controller? controller) => _controller.value = controller;
+  _updateController(Controller controller) => _controller.value = controller;
 
   void _openMainColorPicker() {
     showDialog(
       context: context,
       builder: (_) {
-        return ValueListenableBuilder<Controller?>(
+        return ValueListenableBuilder<Controller>(
           valueListenable: _controller,
           builder: (_, value, __) {
             return AlertDialog(
@@ -88,10 +88,10 @@ class _SignatureExampleState extends State<SignatureExample> {
               title: const Text("Pick a color"),
               content: MaterialColorPicker(
                   shrinkWrap: true,
-                  selectedColor: value?.color,
+                  selectedColor: value.color,
                   allowShades: false,
                   onMainColorChange: (color) =>
-                      _updateController(value?.copyWith(color: color))),
+                      _updateController(value.copyWith(color: color))),
               actions: [
                 FlatButton(
                     child: const Text('Done'),
@@ -108,7 +108,7 @@ class _SignatureExampleState extends State<SignatureExample> {
     showDialog(
         context: context,
         builder: (_) {
-          return ValueListenableBuilder<Controller?>(
+          return ValueListenableBuilder<Controller>(
               valueListenable: _controller,
               builder: (_, ctrl, __) {
                 return Column(
@@ -121,15 +121,15 @@ class _SignatureExampleState extends State<SignatureExample> {
                       content: Column(
                         children: [
                           CupertinoSlider(
-                            value: (ctrl == null) ? 2.0 : ctrl.strokeWidth,
+                            value: ctrl.strokeWidth,
                             min: 2.0,
                             max: 20.0,
                             divisions: 9,
                             onChanged: (value) => _updateController(
-                                ctrl?.copyWith(strokeWidth: value)),
+                                ctrl.copyWith(strokeWidth: value)),
                           ),
                           Text(
-                            "${ctrl?.strokeWidth.toInt()}",
+                            "${ctrl.strokeWidth.toInt()}",
                             style: const TextStyle(
                                 fontSize: 20, color: Colors.blue),
                           )
@@ -153,7 +153,8 @@ class _SignatureExampleState extends State<SignatureExample> {
         await (_imageKey.currentState!.exportImage() as FutureOr<Uint8List>);
     final directory = (await getApplicationDocumentsDirectory()).path;
     await Directory('$directory/sample').create(recursive: true);
-    final fullPath = '$directory/sample/image.png';
+    final fullPath =
+        '$directory/sample/${DateTime.now().toIso8601String()}.png';
     final imgFile = File('$fullPath');
     imgFile.writeAsBytesSync(image);
     ScaffoldMessenger.of(context).showSnackBar(

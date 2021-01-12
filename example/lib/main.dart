@@ -31,9 +31,9 @@ class ImagePainterExample extends StatefulWidget {
 }
 
 class _ImagePainterExampleState extends State<ImagePainterExample> {
-  GlobalKey<ImagePainterState>? _imageKey;
+  late GlobalKey<ImagePainterState> _imageKey;
   final _key = GlobalKey<ScaffoldState>();
-  final _controller = ValueNotifier<Controller?>(null);
+  late final ValueNotifier<Controller> _controller;
   Map<IconData, PaintMode> options = {
     Icons.zoom_out_map: PaintMode.None,
     Icons.horizontal_rule: PaintMode.Line,
@@ -45,15 +45,15 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
   };
   @override
   void initState() {
-    _controller.value =
-        Controller(color: Colors.blue, mode: PaintMode.Line, strokeWidth: 4.0);
+    _controller = ValueNotifier<Controller>(
+        Controller(color: Colors.blue, mode: PaintMode.Line, strokeWidth: 4.0));
     _imageKey = GlobalKey<ImagePainterState>();
     super.initState();
   }
 
   void saveImage() async {
     final image =
-        await (_imageKey!.currentState!.exportImage() as FutureOr<Uint8List>);
+        await (_imageKey.currentState!.exportImage() as FutureOr<Uint8List>);
     final directory = (await getApplicationDocumentsDirectory()).path;
     await Directory('$directory/sample').create(recursive: true);
     final fullPath =
@@ -78,7 +78,7 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
     );
   }
 
-  _updateController(Controller? controller) {
+  _updateController(Controller controller) {
     _controller.value = controller;
   }
 
@@ -86,7 +86,7 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
     await showDialog<Color>(
         context: context,
         builder: (_) {
-          return ValueListenableBuilder<Controller?>(
+          return ValueListenableBuilder<Controller>(
             valueListenable: _controller,
             builder: (_, value, __) {
               return AlertDialog(
@@ -94,10 +94,10 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
                 title: const Text("Pick a color"),
                 content: MaterialColorPicker(
                   shrinkWrap: true,
-                  selectedColor: value?.color,
+                  selectedColor: value.color,
                   allowShades: false,
                   onMainColorChange: (color) => _updateController(
-                    value?.copyWith(color: color),
+                    value.copyWith(color: color),
                   ),
                 ),
                 actions: [
@@ -115,7 +115,7 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
     await showDialog<double>(
         context: context,
         builder: (_) {
-          return ValueListenableBuilder<Controller?>(
+          return ValueListenableBuilder<Controller>(
             valueListenable: _controller,
             builder: (_, ctrl, __) {
               return Column(
@@ -128,16 +128,16 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
                     content: Column(
                       children: [
                         CupertinoSlider(
-                            value: ctrl == null ? 1.0 : ctrl.strokeWidth,
+                            value: ctrl.strokeWidth,
                             min: 2.0,
                             max: 20.0,
                             divisions: 9,
                             onChanged: (value) {
                               _updateController(
-                                  ctrl?.copyWith(strokeWidth: value));
+                                  ctrl.copyWith(strokeWidth: value));
                             }),
                         Text(
-                          "${ctrl?.strokeWidth.toInt()}",
+                          "${ctrl.strokeWidth.toInt()}",
                           style:
                               const TextStyle(fontSize: 20, color: Colors.blue),
                         )
@@ -184,16 +184,16 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
             children: [
               IconButton(
                   icon: const Icon(Icons.reply, color: Colors.white),
-                  onPressed: () => _imageKey!.currentState!.undo()),
+                  onPressed: () => _imageKey.currentState!.undo()),
               IconButton(
                 icon: const Icon(Icons.clear, color: Colors.white),
-                onPressed: () => _imageKey!.currentState!.clearAll(),
+                onPressed: () => _imageKey.currentState!.clearAll(),
               ),
             ],
           ),
         ),
       ),
-      body: ValueListenableBuilder<Controller?>(
+      body: ValueListenableBuilder<Controller>(
         valueListenable: _controller,
         builder: (_, ctrl, __) {
           return Column(
@@ -207,16 +207,16 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
                   children: options.entries.map((item) {
                     return SelectionItems(
                       icon: item.key,
-                      isSelected: ctrl?.mode == item.value,
+                      isSelected: ctrl.mode == item.value,
                       onTap: () =>
-                          _updateController(ctrl?.copyWith(mode: item.value)),
+                          _updateController(ctrl.copyWith(mode: item.value)),
                     );
                   }).toList(),
                 ),
               ),
               Expanded(
                 child: ImagePainter.asset("assets/sample.jpg",
-                    key: _imageKey, controller: ctrl!, scalable: true),
+                    key: _imageKey, controller: ctrl, scalable: true),
               ),
             ],
           );
