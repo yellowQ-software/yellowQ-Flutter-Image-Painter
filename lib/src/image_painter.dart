@@ -18,15 +18,18 @@ class DrawImage extends CustomPainter {
   ///Keeps track whether the paint action is running or not.
   final bool isDragging;
 
+  ///Flag for triggering signature mode.
   final bool isSignature;
 
+  ///The background for signature painting.
   final Color backgroundColor;
 
+  ///Constructor for the canvas
   DrawImage(
       {this.image,
-      this.isDragging = false,
       this.update,
       this.points,
+      this.isDragging = false,
       this.isSignature = false,
       this.backgroundColor,
       this.paintHistory});
@@ -58,13 +61,13 @@ class DrawImage extends CustomPainter {
       final _offset = item.map.value.offset;
       final _painter = item.map.value.painter;
       switch (item.map.key) {
-        case PaintMode.Box:
+        case PaintMode.box:
           canvas.drawRect(Rect.fromPoints(_offset[0], _offset[1]), _painter);
           break;
-        case PaintMode.Line:
+        case PaintMode.line:
           canvas.drawLine(_offset[0], _offset[1], _painter);
           break;
-        case PaintMode.Circle:
+        case PaintMode.circle:
           final path = Path();
           path.addOval(
             Rect.fromCircle(
@@ -72,16 +75,16 @@ class DrawImage extends CustomPainter {
           );
           canvas.drawPath(path, _painter);
           break;
-        case PaintMode.Arrow:
+        case PaintMode.arrow:
           drawArrow(canvas, _offset[0], _offset[1], _painter);
           break;
-        case PaintMode.DottedLine:
+        case PaintMode.dashLine:
           final path = Path()
             ..moveTo(_offset[0].dx, _offset[0].dy)
             ..lineTo(_offset[1].dx, _offset[1].dy);
           canvas.drawPath(_dashPath(path, _painter.strokeWidth), _painter);
           break;
-        case PaintMode.FreeStyle:
+        case PaintMode.freeStyle:
           for (var i = 0; i < _offset.length - 1; i++) {
             if (_offset[i] != null && _offset[i + 1] != null) {
               final _path = Path()
@@ -94,7 +97,7 @@ class DrawImage extends CustomPainter {
             }
           }
           break;
-        case PaintMode.Text:
+        case PaintMode.text:
           final textSpan = TextSpan(
             text: item.map.value.text,
             style: TextStyle(
@@ -125,28 +128,28 @@ class DrawImage extends CustomPainter {
       final _end = update.end;
       final _painter = update.painter;
       switch (update.mode) {
-        case PaintMode.Box:
+        case PaintMode.box:
           canvas.drawRect(Rect.fromPoints(_start, _end), _painter);
           break;
-        case PaintMode.Line:
+        case PaintMode.line:
           canvas.drawLine(_start, _end, _painter);
           break;
-        case PaintMode.Circle:
+        case PaintMode.circle:
           final path = Path();
           path.addOval(
               Rect.fromCircle(center: _end, radius: (_end - _start).distance));
           canvas.drawPath(path, _painter);
           break;
-        case PaintMode.Arrow:
+        case PaintMode.arrow:
           drawArrow(canvas, _start, _end, _painter);
           break;
-        case PaintMode.DottedLine:
+        case PaintMode.dashLine:
           final path = Path()
             ..moveTo(_start.dx, _start.dy)
             ..lineTo(_end.dx, _end.dy);
           canvas.drawPath(_dashPath(path, _painter.strokeWidth), _painter);
           break;
-        case PaintMode.FreeStyle:
+        case PaintMode.freeStyle:
           for (var i = 0; i < points.length - 1; i++) {
             if (points[i] != null && points[i + 1] != null) {
               canvas.drawLine(
@@ -217,28 +220,28 @@ class DrawImage extends CustomPainter {
 
 enum PaintMode {
   ///Prefer using [None] while doing scaling operations.
-  None,
+  none,
 
   ///Allows for drawing freehand shapes or text.
-  FreeStyle,
+  freeStyle,
 
   ///Allows to draw line between two points.
-  Line,
+  line,
 
   ///Allows to draw rectangle.
-  Box,
+  box,
 
   ///Allows to write texts over an image.
-  Text,
+  text,
 
   ///Allows us to draw line with arrow at the end point.
-  Arrow,
+  arrow,
 
   ///Allows to draw circle from a point.
-  Circle,
+  circle,
 
   ///Allows to draw dashed line between two point.
-  DottedLine
+  dashLine
 }
 
 ///[PaintInfo] keeps track of a single unit of shape, whichever selected.
@@ -260,10 +263,19 @@ class PaintInfo {
 
 ///Records realtime updates of ongoing [PaintInfo] when inDrag.
 class UpdatePoints {
+  ///Records the first tap offset,
   final Offset start;
+
+  ///Records all the offset after first one.
   final Offset end;
+
+  ///Records [Paint] method of the ongoing painting.
   final Paint painter;
+
+  ///Records [PaintMode] of the ongoing painting.
   final PaintMode mode;
+
+  ///Constructor for ongoing painthistory.
   UpdatePoints({this.start, this.end, this.painter, this.mode});
 
   @override
@@ -283,8 +295,11 @@ class UpdatePoints {
   }
 }
 
-///Records the [PaintMode] as well as [PaintInfo] of that particular [PaintMode] in a map.
+///Records the [PaintMode] as well as [PaintInfo] of that particular [PaintMode].
 class PaintHistory {
-  MapEntry<PaintMode, PaintInfo> map;
+  ///Tracks [PaintMode] and [PaintInfo] in a map;
+  final MapEntry<PaintMode, PaintInfo> map;
+
+  ///Constructor for the painthistory tracker.
   PaintHistory(this.map);
 }

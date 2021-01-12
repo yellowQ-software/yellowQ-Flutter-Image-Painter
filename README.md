@@ -57,7 +57,7 @@ ImagePainter.network("https://sample_image.png",
 ///To change color, strokewidth or paint mode: 
 setState((){
     imageController = imageController.copyWith(color:Colors.red);
-    imageController = imageController.copyWith(mode:PaintMode.Arrow);
+    imageController = imageController.copyWith(mode:PaintMode.arrow);
     imageController = imageController.copyWith(strokeWidth:10.0);
 })
 ///Export the image:

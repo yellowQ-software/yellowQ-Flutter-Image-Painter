@@ -32,18 +32,18 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
   final _key = GlobalKey<ScaffoldState>();
   final _controller = ValueNotifier<Controller>(null);
   Map<IconData, PaintMode> options = {
-    Icons.zoom_out_map: PaintMode.None,
-    Icons.horizontal_rule: PaintMode.Line,
-    Icons.crop_free: PaintMode.Box,
-    Icons.edit: PaintMode.FreeStyle,
-    Icons.lens_outlined: PaintMode.Circle,
-    Icons.arrow_right_alt_outlined: PaintMode.Arrow,
-    Icons.power_input: PaintMode.DottedLine
+    Icons.zoom_out_map: PaintMode.none,
+    Icons.horizontal_rule: PaintMode.line,
+    Icons.crop_free: PaintMode.box,
+    Icons.edit: PaintMode.freeStyle,
+    Icons.lens_outlined: PaintMode.circle,
+    Icons.arrow_right_alt_outlined: PaintMode.arrow,
+    Icons.power_input: PaintMode.dashLine
   };
   @override
   void initState() {
     _controller.value =
-        Controller(color: Colors.blue, mode: PaintMode.Line, strokeWidth: 4.0);
+        Controller(color: Colors.blue, mode: PaintMode.line, strokeWidth: 4.0);
     _imageKey = GlobalKey<ImagePainterState>();
     super.initState();
   }
@@ -56,7 +56,7 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
         '$directory/sample/${DateTime.now().millisecondsSinceEpoch}.png';
     final imgFile = File('$fullPath');
     imgFile.writeAsBytesSync(image);
-    _key.currentState.showSnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: Colors.grey[700],
         padding: const EdgeInsets.only(left: 10),

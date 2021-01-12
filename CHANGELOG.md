@@ -12,7 +12,7 @@
 # 0.1.8
 
 - Added dynamic strokeMultiplier to compensate strokewidth for high resolution image.
-- Pan or moving around image is available to use when mode is `PaintMode.None`. 
+- Pan or moving around image is available to use when mode is `PaintMode.none`. 
 - Performance improvements and lint fixes. 
 - Improved example. 
 

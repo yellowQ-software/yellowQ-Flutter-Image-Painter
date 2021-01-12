@@ -12,6 +12,7 @@ import 'ported_interactive_viewer.dart';
 
 export 'image_painter.dart';
 
+///[ImagePainter] widget.
 @immutable
 class ImagePainter extends StatefulWidget {
   const ImagePainter._(
@@ -124,7 +125,7 @@ class ImagePainter extends StatefulWidget {
         isSignature: true,
         isScalable: false,
         signatureBackgroundColor: signatureBgColor ?? Colors.white,
-        controller: controller.copyWith(mode: PaintMode.FreeStyle));
+        controller: controller.copyWith(mode: PaintMode.freeStyle));
   }
 
   ///Only accessible through [ImagePainter.network] constructor.
@@ -154,14 +155,17 @@ class ImagePainter extends StatefulWidget {
   ///Defines whether the widget should be scaled or not. Defaults to [false].
   final bool isScalable;
 
+  ///Flag to determine signature or image;
   final bool isSignature;
 
+  ///Signature mode background color
   final Color signatureBackgroundColor;
 
   @override
   ImagePainterState createState() => ImagePainterState();
 }
 
+///
 class ImagePainterState extends State<ImagePainter> {
   final _repaintKey = GlobalKey();
   ui.Image _image;
@@ -194,7 +198,7 @@ class ImagePainterState extends State<ImagePainter> {
   Paint get _painter => Paint()
     ..color = _controller.value.color
     ..strokeWidth = _controller.value.strokeWidth * _strokeMultiplier
-    ..style = _controller.value.mode == PaintMode.DottedLine
+    ..style = _controller.value.mode == PaintMode.dashLine
         ? PaintingStyle.stroke
         : _controller.value.paintStyle;
 
@@ -296,7 +300,7 @@ class ImagePainterState extends State<ImagePainter> {
               return ImagePainterTransformer(
                 maxScale: 2.4,
                 minScale: 1,
-                panEnabled: controller.mode == PaintMode.None,
+                panEnabled: controller.mode == PaintMode.none,
                 scaleEnabled: widget.isScalable,
                 onInteractionUpdate: (details) =>
                     _scaleUpdateGesture(details, controller),
@@ -372,9 +376,9 @@ class ImagePainterState extends State<ImagePainter> {
       _inDrag = true;
       _start ??= onUpdate.focalPoint;
       _end = onUpdate.focalPoint;
-      if (controller.mode == PaintMode.FreeStyle || widget.isSignature) {
+      if (controller.mode == PaintMode.freeStyle || widget.isSignature) {
         _points.add(_end);
-      } else if (controller.mode == PaintMode.Text &&
+      } else if (controller.mode == PaintMode.text &&
           _paintHistory.any((element) => element.map.value.text != null)) {
         _paintHistory
             .lastWhere((element) => element.map.value.text != null)
@@ -389,14 +393,14 @@ class ImagePainterState extends State<ImagePainter> {
   void _scaleEndGesture(ScaleEndDetails onEnd, Controller controller) {
     setState(() {
       _inDrag = false;
-      if (controller.mode == PaintMode.None) {
+      if (controller.mode == PaintMode.none) {
       } else if (_start != null &&
           _end != null &&
-          controller.mode != PaintMode.FreeStyle) {
+          controller.mode != PaintMode.freeStyle) {
         _addEndPoints(_start, _end, controller);
       } else if (_start != null &&
               _end != null &&
-              controller.mode == PaintMode.FreeStyle ||
+              controller.mode == PaintMode.freeStyle ||
           widget.isSignature) {
         _points.add(null);
         _addFreeStylePoints(controller);
@@ -422,7 +426,7 @@ class ImagePainterState extends State<ImagePainter> {
     _paintHistory.add(
       PaintHistory(
         MapEntry<PaintMode, PaintInfo>(
-          widget.isSignature ? PaintMode.FreeStyle : controller.mode,
+          widget.isSignature ? PaintMode.freeStyle : controller.mode,
           PaintInfo(offset: <Offset>[..._points], painter: _painter),
         ),
       ),
@@ -490,7 +494,7 @@ class Controller {
   Controller(
       {this.strokeWidth = 4.0,
       this.color = Colors.red,
-      this.mode = PaintMode.Line,
+      this.mode = PaintMode.line,
       this.paintStyle = PaintingStyle.stroke});
 
   @override
@@ -512,6 +516,7 @@ class Controller {
         mode.hashCode;
   }
 
+  ///Method to change immutable controller.
   Controller copyWith({
     double strokeWidth,
     Color color,

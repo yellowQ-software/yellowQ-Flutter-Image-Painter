@@ -7,11 +7,9 @@ analyzer:
 linter:
   rules:
     await_only_futures: true
-    # This one is desirable, but that's a lot of work for now
-    public_member_api_docs: false
-    # Desirable, but would be breaking changes:
-    avoid_positional_boolean_parameters: false
-    constant_identifier_names: false
+    public_member_api_docs: true
+    avoid_positional_boolean_parameters: true
+    constant_identifier_names: true
     include_file_not_found: false
 
     # STYLE

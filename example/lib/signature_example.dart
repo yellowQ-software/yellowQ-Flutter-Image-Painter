@@ -18,7 +18,7 @@ class _SignatureExampleState extends State<SignatureExample> {
   @override
   void initState() {
     _controller.value =
-        Controller(color: Colors.black, mode: PaintMode.Line, strokeWidth: 4.0);
+        Controller(color: Colors.black, mode: PaintMode.line, strokeWidth: 4.0);
     super.initState();
   }
 
@@ -155,7 +155,7 @@ class _SignatureExampleState extends State<SignatureExample> {
     final fullPath = '$directory/sample/image.png';
     final imgFile = File('$fullPath');
     imgFile.writeAsBytesSync(image);
-    _key.currentState.showSnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: Colors.grey[700],
         padding: const EdgeInsets.only(left: 10),

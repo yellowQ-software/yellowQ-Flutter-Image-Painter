@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart' hide InteractiveViewer;
 import 'package:flutter/physics.dart';
 import 'package:vector_math/vector_math_64.dart' show Quad, Vector3, Matrix4;
 
+///[InteractiveViewer] widget of flutter modified to fit package needs.
 @immutable
 class ImagePainterTransformer extends StatefulWidget {
   /// Create an InteractiveViewer.
