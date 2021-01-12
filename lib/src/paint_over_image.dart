@@ -2,12 +2,13 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:image_painter/src/ported_interactive_viewer.dart';
 
 import 'image_painter.dart';
+import 'ported_interactive_viewer.dart';
 
 export 'image_painter.dart';
 
@@ -24,7 +25,7 @@ class ImagePainter extends StatefulWidget {
       this.controller,
       this.placeHolder,
       this.isScalable,
-      this.isSignature: false,
+      this.isSignature = false,
       this.signatureBackgroundColor})
       : super(key: key);
 
@@ -32,7 +33,7 @@ class ImagePainter extends StatefulWidget {
   factory ImagePainter.network(
     String url, {
     @required Controller controller,
-    Key key,
+    @required Key key,
     double height,
     double width,
     Widget placeholderWidget,
@@ -52,7 +53,7 @@ class ImagePainter extends StatefulWidget {
   factory ImagePainter.asset(
     String path, {
     @required Controller controller,
-    Key key,
+    @required Key key,
     double height,
     double width,
     bool scalable,
@@ -72,7 +73,7 @@ class ImagePainter extends StatefulWidget {
   factory ImagePainter.file(
     File file, {
     @required Controller controller,
-    Key key,
+    @required Key key,
     double height,
     double width,
     bool scalable,
@@ -92,7 +93,7 @@ class ImagePainter extends StatefulWidget {
   factory ImagePainter.memory(
     Uint8List byteArray, {
     @required Controller controller,
-    Key key,
+    @required Key key,
     double height,
     double width,
     bool scalable,
@@ -111,7 +112,7 @@ class ImagePainter extends StatefulWidget {
   ///Constructor for signature painting.
   factory ImagePainter.signature({
     @required Controller controller,
-    Key key,
+    @required Key key,
     Color signatureBgColor,
     double height,
     double width,
@@ -201,35 +202,51 @@ class ImagePainterState extends State<ImagePainter> {
   Future<void> _resolveAndConvertImage() async {
     if (widget.networkUrl != null) {
       _image = await _loadNetworkImage(widget.networkUrl);
-      setStrokeMultiplier();
+      if (_image == null) {
+        throw ("${widget.networkUrl} couldn't be resolved.");
+      } else {
+        _setStrokeMultiplier();
+      }
     } else if (widget.assetPath != null) {
       final img = await rootBundle.load(widget.assetPath);
       _image = await _convertImage(Uint8List.view(img.buffer));
-      setStrokeMultiplier();
+      if (_image == null) {
+        throw ("${widget.assetPath} couldn't be resolved.");
+      } else {
+        _setStrokeMultiplier();
+      }
     } else if (widget.file != null) {
       final img = await widget.file.readAsBytes();
       _image = await _convertImage(img);
-      setStrokeMultiplier();
+      if (_image == null) {
+        throw ("Image couldn't be resolved from provided file.");
+      } else {
+        _setStrokeMultiplier();
+      }
     } else if (widget.byteArray != null) {
       _image = await _convertImage(widget.byteArray);
-      setStrokeMultiplier();
+      if (_image == null) {
+        throw ("Image couldn't be resolved from provided byteArray.");
+      } else {
+        _setStrokeMultiplier();
+      }
     } else {
       _isLoaded.value = true;
     }
   }
 
-  setStrokeMultiplier() {
+  _setStrokeMultiplier() {
     if ((_image.height + _image.width) > 1000) {
       _strokeMultiplier = (_image.height + _image.width) ~/ 1000;
     }
   }
 
   ///Completer function to convert asset or file image to [ui.Image] before drawing on custompainter.
-  Future<ui.Image> _convertImage(List<int> img) async {
+  Future<ui.Image> _convertImage(Uint8List img) async {
     final completer = Completer<ui.Image>();
-    ui.decodeImageFromList(img, (ui.Image img) {
+    ui.decodeImageFromList(img, (image) {
       _isLoaded.value = true;
-      return completer.complete(img);
+      return completer.complete(image);
     });
     return completer.future;
   }
@@ -239,7 +256,7 @@ class ImagePainterState extends State<ImagePainter> {
     final completer = Completer<ImageInfo>();
     var img = NetworkImage(path);
     img.resolve(const ImageConfiguration()).addListener(
-        ImageStreamListener((ImageInfo info, _) => completer.complete(info)));
+        ImageStreamListener((info, _) => completer.complete(info)));
     final imageInfo = await completer.future;
     _isLoaded.value = true;
     return imageInfo.image;
@@ -247,21 +264,19 @@ class ImagePainterState extends State<ImagePainter> {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
+    return ValueListenableBuilder<bool>(
       valueListenable: _isLoaded,
-      builder: (_, bool loaded, __) {
+      builder: (_, loaded, __) {
         if (loaded) {
           return widget.isSignature ? _paintSignature() : _paintImage();
         } else {
-          return widget.placeHolder ??
-              Container(
-                height: widget.height ?? double.maxFinite,
-                width: widget.width ?? double.maxFinite,
-                child: Center(
-                  child:
-                      widget.placeHolder ?? const CircularProgressIndicator(),
-                ),
-              );
+          return Container(
+            height: widget.height ?? double.maxFinite,
+            width: widget.width ?? double.maxFinite,
+            child: Center(
+              child: widget.placeHolder ?? const CircularProgressIndicator(),
+            ),
+          );
         }
       },
     );
@@ -275,17 +290,17 @@ class ImagePainterState extends State<ImagePainter> {
       child: FittedBox(
         alignment: FractionalOffset.center,
         child: ClipRect(
-          child: ValueListenableBuilder(
+          child: ValueListenableBuilder<Controller>(
             valueListenable: _controller,
-            builder: (_, Controller controller, __) {
+            builder: (_, controller, __) {
               return ImagePainterTransformer(
                 maxScale: 2.4,
                 minScale: 1,
                 panEnabled: controller.mode == PaintMode.None,
                 scaleEnabled: widget.isScalable,
-                onInteractionUpdate: (ScaleUpdateDetails details) =>
+                onInteractionUpdate: (details) =>
                     _scaleUpdateGesture(details, controller),
-                onInteractionEnd: (ScaleEndDetails details) =>
+                onInteractionEnd: (details) =>
                     _scaleEndGesture(details, controller),
                 child: CustomPaint(
                   size: Size(_image.width.toDouble(), _image.height.toDouble()),
@@ -318,15 +333,15 @@ class ImagePainterState extends State<ImagePainter> {
         child: Container(
           width: widget.width ?? double.maxFinite,
           height: widget.height ?? double.maxFinite,
-          child: ValueListenableBuilder(
+          child: ValueListenableBuilder<Controller>(
             valueListenable: _controller,
-            builder: (_, Controller controller, __) {
+            builder: (_, controller, __) {
               return ImagePainterTransformer(
                   panEnabled: false,
                   scaleEnabled: false,
-                  onInteractionUpdate: (ScaleUpdateDetails details) =>
+                  onInteractionUpdate: (details) =>
                       _scaleUpdateGesture(details, controller),
-                  onInteractionEnd: (ScaleEndDetails details) =>
+                  onInteractionEnd: (details) =>
                       _scaleEndGesture(details, controller),
                   child: CustomPaint(
                     willChange: true,
@@ -392,7 +407,7 @@ class ImagePainterState extends State<ImagePainter> {
     _points.clear();
   }
 
-  void _addEndPoints(dx, dy, Controller controller) {
+  void _addEndPoints(Offset dx, Offset dy, Controller controller) {
     _paintHistory.add(
       PaintHistory(
         MapEntry<PaintMode, PaintInfo>(
@@ -404,29 +419,14 @@ class ImagePainterState extends State<ImagePainter> {
   }
 
   void _addFreeStylePoints(Controller controller) {
-    if (widget.isSignature) {
-      _paintHistory.add(
-        PaintHistory(
-          MapEntry<PaintMode, PaintInfo>(
-            PaintMode.FreeStyle,
-            PaintInfo(
-                offset: <Offset>[..._points],
-                painter: Paint()
-                  ..color = controller.color
-                  ..strokeWidth = controller.strokeWidth),
-          ),
+    _paintHistory.add(
+      PaintHistory(
+        MapEntry<PaintMode, PaintInfo>(
+          widget.isSignature ? PaintMode.FreeStyle : controller.mode,
+          PaintInfo(offset: <Offset>[..._points], painter: _painter),
         ),
-      );
-    } else {
-      _paintHistory.add(
-        PaintHistory(
-          MapEntry<PaintMode, PaintInfo>(
-            controller.mode,
-            PaintInfo(offset: <Offset>[..._points], painter: _painter),
-          ),
-        ),
-      );
-    }
+      ),
+    );
   }
 
   ///Provides [ui.Image] of the recorded canvas to perform action.
@@ -446,8 +446,8 @@ class ImagePainterState extends State<ImagePainter> {
   Future<Uint8List> exportImage() async {
     ui.Image _image;
     if (widget.isSignature) {
-      RenderRepaintBoundary _boundary =
-          _repaintKey.currentContext.findRenderObject();
+      final _boundary = _repaintKey.currentContext.findRenderObject()
+          as RenderRepaintBoundary;
       _image = await _boundary.toImage(pixelRatio: 3);
     } else if (widget.byteArray != null && _paintHistory.isEmpty) {
       return widget.byteArray;
@@ -461,17 +461,13 @@ class ImagePainterState extends State<ImagePainter> {
   ///Cancels or removes the last [PaintHistory].
   void undo() {
     if (_paintHistory.isNotEmpty) {
-      setState(() {
-        _paintHistory.removeLast();
-      });
+      setState(_paintHistory.removeLast);
     }
   }
 
   ///Cancels or clears all the previous [PaintHistory].
   void clearAll() {
-    setState(() {
-      _paintHistory.clear();
-    });
+    setState(_paintHistory.clear);
   }
 }
 

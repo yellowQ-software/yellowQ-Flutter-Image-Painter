@@ -74,7 +74,7 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
     );
   }
 
-  void _updateController(Controller controller) {
+  _updateController(Controller controller) {
     _controller.value = controller;
   }
 
@@ -82,9 +82,9 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
     await showDialog<Color>(
         context: context,
         builder: (_) {
-          return ValueListenableBuilder(
+          return ValueListenableBuilder<Controller>(
             valueListenable: _controller,
-            builder: (BuildContext context, value, Widget child) {
+            builder: (_, value, __) {
               return AlertDialog(
                 contentPadding: const EdgeInsets.all(6.0),
                 title: const Text("Pick a color"),
@@ -111,7 +111,7 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
     await showDialog<double>(
         context: context,
         builder: (_) {
-          return ValueListenableBuilder(
+          return ValueListenableBuilder<Controller>(
             valueListenable: _controller,
             builder: (_, ctrl, __) {
               return Column(
@@ -162,15 +162,15 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
         actions: [
           IconButton(
             icon: const Icon(Icons.brush_sharp),
-            onPressed: () => _openStrokeDialog(),
+            onPressed: _openStrokeDialog,
           ),
           IconButton(
             icon: const Icon(Icons.color_lens),
-            onPressed: () => _openMainColorPicker(),
+            onPressed: _openMainColorPicker,
           ),
           IconButton(
             icon: const Icon(Icons.save),
-            onPressed: () => saveImage(),
+            onPressed: saveImage,
           ),
         ],
         bottom: PreferredSize(
@@ -189,7 +189,7 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
           ),
         ),
       ),
-      body: ValueListenableBuilder(
+      body: ValueListenableBuilder<Controller>(
         valueListenable: _controller,
         builder: (_, ctrl, __) {
           return Column(

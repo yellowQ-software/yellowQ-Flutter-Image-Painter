@@ -1,5 +1,10 @@
 # image_painter
 
+[![pub package](https://img.shields.io/pub/v/image_painter.svg)](https://pub.dev/packages/image_painter)
+![style: effective dart](https://img.shields.io/badge/style-effective_dart-40c4ff.svg)
+[![Platform Badge](https://img.shields.io/badge/platform-android%20|%20ios%20-green.svg)](https://pub.dev/packages/image_painter)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A flutter implementation of painting over image.
 
 # Overview
@@ -61,3 +66,4 @@ Uint8List image = await _imageKey.currentState.exportImage();
 File imgFile = new File('directory/sample.png');
     imgFile.writeAsBytesSync(image);
 ```
+**For more thorough implementation guide, check the [example](./example).**

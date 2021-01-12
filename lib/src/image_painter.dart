@@ -256,12 +256,14 @@ class PaintInfo {
   PaintInfo({this.offset, this.painter, this.text});
 }
 
+@immutable
+
 ///Records realtime updates of ongoing [PaintInfo] when inDrag.
 class UpdatePoints {
-  Offset start;
-  Offset end;
-  Paint painter;
-  PaintMode mode;
+  final Offset start;
+  final Offset end;
+  final Paint painter;
+  final PaintMode mode;
   UpdatePoints({this.start, this.end, this.painter, this.mode});
 
   @override

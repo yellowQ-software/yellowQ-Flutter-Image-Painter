@@ -31,15 +31,14 @@ class _SignatureExampleState extends State<SignatureExample> {
         actions: [
           IconButton(
             icon: const Icon(Icons.brush_sharp),
-            onPressed: () => _openStrokeDialog(),
+            onPressed: _openStrokeDialog,
           ),
           IconButton(
               icon: const Icon(Icons.color_lens),
               onPressed: () {
                 _openMainColorPicker();
               }),
-          IconButton(
-              icon: const Icon(Icons.save), onPressed: () => saveImage()),
+          IconButton(icon: const Icon(Icons.save), onPressed: saveImage),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(40),
@@ -61,7 +60,7 @@ class _SignatureExampleState extends State<SignatureExample> {
           borderRadius: BorderRadius.circular(8),
           child: ValueListenableBuilder<Controller>(
               valueListenable: _controller,
-              builder: (_, Controller controller, __) {
+              builder: (_, controller, __) {
                 return ImagePainter.signature(
                   height: 200,
                   width: 300,
@@ -75,16 +74,15 @@ class _SignatureExampleState extends State<SignatureExample> {
     );
   }
 
-  void _updateController(Controller controller) =>
-      _controller.value = controller;
+  _updateController(Controller controller) => _controller.value = controller;
 
   void _openMainColorPicker() {
     showDialog(
       context: context,
       builder: (_) {
-        return ValueListenableBuilder(
+        return ValueListenableBuilder<Controller>(
           valueListenable: _controller,
-          builder: (BuildContext context, value, Widget child) {
+          builder: (__, value, _) {
             return AlertDialog(
               contentPadding: const EdgeInsets.all(6.0),
               title: const Text("Pick a color"),
@@ -110,7 +108,7 @@ class _SignatureExampleState extends State<SignatureExample> {
     showDialog(
         context: context,
         builder: (_) {
-          return ValueListenableBuilder(
+          return ValueListenableBuilder<Controller>(
               valueListenable: _controller,
               builder: (_, ctrl, __) {
                 return Column(

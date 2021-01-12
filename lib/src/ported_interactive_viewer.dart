@@ -324,7 +324,7 @@ class ImagePainterTransformer extends StatefulWidget {
   /// Returns the closest point to the given point on the given line segment.
   @visibleForTesting
   static Vector3 getNearestPointOnLine(Vector3 point, Vector3 l1, Vector3 l2) {
-    final double lengthSquared = math.pow(l2.x - l1.x, 2.0).toDouble() +
+    final lengthSquared = math.pow(l2.x - l1.x, 2.0).toDouble() +
         math.pow(l2.y - l1.y, 2.0).toDouble();
 
     // In this case, l1 == l2.
@@ -334,17 +334,16 @@ class ImagePainterTransformer extends StatefulWidget {
 
     // Calculate how far down the line segment the closest point is and return
     // the point.
-    final Vector3 l1P = point - l1;
-    final Vector3 l1L2 = l2 - l1;
-    final double fraction =
-        (l1P.dot(l1L2) / lengthSquared).clamp(0.0, 1.0).toDouble();
+    final l1P = point - l1;
+    final l1L2 = l2 - l1;
+    final fraction = (l1P.dot(l1L2) / lengthSquared).clamp(0.0, 1.0).toDouble();
     return l1 + l1L2 * fraction;
   }
 
   /// Given a quad, return its axis aligned bounding box.
   @visibleForTesting
   static Quad getAxisAlignedBoundingBox(Quad quad) {
-    final double minX = math.min(
+    final minX = math.min(
       quad.point0.x,
       math.min(
         quad.point1.x,
@@ -354,7 +353,7 @@ class ImagePainterTransformer extends StatefulWidget {
         ),
       ),
     );
-    final double minY = math.min(
+    final minY = math.min(
       quad.point0.y,
       math.min(
         quad.point1.y,
@@ -364,7 +363,7 @@ class ImagePainterTransformer extends StatefulWidget {
         ),
       ),
     );
-    final double maxX = math.max(
+    final maxX = math.max(
       quad.point0.x,
       math.max(
         quad.point1.x,
@@ -374,7 +373,7 @@ class ImagePainterTransformer extends StatefulWidget {
         ),
       ),
     );
-    final double maxY = math.max(
+    final maxY = math.max(
       quad.point0.y,
       math.max(
         quad.point1.y,
@@ -397,14 +396,14 @@ class ImagePainterTransformer extends StatefulWidget {
   /// Algorithm from https://math.stackexchange.com/a/190373.
   @visibleForTesting
   static bool pointIsInside(Vector3 point, Quad quad) {
-    final Vector3 aM = point - quad.point0;
-    final Vector3 aB = quad.point1 - quad.point0;
-    final Vector3 aD = quad.point3 - quad.point0;
+    final aM = point - quad.point0;
+    final aB = quad.point1 - quad.point0;
+    final aD = quad.point3 - quad.point0;
 
-    final double aMAB = aM.dot(aB);
-    final double aBAB = aB.dot(aB);
-    final double aMAD = aM.dot(aD);
-    final double aDAD = aD.dot(aD);
+    final aMAB = aM.dot(aB);
+    final aBAB = aB.dot(aB);
+    final aMAD = aM.dot(aD);
+    final aDAD = aD.dot(aD);
 
     return 0 <= aMAB && aMAB <= aBAB && 0 <= aMAD && aMAD <= aDAD;
   }
@@ -420,7 +419,7 @@ class ImagePainterTransformer extends StatefulWidget {
     }
 
     // Otherwise, return the nearest point on the quad.
-    final List<Vector3> closestPoints = <Vector3>[
+    final closestPoints = <Vector3>[
       ImagePainterTransformer.getNearestPointOnLine(
           point, quad.point0, quad.point1),
       ImagePainterTransformer.getNearestPointOnLine(
@@ -430,10 +429,10 @@ class ImagePainterTransformer extends StatefulWidget {
       ImagePainterTransformer.getNearestPointOnLine(
           point, quad.point3, quad.point0),
     ];
-    double minDistance = double.infinity;
+    var minDistance = double.infinity;
     Vector3 closestOverall;
-    for (final Vector3 closePoint in closestPoints) {
-      final double distance = math.sqrt(
+    for (final closePoint in closestPoints) {
+      final distance = math.sqrt(
         math.pow(point.x - closePoint.x, 2) +
             math.pow(point.y - closePoint.y, 2),
       );
@@ -480,10 +479,10 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
     assert(!widget.boundaryMargin.top.isNaN);
     assert(!widget.boundaryMargin.bottom.isNaN);
 
-    final RenderBox childRenderBox =
+    final childRenderBox =
         _childKey.currentContext.findRenderObject() as RenderBox;
-    final Size childSize = childRenderBox.size;
-    final Rect boundaryRect =
+    final childSize = childRenderBox.size;
+    final boundaryRect =
         widget.boundaryMargin.inflateRect(Offset.zero & childSize);
     // Boundaries that are partially infinite are not allowed because Matrix4's
     // rotation and translation methods don't handle infinites well.
@@ -500,7 +499,7 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
   // The Rect representing the child's parent.
   Rect get _viewport {
     assert(_parentKey.currentContext != null);
-    final RenderBox parentRenderBox =
+    final parentRenderBox =
         _parentKey.currentContext.findRenderObject() as RenderBox;
     return Offset.zero & parentRenderBox.size;
   }
@@ -512,11 +511,11 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
       return matrix.clone();
     }
 
-    final Offset alignedTranslation = widget.alignPanAxis && _panAxis != null
+    final alignedTranslation = widget.alignPanAxis && _panAxis != null
         ? _alignAxis(translation, _panAxis)
         : translation;
 
-    final Matrix4 nextMatrix = matrix.clone()
+    final nextMatrix = matrix.clone()
       ..translate(
         alignedTranslation.dx,
         alignedTranslation.dy,
@@ -524,7 +523,7 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
 
     // Transform the viewport to determine where its four corners will be after
     // the child has been transformed.
-    final Quad nextViewport = _transformViewport(nextMatrix, _viewport);
+    final nextViewport = _transformViewport(nextMatrix, _viewport);
 
     // If the boundaries are infinite, then no need to check if the translation
     // fits within them.
@@ -536,28 +535,27 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
     // mismatch in orientation between the viewport and boundaries effectively
     // limits translation. With this approach, all points that are visible with
     // no rotation are visible after rotation.
-    final Quad boundariesAabbQuad = _getAxisAlignedBoundingBoxWithRotation(
+    final boundariesAabbQuad = _getAxisAlignedBoundingBoxWithRotation(
       _boundaryRect,
       _currentRotation,
     );
 
     // If the given translation fits completely within the boundaries, allow it.
-    final Offset offendingDistance =
-        _exceedsBy(boundariesAabbQuad, nextViewport);
+    final offendingDistance = _exceedsBy(boundariesAabbQuad, nextViewport);
     if (offendingDistance == Offset.zero) {
       return nextMatrix;
     }
 
     // Desired translation goes out of bounds, so translate to the nearest
     // in-bounds point instead.
-    final Offset nextTotalTranslation = _getMatrixTranslation(nextMatrix);
-    final double currentScale = matrix.getMaxScaleOnAxis();
-    final Offset correctedTotalTranslation = Offset(
+    final nextTotalTranslation = _getMatrixTranslation(nextMatrix);
+    final currentScale = matrix.getMaxScaleOnAxis();
+    final correctedTotalTranslation = Offset(
       nextTotalTranslation.dx - offendingDistance.dx * currentScale,
       nextTotalTranslation.dy - offendingDistance.dy * currentScale,
     );
 
-    final Matrix4 correctedMatrix = matrix.clone()
+    final correctedMatrix = matrix.clone()
       ..setTranslation(Vector3(
         correctedTotalTranslation.dx,
         correctedTotalTranslation.dy,
@@ -565,9 +563,8 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
       ));
 
     // Double check that the corrected translation fits.
-    final Quad correctedViewport =
-        _transformViewport(correctedMatrix, _viewport);
-    final Offset offendingCorrectedDistance =
+    final correctedViewport = _transformViewport(correctedMatrix, _viewport);
+    final offendingCorrectedDistance =
         _exceedsBy(boundariesAabbQuad, correctedViewport);
     if (offendingCorrectedDistance == Offset.zero) {
       return correctedMatrix;
@@ -583,7 +580,7 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
 
     // Otherwise, allow translation in only the direction that fits. This
     // happens when the viewport is larger than the boundary in one direction.
-    final Offset unidirectionalCorrectedTotalTranslation = Offset(
+    final unidirectionalCorrectedTotalTranslation = Offset(
       offendingCorrectedDistance.dx == 0.0 ? correctedTotalTranslation.dx : 0.0,
       offendingCorrectedDistance.dy == 0.0 ? correctedTotalTranslation.dy : 0.0,
     );
@@ -605,24 +602,23 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
 
     // Don't allow a scale that results in an overall scale beyond min/max
     // scale.
-    final double currentScale =
-        _transformationController.value.getMaxScaleOnAxis();
-    final double totalScale = currentScale * scale;
-    final double clampedTotalScale = totalScale.clamp(
+    final currentScale = _transformationController.value.getMaxScaleOnAxis();
+    final totalScale = currentScale * scale;
+    final clampedTotalScale = totalScale.clamp(
       widget.minScale,
       widget.maxScale,
     ) as double;
-    final double clampedScale = clampedTotalScale / currentScale;
-    final Matrix4 nextMatrix = matrix.clone()..scale(clampedScale);
+    final clampedScale = clampedTotalScale / currentScale;
+    final nextMatrix = matrix.clone()..scale(clampedScale);
 
     // Ensure that the scale cannot make the child so big that it can't fit
     // inside the boundaries (in either direction).
-    final double minScale = math.max(
+    final minScale = math.max(
       _viewport.width / _boundaryRect.width,
       _viewport.height / _boundaryRect.height,
     );
     if (clampedTotalScale < minScale) {
-      final double minCurrentScale = minScale / currentScale;
+      final minCurrentScale = minScale / currentScale;
       return matrix.clone()..scale(minCurrentScale);
     }
 
@@ -635,7 +631,7 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
     if (rotation == 0) {
       return matrix.clone();
     }
-    final Offset focalPointScene = _transformationController.toScene(
+    final focalPointScene = _transformationController.toScene(
       focalPoint,
     );
     return matrix.clone()
@@ -664,8 +660,8 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
   // starts at 0. Pan will have no scale and no rotation because it uses only one
   // finger.
   _GestureType _getGestureType(ScaleUpdateDetails details) {
-    final double scale = !widget.scaleEnabled ? 1.0 : details.scale;
-    final double rotation = !_rotateEnabled ? 0.0 : details.rotation;
+    final scale = !widget.scaleEnabled ? 1.0 : details.scale;
+    final rotation = !_rotateEnabled ? 0.0 : details.rotation;
     if ((scale - 1).abs() > rotation.abs()) {
       return _GestureType.scale;
     } else if (rotation != 0.0) {
@@ -701,7 +697,7 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
   // Handle an update to an ongoing gesture. All of pan, scale, and rotate are
   // handled with GestureDetector's scale gesture.
   void _onScaleUpdate(ScaleUpdateDetails details) {
-    final double scale = _transformationController.value.getMaxScaleOnAxis();
+    final scale = _transformationController.value.getMaxScaleOnAxis();
     if (widget.onInteractionUpdate != null) {
       widget.onInteractionUpdate(ScaleUpdateDetails(
         focalPoint: _transformationController.toScene(
@@ -711,7 +707,7 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
         rotation: details.rotation,
       ));
     }
-    final Offset focalPointScene = _transformationController.toScene(
+    final focalPointScene = _transformationController.toScene(
       details.localFocalPoint,
     );
 
@@ -734,8 +730,8 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
         // details.scale gives us the amount to change the scale as of the
         // start of this gesture, so calculate the amount to scale as of the
         // previous call to _onScaleUpdate.
-        final double desiredScale = _scaleStart * details.scale;
-        final double scaleChange = desiredScale / scale;
+        final desiredScale = _scaleStart * details.scale;
+        final scaleChange = desiredScale / scale;
         _transformationController.value = _matrixScale(
           _transformationController.value,
           scaleChange,
@@ -745,7 +741,7 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
         // the same places in the scene. That means that the focal point of
         // the scale should be on the same place in the scene before and after
         // the scale.
-        final Offset focalPointSceneScaled = _transformationController.toScene(
+        final focalPointSceneScaled = _transformationController.toScene(
           details.localFocalPoint,
         );
         _transformationController.value = _matrixTranslate(
@@ -758,7 +754,7 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
         // the translate came in contact with a boundary. In that case, update
         // _referenceFocalPoint so subsequent updates happen in relation to
         // the new effective focal point.
-        final Offset focalPointSceneCheck = _transformationController.toScene(
+        final focalPointSceneCheck = _transformationController.toScene(
           details.localFocalPoint,
         );
         if (_round(_referenceFocalPoint) != _round(focalPointSceneCheck)) {
@@ -770,7 +766,7 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
         if (details.rotation == 0.0) {
           return;
         }
-        final double desiredRotation = _rotationStart + details.rotation;
+        final desiredRotation = _rotationStart + details.rotation;
         _transformationController.value = _matrixRotate(
           _transformationController.value,
           _currentRotation - desiredRotation,
@@ -790,7 +786,7 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
         _panAxis ??= _getPanAxis(_referenceFocalPoint, focalPointScene);
         // Translate so that the same point in the scene is underneath the
         // focal point before and after the movement.
-        final Offset translationChange = focalPointScene - _referenceFocalPoint;
+        final translationChange = focalPointScene - _referenceFocalPoint;
         _transformationController.value = _matrixTranslate(
           _transformationController.value,
           translationChange,
@@ -827,20 +823,19 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
       return;
     }
 
-    final Vector3 translationVector =
-        _transformationController.value.getTranslation();
-    final Offset translation = Offset(translationVector.x, translationVector.y);
-    final FrictionSimulation frictionSimulationX = FrictionSimulation(
+    final translationVector = _transformationController.value.getTranslation();
+    final translation = Offset(translationVector.x, translationVector.y);
+    final frictionSimulationX = FrictionSimulation(
       _kDrag,
       translation.dx,
       details.velocity.pixelsPerSecond.dx,
     );
-    final FrictionSimulation frictionSimulationY = FrictionSimulation(
+    final frictionSimulationY = FrictionSimulation(
       _kDrag,
       translation.dy,
       details.velocity.pixelsPerSecond.dy,
     );
-    final double tFinal = _getFinalTime(
+    final tFinal = _getFinalTime(
       details.velocity.pixelsPerSecond.distance,
       _kDrag,
     );
@@ -862,14 +857,14 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
       return;
     }
     if (event is PointerScrollEvent) {
-      final RenderBox childRenderBox =
+      final childRenderBox =
           _childKey.currentContext.findRenderObject() as RenderBox;
-      final Size childSize = childRenderBox.size;
-      final double scaleChange = 1.0 - event.scrollDelta.dy / childSize.height;
+      final childSize = childRenderBox.size;
+      final scaleChange = 1.0 - event.scrollDelta.dy / childSize.height;
       if (scaleChange == 0.0) {
         return;
       }
-      final Offset focalPointScene = _transformationController.toScene(
+      final focalPointScene = _transformationController.toScene(
         event.localPosition,
       );
       _transformationController.value = _matrixScale(
@@ -879,7 +874,7 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
 
       // After scaling, translate such that the event's position is at the
       // same scene point before and after the scale.
-      final Offset focalPointSceneScaled = _transformationController.toScene(
+      final focalPointSceneScaled = _transformationController.toScene(
         event.localPosition,
       );
       _transformationController.value = _matrixTranslate(
@@ -899,16 +894,15 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
       return;
     }
     // Translate such that the resulting translation is _animation.value.
-    final Vector3 translationVector =
-        _transformationController.value.getTranslation();
-    final Offset translation = Offset(translationVector.x, translationVector.y);
-    final Offset translationScene = _transformationController.toScene(
+    final translationVector = _transformationController.value.getTranslation();
+    final translation = Offset(translationVector.x, translationVector.y);
+    final translationScene = _transformationController.toScene(
       translation,
     );
-    final Offset animationScene = _transformationController.toScene(
+    final animationScene = _transformationController.toScene(
       _animation.value,
     );
-    final Offset translationChangeScene = animationScene - translationScene;
+    final translationChangeScene = animationScene - translationScene;
     _transformationController.value = _matrixTranslate(
       _transformationController.value,
       translationChangeScene,
@@ -1065,8 +1059,8 @@ class TransformationController extends ValueNotifier<Matrix4> {
   Offset toScene(Offset viewportPoint) {
     // On viewportPoint, perform the inverse transformation of the scene to get
     // where the point would be in the scene before the transformation.
-    final Matrix4 inverseMatrix = Matrix4.inverted(value);
-    final Vector3 untransformed = inverseMatrix.transform3(Vector3(
+    final inverseMatrix = Matrix4.inverted(value);
+    final untransformed = inverseMatrix.transform3(Vector3(
       viewportPoint.dx,
       viewportPoint.dy,
       0,
@@ -1086,13 +1080,13 @@ enum _GestureType {
 // Given a velocity and drag, calculate the time at which motion will come to
 // a stop, within the margin of effectivelyMotionless.
 double _getFinalTime(double velocity, double drag) {
-  const double effectivelyMotionless = 10.0;
+  const effectivelyMotionless = 10.0;
   return math.log(effectivelyMotionless / velocity) / math.log(drag / 100);
 }
 
 // Return the translation from the given Matrix4 as an Offset.
 Offset _getMatrixTranslation(Matrix4 matrix) {
-  final Vector3 nextTranslation = matrix.getTranslation();
+  final nextTranslation = matrix.getTranslation();
   return Offset(nextTranslation.x, nextTranslation.y);
 }
 
@@ -1101,7 +1095,7 @@ Offset _getMatrixTranslation(Matrix4 matrix) {
 // given matrix. The viewport transforms as the inverse of the child (i.e.
 // moving the child left is equivalent to moving the viewport right).
 Quad _transformViewport(Matrix4 matrix, Rect viewport) {
-  final Matrix4 inverseMatrix = matrix.clone()..invert();
+  final inverseMatrix = matrix.clone()..invert();
   return Quad.points(
     inverseMatrix.transform3(Vector3(
       viewport.topLeft.dx,
@@ -1129,11 +1123,11 @@ Quad _transformViewport(Matrix4 matrix, Rect viewport) {
 // Find the axis aligned bounding box for the rect rotated about its center by
 // the given amount.
 Quad _getAxisAlignedBoundingBoxWithRotation(Rect rect, double rotation) {
-  final Matrix4 rotationMatrix = Matrix4.identity()
+  final rotationMatrix = Matrix4.identity()
     ..translate(rect.size.width / 2, rect.size.height / 2)
     ..rotateZ(rotation)
     ..translate(-rect.size.width / 2, -rect.size.height / 2);
-  final Quad boundariesRotated = Quad.points(
+  final boundariesRotated = Quad.points(
     rotationMatrix.transform3(Vector3(rect.left, rect.top, 0.0)),
     rotationMatrix.transform3(Vector3(rect.right, rect.top, 0.0)),
     rotationMatrix.transform3(Vector3(rect.right, rect.bottom, 0.0)),
@@ -1146,17 +1140,17 @@ Quad _getAxisAlignedBoundingBoxWithRotation(Rect rect, double rotation) {
 // is completely contained within the boundary (inclusively), then returns
 // Offset.zero.
 Offset _exceedsBy(Quad boundary, Quad viewport) {
-  final List<Vector3> viewportPoints = <Vector3>[
+  final viewportPoints = <Vector3>[
     viewport.point0,
     viewport.point1,
     viewport.point2,
     viewport.point3,
   ];
-  Offset largestExcess = Offset.zero;
-  for (final Vector3 point in viewportPoints) {
-    final Vector3 pointInside =
+  var largestExcess = Offset.zero;
+  for (final point in viewportPoints) {
+    final pointInside =
         ImagePainterTransformer.getNearestPointInside(point, boundary);
-    final Offset excess = Offset(
+    final excess = Offset(
       pointInside.x - point.x,
       pointInside.y - point.y,
     );
@@ -1198,7 +1192,7 @@ Axis _getPanAxis(Offset point1, Offset point2) {
   if (point1 == point2) {
     return null;
   }
-  final double x = point2.dx - point1.dx;
-  final double y = point2.dy - point1.dy;
+  final x = point2.dx - point1.dx;
+  final y = point2.dy - point1.dy;
   return x.abs() > y.abs() ? Axis.horizontal : Axis.vertical;
 }
