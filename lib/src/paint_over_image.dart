@@ -186,13 +186,38 @@ class ImagePainterState extends State<ImagePainter> {
   @override
   void didUpdateWidget(ImagePainter oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.controller.text != null &&
+        widget.controller.text != "" &&
+        oldWidget.controller.text != widget.controller.text) {
+      _addText(widget.controller.text);
+    }
     if (oldWidget.controller != widget.controller) {
+      print("updating controller");
       _controller.value = _controller.value.copyWith(
           color: widget.controller.color,
           strokeWidth: widget.controller.strokeWidth,
           mode: widget.controller.mode,
           paintingStyle: widget.controller.paintStyle);
     }
+  }
+
+  _addText(String text) {
+    _paintHistory.add(
+      PaintHistory(
+        MapEntry<PaintMode, PaintInfo>(
+          PaintMode.text,
+          PaintInfo(offset: [], painter: _painter, text: text),
+        ),
+      ),
+    );
+    _controller.value = _controller.value.copyWith(text: "");
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _isLoaded.dispose();
+    super.dispose();
   }
 
   Paint get _painter => Paint()
@@ -490,12 +515,15 @@ class Controller {
   ///Tracks [PaintMode] of the current [Paint] method.
   final PaintMode mode;
 
+  final String text;
+
   ///Constructor of the [Controller] class.
   Controller(
       {this.strokeWidth = 4.0,
       this.color = Colors.red,
       this.mode = PaintMode.line,
-      this.paintStyle = PaintingStyle.stroke});
+      this.paintStyle = PaintingStyle.stroke,
+      this.text = ""});
 
   @override
   bool operator ==(Object o) {
@@ -505,7 +533,8 @@ class Controller {
         o.strokeWidth == strokeWidth &&
         o.color == color &&
         o.paintStyle == paintStyle &&
-        o.mode == mode;
+        o.mode == mode &&
+        o.text == text;
   }
 
   @override
@@ -513,21 +542,23 @@ class Controller {
     return strokeWidth.hashCode ^
         color.hashCode ^
         paintStyle.hashCode ^
-        mode.hashCode;
+        mode.hashCode ^
+        text.hashCode;
   }
 
   ///Method to change immutable controller.
-  Controller copyWith({
-    double strokeWidth,
-    Color color,
-    PaintMode mode,
-    PaintingStyle paintingStyle,
-  }) {
+  Controller copyWith(
+      {double strokeWidth,
+      Color color,
+      PaintMode mode,
+      PaintingStyle paintingStyle,
+      String text}) {
     return Controller(
         strokeWidth: strokeWidth ?? this.strokeWidth,
         color: color ?? this.color,
         mode: mode ?? this.mode,
         // ignore: unnecessary_this
-        paintStyle: paintingStyle ?? this.paintStyle);
+        paintStyle: paintingStyle ?? this.paintStyle,
+        text: text ?? this.text);
   }
 }

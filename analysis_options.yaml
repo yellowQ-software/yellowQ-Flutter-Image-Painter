@@ -7,7 +7,7 @@ analyzer:
 linter:
   rules:
     await_only_futures: true
-    public_member_api_docs: true
+    public_member_api_docs: false
     avoid_positional_boolean_parameters: true
     constant_identifier_names: true
     include_file_not_found: false

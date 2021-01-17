@@ -61,7 +61,7 @@ class DrawImage extends CustomPainter {
       final _offset = item.map.value.offset;
       final _painter = item.map.value.painter;
       switch (item.map.key) {
-        case PaintMode.box:
+        case PaintMode.rect:
           canvas.drawRect(Rect.fromPoints(_offset[0], _offset[1]), _painter);
           break;
         case PaintMode.line:
@@ -128,7 +128,7 @@ class DrawImage extends CustomPainter {
       final _end = update.end;
       final _painter = update.painter;
       switch (update.mode) {
-        case PaintMode.box:
+        case PaintMode.rect:
           canvas.drawRect(Rect.fromPoints(_start, _end), _painter);
           break;
         case PaintMode.line:
@@ -229,7 +229,7 @@ enum PaintMode {
   line,
 
   ///Allows to draw rectangle.
-  box,
+  rect,
 
   ///Allows to write texts over an image.
   text,
