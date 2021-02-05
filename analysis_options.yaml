@@ -20,21 +20,21 @@ linter:
     library_prefixes: true
     non_constant_identifier_names: true
     directives_ordering: true
-    lines_longer_than_80_chars: false # avoid
+    lines_longer_than_80_chars: false
     curly_braces_in_flow_control_structures: true
 
     # DOCUMENTATION
     slash_for_doc_comments: true
-    package_api_docs: true # prefer
+    package_api_docs: true 
 
     implementation_imports: true
-    avoid_relative_lib_imports: true # prefer
-    prefer_relative_imports: true # prefer
+    avoid_relative_lib_imports: true 
+    prefer_relative_imports: true 
     prefer_adjacent_string_concatenation: true
-    prefer_interpolation_to_compose_strings: true # prefer
-    unnecessary_brace_in_string_interps: true # avoid
+    prefer_interpolation_to_compose_strings: true
+    unnecessary_brace_in_string_interps: false 
     prefer_collection_literals: true
-    avoid_function_literals_in_foreach_calls: true # avoid
+    avoid_function_literals_in_foreach_calls: true
     prefer_iterable_whereType: true
     prefer_function_declarations_over_variables: true
     unnecessary_lambdas: true
@@ -48,24 +48,24 @@ linter:
     empty_constructor_bodies: true
     unnecessary_new: true
     unnecessary_const: true
-    avoid_catches_without_on_clauses: true # avoid
+    avoid_catches_without_on_clauses: true
     avoid_catching_errors: true
     use_rethrow_when_possible: true
-    use_to_and_as_if_applicable: true # prefer
-    one_member_abstracts: true # avoid
-    avoid_classes_with_only_static_members: true # avoid
+    use_to_and_as_if_applicable: true 
+    one_member_abstracts: true
+    avoid_classes_with_only_static_members: true
     prefer_mixin: true
-    prefer_final_fields: true # prefer
+    prefer_final_fields: true 
     use_setters_to_change_properties: true
     avoid_setters_without_getters: true
-    avoid_returning_null: true # avoid
-    avoid_returning_this: true # avoid
-    type_annotate_public_apis: true # prefer
-    omit_local_variable_types: true # avoid
-    avoid_types_on_closure_parameters: true # avoid
-    avoid_return_types_on_setters: true # avoid
+    avoid_returning_null: true
+    avoid_returning_this: true
+    type_annotate_public_apis: true 
+    omit_local_variable_types: true
+    avoid_types_on_closure_parameters: true
+    avoid_return_types_on_setters: true
     prefer_generic_function_type_aliases: true
-    avoid_private_typedef_functions: true # prefer
+    avoid_private_typedef_functions: true 
     hash_and_equals: true
-    avoid_equals_and_hash_code_on_mutable_classes: true # avoid
+    avoid_equals_and_hash_code_on_mutable_classes: true
     avoid_null_checks_in_equality_operators: true

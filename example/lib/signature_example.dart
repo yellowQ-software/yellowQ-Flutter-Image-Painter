@@ -14,11 +14,12 @@ class SignatureExample extends StatefulWidget {
 class _SignatureExampleState extends State<SignatureExample> {
   final _imageKey = GlobalKey<ImagePainterState>();
   final _key = GlobalKey<ScaffoldState>();
-  final _controller = ValueNotifier<Controller>(null);
+  ValueNotifier<Controller> _controller;
   @override
   void initState() {
-    _controller.value =
-        Controller(color: Colors.black, mode: PaintMode.line, strokeWidth: 4.0);
+    _controller = ValueNotifier<Controller>(
+      Controller(color: Colors.black, mode: PaintMode.line, strokeWidth: 4.0),
+    );
     super.initState();
   }
 
@@ -155,6 +156,7 @@ class _SignatureExampleState extends State<SignatureExample> {
     final fullPath = '$directory/sample/image.png';
     final imgFile = File('$fullPath');
     imgFile.writeAsBytesSync(image);
+    // ignore: deprecated_member_use
     _key.currentState.showSnackBar(
       SnackBar(
         backgroundColor: Colors.grey[700],

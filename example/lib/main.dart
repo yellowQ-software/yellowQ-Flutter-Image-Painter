@@ -65,6 +65,7 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
         '$directory/sample/${DateTime.now().millisecondsSinceEpoch}.png';
     final imgFile = File('$fullPath');
     imgFile.writeAsBytesSync(image);
+    // ignore: deprecated_member_use
     _key.currentState.showSnackBar(
       SnackBar(
         backgroundColor: Colors.grey[700],

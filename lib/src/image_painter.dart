@@ -7,13 +7,10 @@ class DrawImage extends CustomPainter {
   final Image image;
 
   ///Keeps track of all the units of [PaintHistory].
-  final List<PaintHistory> paintHistory;
+  final List<PaintInfo> paintHistory;
 
   ///Keeps track of points on currently drawing state.
-  final UpdatePoints update;
-
-  ///Keeps track of freestyle points on currently drawing state.
-  final List<Offset> points;
+  final CurrentUpdates update;
 
   ///Keeps track whether the paint action is running or not.
   final bool isDragging;
@@ -28,7 +25,6 @@ class DrawImage extends CustomPainter {
   DrawImage(
       {this.image,
       this.update,
-      this.points,
       this.isDragging = false,
       this.isSignature = false,
       this.backgroundColor,
@@ -58,9 +54,9 @@ class DrawImage extends CustomPainter {
 
     ///paints all the previoud paintInfo history recorded on [PaintHistory]
     for (var item in paintHistory) {
-      final _offset = item.map.value.offset;
-      final _painter = item.map.value.painter;
-      switch (item.map.key) {
+      final _offset = item.offset;
+      final _painter = item.painter;
+      switch (item.mode) {
         case PaintMode.rect:
           canvas.drawRect(Rect.fromPoints(_offset[0], _offset[1]), _painter);
           break;
@@ -85,21 +81,23 @@ class DrawImage extends CustomPainter {
           canvas.drawPath(_dashPath(path, _painter.strokeWidth), _painter);
           break;
         case PaintMode.freeStyle:
+          final _paint = _painter
+            ..strokeCap = StrokeCap.round
+            ..strokeJoin = StrokeJoin.round;
           for (var i = 0; i < _offset.length - 1; i++) {
             if (_offset[i] != null && _offset[i + 1] != null) {
               final _path = Path()
                 ..moveTo(_offset[i].dx, _offset[i].dy)
                 ..lineTo(_offset[i + 1].dx, _offset[i + 1].dy);
-              canvas.drawPath(_path, _painter..strokeCap = StrokeCap.round);
+              canvas.drawPath(_path, _paint);
             } else if (_offset[i] != null && _offset[i + 1] == null) {
-              canvas.drawPoints(PointMode.points, [_offset[i]],
-                  _painter..strokeCap = StrokeCap.round);
+              canvas.drawPoints(PointMode.points, [_offset[i]], _paint);
             }
           }
           break;
         case PaintMode.text:
           final textSpan = TextSpan(
-            text: item.map.value.text,
+            text: item.text,
             style: TextStyle(
                 color: _painter.color,
                 fontSize: 12 * _painter.strokeWidth / 2,
@@ -126,6 +124,7 @@ class DrawImage extends CustomPainter {
     if (isDragging) {
       final _start = update.start;
       final _end = update.end;
+      final points = update.points;
       final _painter = update.painter;
       switch (update.mode) {
         case PaintMode.rect:
@@ -152,13 +151,10 @@ class DrawImage extends CustomPainter {
         case PaintMode.freeStyle:
           for (var i = 0; i < points.length - 1; i++) {
             if (points[i] != null && points[i + 1] != null) {
-              canvas.drawLine(
-                  Offset(points[i].dx, points[i].dy),
-                  Offset(points[i + 1].dx, points[i + 1].dy),
+              canvas.drawLine(points[i], points[i + 1],
                   _painter..strokeCap = StrokeCap.round);
             } else if (points[i] != null && points[i + 1] == null) {
-              canvas.drawPoints(PointMode.points,
-                  [Offset(points[i].dx, points[i].dy)], _painter);
+              canvas.drawPoints(PointMode.points, [points[i]], _painter);
             }
           }
           break;
@@ -246,6 +242,8 @@ enum PaintMode {
 
 ///[PaintInfo] keeps track of a single unit of shape, whichever selected.
 class PaintInfo {
+  PaintMode mode;
+
   ///Used to save specific paint utils used for the specific shape.
   Paint painter;
 
@@ -256,13 +254,13 @@ class PaintInfo {
   String text;
 
   ///In case of string, it is used to save string value entered.
-  PaintInfo({this.offset, this.painter, this.text});
+  PaintInfo({this.offset, this.painter, this.text, this.mode});
 }
 
 @immutable
 
 ///Records realtime updates of ongoing [PaintInfo] when inDrag.
-class UpdatePoints {
+class CurrentUpdates {
   ///Records the first tap offset,
   final Offset start;
 
@@ -275,14 +273,17 @@ class UpdatePoints {
   ///Records [PaintMode] of the ongoing painting.
   final PaintMode mode;
 
+  final List<Offset> points;
+
   ///Constructor for ongoing painthistory.
-  UpdatePoints({this.start, this.end, this.painter, this.mode});
+  CurrentUpdates(
+      {this.start, this.end, this.painter, this.mode, this.points = const []});
 
   @override
   bool operator ==(Object o) {
     if (identical(this, o)) return true;
 
-    return o is UpdatePoints &&
+    return o is CurrentUpdates &&
         o.start == start &&
         o.end == end &&
         o.painter == painter &&
@@ -293,13 +294,4 @@ class UpdatePoints {
   int get hashCode {
     return start.hashCode ^ end.hashCode ^ painter.hashCode ^ mode.hashCode;
   }
-}
-
-///Records the [PaintMode] as well as [PaintInfo] of that particular [PaintMode].
-class PaintHistory {
-  ///Tracks [PaintMode] and [PaintInfo] in a map;
-  final MapEntry<PaintMode, PaintInfo> map;
-
-  ///Constructor for the painthistory tracker.
-  PaintHistory(this.map);
 }
