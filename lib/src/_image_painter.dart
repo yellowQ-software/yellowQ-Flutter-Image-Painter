@@ -1,4 +1,5 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart' hide Image;
 
 ///Handles all the painting ongoing on the canvas.
@@ -7,7 +8,7 @@ class DrawImage extends CustomPainter {
   final Image image;
 
   ///Keeps track of all the units of [PaintHistory].
-  final List<PaintHistory> paintHistory;
+  final List<PaintInfo> paintHistory;
 
   ///Keeps track of points on currently drawing state.
   final UpdatePoints update;
@@ -58,9 +59,9 @@ class DrawImage extends CustomPainter {
 
     ///paints all the previoud paintInfo history recorded on [PaintHistory]
     for (var item in paintHistory) {
-      final _offset = item.map.value.offset;
-      final _painter = item.map.value.painter;
-      switch (item.map.key) {
+      final _offset = item.offset;
+      final _painter = item.painter;
+      switch (item.mode) {
         case PaintMode.rect:
           canvas.drawRect(Rect.fromPoints(_offset[0], _offset[1]), _painter);
           break;
@@ -99,10 +100,10 @@ class DrawImage extends CustomPainter {
           break;
         case PaintMode.text:
           final textSpan = TextSpan(
-            text: item.map.value.text,
+            text: item.text,
             style: TextStyle(
                 color: _painter.color,
-                fontSize: 12 * _painter.strokeWidth / 2,
+                fontSize: 6 * _painter.strokeWidth,
                 fontWeight: FontWeight.bold),
           );
           final textPainter = TextPainter(
@@ -246,6 +247,9 @@ enum PaintMode {
 
 ///[PaintInfo] keeps track of a single unit of shape, whichever selected.
 class PaintInfo {
+  ///Mode of the paint method.
+  PaintMode mode;
+
   ///Used to save specific paint utils used for the specific shape.
   Paint painter;
 
@@ -256,7 +260,7 @@ class PaintInfo {
   String text;
 
   ///In case of string, it is used to save string value entered.
-  PaintInfo({this.offset, this.painter, this.text});
+  PaintInfo({this.offset, this.painter, this.text, this.mode});
 }
 
 @immutable
@@ -293,13 +297,4 @@ class UpdatePoints {
   int get hashCode {
     return start.hashCode ^ end.hashCode ^ painter.hashCode ^ mode.hashCode;
   }
-}
-
-///Records the [PaintMode] as well as [PaintInfo] of that particular [PaintMode].
-class PaintHistory {
-  ///Tracks [PaintMode] and [PaintInfo] in a map;
-  final MapEntry<PaintMode, PaintInfo> map;
-
-  ///Constructor for the painthistory tracker.
-  PaintHistory(this.map);
 }
