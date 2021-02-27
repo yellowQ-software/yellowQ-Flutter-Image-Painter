@@ -7,7 +7,6 @@ analyzer:
 linter:
   rules:
     await_only_futures: true
-    public_member_api_docs: false
     avoid_positional_boolean_parameters: true
     constant_identifier_names: true
     include_file_not_found: false
@@ -25,6 +24,7 @@ linter:
 
     # DOCUMENTATION
     slash_for_doc_comments: true
+    public_member_api_docs: false
     package_api_docs: true # prefer
 
     implementation_imports: true

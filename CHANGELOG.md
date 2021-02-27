@@ -1,3 +1,12 @@
+# 0.3.0
+
+**Breaking Changes:** 
+- `Controller` is no longer required to pass as the editor will handle it manually. 
+- No need to configure controls options. Package provides control bar with all the needed features like change mode, color, undo, clear etc. 
+- Text mode is available now. After adding text, it can be moved freely around until next operation. 
+- The `PaintMode` enums are now lowercases following dart conventions.
+
+
 # 0.2.0
 
 - Fixed issue with image parsing failing when used with file. 

@@ -48,22 +48,15 @@ Basic usage of the libary:
 - `ImagePainter.network`: Painting over image from network url.
 
 ```dart
-///Initialize the controller
-Controller imageController = Controller();
-GlobalKey<ImagePainterState> _imageKey = GlobalKey<ImagePainterState>();
-///Provide controller to the painter.
+final _imageKey = GlobalKey<ImagePainterState>();
+//Provide controller to the painter.
 ImagePainter.network("https://sample_image.png",
-                  key: _imageKey, controller: imageController, scalable: true),
-///To change color, strokewidth or paint mode: 
-setState((){
-    imageController = imageController.copyWith(color:Colors.red);
-    imageController = imageController.copyWith(mode:PaintMode.arrow);
-    imageController = imageController.copyWith(strokeWidth:10.0);
-})
+                  key: _imageKey,scalable: true),
+
 ///Export the image:
-Uint8List image = await _imageKey.currentState.exportImage();
-///Now you use [Uint8List] data and convert it to file.
-File imgFile = new File('directory/sample.png');
-    imgFile.writeAsBytesSync(image);
+Uint8List byteArray = await _imageKey.currentState.exportImage();
+//Now you use `Uint8List` data and convert it to file.
+File imgFile = new File('directoryPath/fileName.png');
+imgFile.writeAsBytesSync(image);
 ```
 **For more thorough implementation guide, check the [example](./example).**

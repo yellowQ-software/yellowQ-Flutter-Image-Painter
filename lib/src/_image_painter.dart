@@ -253,7 +253,8 @@ class PaintInfo {
   ///Used to save specific paint utils used for the specific shape.
   Paint painter;
 
-  ///Used to save offsets. two point in case of other shapes and list of points for [FreeStyle].
+  ///Used to save offsets.
+  ///Two point in case of other shapes and list of points for [FreeStyle].
   List<Offset> offset;
 
   ///Used to save text in case of text type.
