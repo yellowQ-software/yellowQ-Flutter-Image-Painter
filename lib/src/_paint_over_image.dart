@@ -669,6 +669,9 @@ class ImagePainterState extends State<ImagePainter> {
               builder: (_, _ctrl, __) {
                 return PopupMenuButton(
                   tooltip: "Change mode",
+                  shape: ContinuousRectangleBorder(
+                    borderRadius: BorderRadius.circular(40),
+                  ),
                   icon: Icon(
                       paintModes
                           .firstWhere((item) => item.mode == _ctrl.mode)
@@ -682,6 +685,9 @@ class ImagePainterState extends State<ImagePainter> {
               builder: (_, controller, __) {
                 return PopupMenuButton(
                   padding: const EdgeInsets.symmetric(vertical: 10),
+                  shape: ContinuousRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
                   tooltip: "Change color",
                   icon: widget.colorIcon ??
                       Container(
@@ -697,6 +703,9 @@ class ImagePainterState extends State<ImagePainter> {
               }),
           PopupMenuButton(
             tooltip: "Change Brush Size",
+            shape: ContinuousRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
             icon:
                 widget.brushIcon ?? Icon(Icons.brush, color: Colors.grey[700]),
             itemBuilder: (_) => [_showRangeSlider()],

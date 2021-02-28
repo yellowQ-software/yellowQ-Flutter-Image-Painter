@@ -23,7 +23,6 @@ class SelectionItems extends StatelessWidget {
           child:
               Icon(data.icon, color: isSelected ? Colors.white : Colors.black),
         ),
-        horizontalTitleGap: 0,
         title: Text(
           data.label,
           style: Theme.of(context).textTheme.subtitle1.copyWith(
@@ -39,7 +38,7 @@ class SelectionItems extends StatelessWidget {
   }
 }
 
-List<ModeData> paintModes = [
+const List<ModeData> paintModes = [
   ModeData(
       icon: Icons.zoom_out_map, mode: PaintMode.none, label: "None / Zoom"),
   ModeData(icon: Icons.horizontal_rule, mode: PaintMode.line, label: "Line"),
@@ -55,11 +54,12 @@ List<ModeData> paintModes = [
   ModeData(icon: Icons.text_format, mode: PaintMode.text, label: "Text"),
 ];
 
+@immutable
 class ModeData {
   final IconData icon;
   final PaintMode mode;
   final String label;
-  ModeData({
+  const ModeData({
     this.icon,
     this.mode,
     this.label,
