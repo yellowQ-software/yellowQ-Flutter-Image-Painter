@@ -1,3 +1,6 @@
+# 0.3.1
+- Fix static analysis
+
 # 0.3.0
 
 **Breaking Changes:** 
