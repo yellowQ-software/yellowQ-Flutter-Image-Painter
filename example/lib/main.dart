@@ -30,7 +30,6 @@ class ImagePainterExample extends StatefulWidget {
 
 class _ImagePainterExampleState extends State<ImagePainterExample> {
   final _imageKey = GlobalKey<ImagePainterState>();
-  final _key = GlobalKey<ScaffoldState>();
 
   void saveImage() async {
     final image = await _imageKey.currentState.exportImage();
@@ -39,8 +38,8 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
     final fullPath =
         '$directory/sample/${DateTime.now().millisecondsSinceEpoch}.png';
     final imgFile = File('$fullPath');
-    imgFile.writeAsBytesSync(image);
-    _key.currentState.showSnackBar(
+    imgFile.writeAsBytesSync(image[0]);
+    ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: Colors.grey[700],
         padding: const EdgeInsets.only(left: 10),
@@ -61,7 +60,6 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _key,
       appBar: AppBar(
         title: const Text("Image Painter Example"),
         actions: [
@@ -71,8 +69,11 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
           )
         ],
       ),
-      body: ImagePainter.asset("assets/sample.jpg",
-          key: _imageKey, scalable: false),
+      body: ImagePainter.asset(
+        "assets/sample.jpg",
+        key: _imageKey,
+        scalable: false,
+      ),
     );
   }
 }

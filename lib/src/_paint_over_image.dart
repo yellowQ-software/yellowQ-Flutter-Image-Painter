@@ -9,9 +9,10 @@ import 'package:flutter/services.dart';
 
 import '_image_painter.dart';
 import '_ported_interactive_viewer.dart';
-import 'widgets/_color_widget.dart';
-import 'widgets/_mode_widget.dart';
-import 'widgets/_range_slider.dart';
+import '_widgets/_color_widget.dart';
+import '_widgets/_draggable_text.dart';
+import '_widgets/_mode_widget.dart';
+import '_widgets/_range_slider.dart';
 
 export '_image_painter.dart';
 
@@ -36,6 +37,7 @@ class ImagePainter extends StatefulWidget {
     this.controlsAtTop = true,
     this.signatureBackgroundColor,
     this.colors,
+    this.multiImages,
   }) : super(key: key);
 
   ///Constructor for loading image from network url.
@@ -145,6 +147,34 @@ class ImagePainter extends StatefulWidget {
     );
   }
 
+  ///Constructor for loading multiple images.
+  ///Takes `List<Uint8List>` as parameter.
+  factory ImagePainter.multi(List<Uint8List> images,
+      {@required Key key,
+      double height,
+      double width,
+      bool scalable,
+      Widget placeholderWidget,
+      List<Color> colors,
+      Widget brushIcon,
+      Widget undoIcon,
+      Widget clearAllIcon,
+      Widget colorIcon}) {
+    return ImagePainter._(
+      key: key,
+      multiImages: images,
+      height: height,
+      width: width,
+      placeHolder: placeholderWidget,
+      isScalable: scalable ?? false,
+      colors: colors,
+      brushIcon: brushIcon,
+      undoIcon: undoIcon,
+      colorIcon: colorIcon,
+      clearAllIcon: clearAllIcon,
+    );
+  }
+
   ///Constructor for signature painting.
   factory ImagePainter.signature(
       {@required Key key,
@@ -170,6 +200,8 @@ class ImagePainter extends StatefulWidget {
       clearAllIcon: clearAllIcon,
     );
   }
+
+  final List<Uint8List> multiImages;
 
   ///Only accessible through [ImagePainter.network] constructor.
   final String networkUrl;
@@ -228,15 +260,15 @@ class ImagePainter extends StatefulWidget {
 ///
 class ImagePainterState extends State<ImagePainter> {
   final _repaintKey = GlobalKey();
-  ui.Image _image;
+  final _image = <ui.Image>[];
   bool _inDrag = false;
   final _controller = ValueNotifier<Controller>(null);
   final _isLoaded = ValueNotifier<bool>(false);
+  final _selectedIndex = ValueNotifier<int>(0);
   final _paintHistory = <PaintInfo>[];
   final _points = <Offset>[];
   TextEditingController _textController;
   Offset _start, _end;
-  int _strokeMultiplier = 1;
   @override
   void initState() {
     super.initState();
@@ -263,34 +295,41 @@ class ImagePainterState extends State<ImagePainter> {
   ///Converts the incoming image type from constructor to [ui.Image]
   Future<void> _resolveAndConvertImage() async {
     if (widget.networkUrl != null) {
-      _image = await _loadNetworkImage(widget.networkUrl);
+      final _img = await _loadNetworkImage(widget.networkUrl);
       if (_image == null) {
         throw ("${widget.networkUrl} couldn't be resolved.");
       } else {
-        _setStrokeMultiplier();
+        _image.add(_img);
       }
     } else if (widget.assetPath != null) {
       final img = await rootBundle.load(widget.assetPath);
-      _image = await _convertImage(Uint8List.view(img.buffer));
+      final _img = await _convertImage(Uint8List.view(img.buffer));
       if (_image == null) {
         throw ("${widget.assetPath} couldn't be resolved.");
       } else {
-        _setStrokeMultiplier();
+        _image.add(_img);
       }
     } else if (widget.file != null) {
       final img = await widget.file.readAsBytes();
-      _image = await _convertImage(img);
+      final _img = await _convertImage(img);
       if (_image == null) {
         throw ("Image couldn't be resolved from provided file.");
       } else {
-        _setStrokeMultiplier();
+        _image.add(_img);
       }
     } else if (widget.byteArray != null) {
-      _image = await _convertImage(widget.byteArray);
+      final _img = await _convertImage(widget.byteArray);
       if (_image == null) {
         throw ("Image couldn't be resolved from provided byteArray.");
       } else {
-        _setStrokeMultiplier();
+        _image.add(_img);
+      }
+    } else if (widget.multiImages != null || widget.multiImages.isNotEmpty) {
+      final _img = await _convertImage(widget.byteArray);
+      if (_image == null) {
+        throw ("Image couldn't be resolved from provided byteArray.");
+      } else {
+        _image.add(_img);
       }
     } else {
       _isLoaded.value = true;
@@ -299,11 +338,20 @@ class ImagePainterState extends State<ImagePainter> {
 
   ///Dynamically sets stroke multiplier on the basis of widget size.
   ///Implemented to avoid thin stroke on high res images.
-  _setStrokeMultiplier() {
-    if ((_image.height + _image.width) > 1000) {
-      _strokeMultiplier = (_image.height + _image.width) ~/ 1000;
+  int get _strokeMultiplier {
+    if ((_image[_selectedIndex.value].height +
+            _image[_selectedIndex.value]?.width) >
+        1000) {
+      return (_image[_selectedIndex.value].height +
+              _image[_selectedIndex.value]?.width) ~/
+          1000;
+    } else {
+      return 1;
     }
   }
+
+  Size imageSize(ui.Image image) =>
+      Size(image.width.toDouble(), image.height.toDouble());
 
   ///Completer function to convert asset or file image to [ui.Image] before drawing on custompainter.
   Future<ui.Image> _convertImage(Uint8List img) async {
@@ -331,8 +379,10 @@ class ImagePainterState extends State<ImagePainter> {
     return ValueListenableBuilder<bool>(
       valueListenable: _isLoaded,
       builder: (_, loaded, __) {
-        if (loaded) {
-          return widget.isSignature ? _paintSignature() : _paintImage();
+        if (widget.isSignature) {
+          return _paintSignature();
+        } else if (loaded && _image.isNotEmpty) {
+          return _paintImage();
         } else {
           return Container(
             height: widget.height ?? double.maxFinite,
@@ -361,39 +411,88 @@ class ImagePainterState extends State<ImagePainter> {
                 child: ValueListenableBuilder<Controller>(
                   valueListenable: _controller,
                   builder: (_, controller, __) {
-                    return ImagePainterTransformer(
-                      maxScale: 2.4,
-                      minScale: 1,
-                      panEnabled: controller.mode == PaintMode.none,
-                      scaleEnabled: widget.isScalable,
-                      onInteractionUpdate: (details) =>
-                          _scaleUpdateGesture(details, controller),
-                      onInteractionEnd: (details) =>
-                          _scaleEndGesture(details, controller),
-                      child: CustomPaint(
-                        size: Size(
-                            _image.width.toDouble(), _image.height.toDouble()),
-                        willChange: true,
-                        isComplex: true,
-                        painter: DrawImage(
-                          image: _image,
-                          points: _points,
-                          paintHistory: _paintHistory,
-                          isDragging: _inDrag,
-                          update: UpdatePoints(
-                              start: _start,
-                              end: _end,
-                              painter: _painter,
-                              mode: controller.mode),
-                        ),
-                      ),
+                    return ValueListenableBuilder<int>(
+                      valueListenable: _selectedIndex,
+                      builder: (context, index, child) {
+                        return IndexedStack(
+                          index: index,
+                          children: _image.map((image) {
+                            return ImagePainterTransformer(
+                              maxScale: 2.4,
+                              minScale: 1,
+                              panEnabled: controller.mode == PaintMode.none,
+                              scaleEnabled: widget.isScalable,
+                              onInteractionUpdate: (details) =>
+                                  _scaleUpdateGesture(details, controller),
+                              onInteractionEnd: (details) =>
+                                  _scaleEndGesture(details, controller),
+                              child: LayoutBuilder(
+                                builder: (context, constraints) {
+                                  return Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      CustomPaint(
+                                        size: imageSize(_image[index]),
+                                        willChange: true,
+                                        isComplex: true,
+                                        painter: DrawImage(
+                                          image: _image[index],
+                                          points: _points,
+                                          paintHistory: _paintHistory,
+                                          isDragging: _inDrag,
+                                          update: UpdatePoints(
+                                              start: _start,
+                                              end: _end,
+                                              painter: _painter,
+                                              mode: controller.mode),
+                                        ),
+                                      ),
+                                      for (final item in _paintHistory
+                                          .where(
+                                              (element) => element.text != null)
+                                          .toList())
+                                        Positioned(
+                                          top: item.offset.isEmpty
+                                              ? null
+                                              : item.offset[0].dy,
+                                          left: item.offset.isEmpty
+                                              ? null
+                                              : item.offset[0].dx,
+                                          child: DraggableText(
+                                            item: item,
+                                            onDragEnd: (details) {
+                                              final _renderBox =
+                                                  context.findRenderObject()
+                                                      as RenderBox;
+                                              setState(() {
+                                                if (item.offset.isEmpty) {
+                                                  item.offset.add(
+                                                      _renderBox.globalToLocal(
+                                                          details.offset));
+                                                } else {
+                                                  item.offset.clear();
+                                                  item.offset.add(
+                                                      _renderBox.globalToLocal(
+                                                          details.offset));
+                                                }
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            );
+                          }).toList(),
+                        );
+                      },
                     );
                   },
                 ),
               ),
             ),
           ),
-          if (!widget.controlsAtTop) _buildControls(),
           SizedBox(height: MediaQuery.of(context).padding.bottom)
         ],
       ),
@@ -458,14 +557,6 @@ class ImagePainterState extends State<ImagePainter> {
         _start ??= onUpdate.focalPoint;
         _end = onUpdate.focalPoint;
         if (ctrl.mode == PaintMode.freeStyle) _points.add(_end);
-        if (ctrl.mode == PaintMode.text &&
-            _paintHistory
-                .where((element) => element.mode == PaintMode.text)
-                .isNotEmpty) {
-          _paintHistory
-              .lastWhere((element) => element.mode == PaintMode.text)
-              .offset = [_end];
-        }
       },
     );
   }
@@ -507,11 +598,11 @@ class ImagePainterState extends State<ImagePainter> {
       );
 
   ///Provides [ui.Image] of the recorded canvas to perform action.
-  Future<ui.Image> _renderImage() async {
+  Future<ui.Image> _renderImage(ui.Image rawImage) async {
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
-    final painter = DrawImage(image: _image, paintHistory: _paintHistory);
-    final size = Size(_image.width.toDouble(), _image.height.toDouble());
+    final painter = DrawImage(image: rawImage, paintHistory: _paintHistory);
+    final size = Size(rawImage.width.toDouble(), rawImage.height.toDouble());
     painter.paint(canvas, size);
     return recorder
         .endRecording()
@@ -563,42 +654,51 @@ class ImagePainterState extends State<ImagePainter> {
 
   PopupMenuItem _showColorPicker(Controller controller) {
     return PopupMenuItem(
-        enabled: false,
-        child: Center(
-          child: Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 10,
-            runSpacing: 10,
-            children: (widget.colors ?? editorColors).map((color) {
-              return ColorItem(
-                isSelected: color == controller.color,
-                color: color,
-                onTap: () {
-                  _controller.value = controller.copyWith(color: color);
-                  Navigator.pop(context);
-                },
-              );
-            }).toList(),
-          ),
-        ));
+      enabled: false,
+      child: Center(
+        child: OverflowBar(
+          overflowAlignment: OverflowBarAlignment.center,
+          spacing: 10,
+          overflowSpacing: 10,
+          children: (widget.colors ?? editorColors).map((color) {
+            return ColorItem(
+              isSelected: color == controller.color,
+              color: color,
+              onTap: () {
+                _controller.value = controller.copyWith(color: color);
+                Navigator.pop(context);
+              },
+            );
+          }).toList(),
+        ),
+      ),
+    );
   }
 
   ///Generates [Uint8List] of the [ui.Image] generated by the [renderImage()] method.
   ///Can be converted to image file by writing as bytes.
-  Future<Uint8List> exportImage() async {
+  Future<List<Uint8List>> exportImage() async {
     ui.Image _convertedImage;
+    final _resultImages = <Uint8List>[];
     if (widget.isSignature) {
       final _boundary = _repaintKey.currentContext.findRenderObject()
           as RenderRepaintBoundary;
       _convertedImage = await _boundary.toImage(pixelRatio: 3);
+      final byteData =
+          await _convertedImage.toByteData(format: ui.ImageByteFormat.png);
+      _resultImages.add(byteData.buffer.asUint8List());
     } else if (widget.byteArray != null && _paintHistory.isEmpty) {
-      return widget.byteArray;
+      _resultImages.add(widget.byteArray);
     } else {
-      _convertedImage = await _renderImage();
+      for (final item in _image) {
+        _convertedImage = await _renderImage(item);
+        final byteData =
+            await _convertedImage.toByteData(format: ui.ImageByteFormat.png);
+        _resultImages.add(byteData.buffer.asUint8List());
+      }
     }
-    final byteData =
-        await _convertedImage.toByteData(format: ui.ImageByteFormat.png);
-    return byteData.buffer.asUint8List();
+
+    return _resultImages;
   }
 
   void _openTextDialog() {

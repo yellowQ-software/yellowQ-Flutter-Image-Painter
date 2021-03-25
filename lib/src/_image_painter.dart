@@ -98,27 +98,27 @@ class DrawImage extends CustomPainter {
             }
           }
           break;
-        case PaintMode.text:
-          final textSpan = TextSpan(
-            text: item.text,
-            style: TextStyle(
-                color: _painter.color,
-                fontSize: 6 * _painter.strokeWidth,
-                fontWeight: FontWeight.bold),
-          );
-          final textPainter = TextPainter(
-            text: textSpan,
-            textAlign: TextAlign.center,
-            textDirection: TextDirection.ltr,
-          );
-          textPainter.layout(minWidth: 0, maxWidth: size.width);
-          final textOffset = _offset.isEmpty
-              ? Offset(size.width / 2 - textPainter.width / 2,
-                  size.height / 2 - textPainter.height / 2)
-              : Offset(_offset[0].dx - textPainter.width / 2,
-                  _offset[0].dy - textPainter.height / 2);
-          textPainter.paint(canvas, textOffset);
-          break;
+        // case PaintMode.text:
+        //   final textSpan = TextSpan(
+        //     text: item.text,
+        //     style: TextStyle(
+        //         color: _painter.color,
+        //         fontSize: 6 * _painter.strokeWidth,
+        //         fontWeight: FontWeight.bold),
+        //   );
+        //   final textPainter = TextPainter(
+        //     text: textSpan,
+        //     textAlign: TextAlign.center,
+        //     textDirection: TextDirection.ltr,
+        //   );
+        //   textPainter.layout(minWidth: 0, maxWidth: size.width);
+        //   final textOffset = _offset.isEmpty
+        //       ? Offset(size.width / 2 - textPainter.width / 2,
+        //           size.height / 2 - textPainter.height / 2)
+        //       : Offset(_offset[0].dx - textPainter.width / 2,
+        //           _offset[0].dy - textPainter.height / 2);
+        //   textPainter.paint(canvas, textOffset);
+        //   break;
         default:
       }
     }

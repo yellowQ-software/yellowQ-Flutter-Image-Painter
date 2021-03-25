@@ -11,34 +11,26 @@ class SignatureExample extends StatefulWidget {
 }
 
 class _SignatureExampleState extends State<SignatureExample> {
-  final _imageKey = GlobalKey<ImagePainterState>();
-  final _key = GlobalKey<ScaffoldState>();
-  final _controller = ValueNotifier<Controller>(null);
+  GlobalKey<ImagePainterState> _imageKey;
   @override
   void initState() {
-    _controller.value =
-        Controller(color: Colors.black, mode: PaintMode.line, strokeWidth: 4.0);
     super.initState();
+    _imageKey = GlobalKey<ImagePainterState>();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _key,
       appBar: AppBar(title: const Text("Image Painter Example")),
       body: Center(
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8),
-          child: ValueListenableBuilder<Controller>(
-              valueListenable: _controller,
-              builder: (_, controller, __) {
-                return ImagePainter.signature(
-                  height: 200,
-                  width: 300,
-                  key: _imageKey,
-                  signatureBgColor: Colors.grey[200],
-                );
-              }),
+          child: ImagePainter.signature(
+            height: 200,
+            width: 300,
+            key: _imageKey,
+            signatureBgColor: Colors.grey[200],
+          ),
         ),
       ),
     );
@@ -50,8 +42,8 @@ class _SignatureExampleState extends State<SignatureExample> {
     await Directory('$directory/sample').create(recursive: true);
     final fullPath = '$directory/sample/image.png';
     final imgFile = File('$fullPath');
-    imgFile.writeAsBytesSync(image);
-    _key.currentState.showSnackBar(
+    imgFile.writeAsBytesSync(image[0]);
+    ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: Colors.grey[700],
         padding: const EdgeInsets.only(left: 10),
