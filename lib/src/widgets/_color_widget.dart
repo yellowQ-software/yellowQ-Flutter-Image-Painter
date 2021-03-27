@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 
 class ColorItem extends StatelessWidget {
-  const ColorItem({Key key, this.onTap, this.isSelected, this.color})
-      : super(key: key);
-  final VoidCallback onTap;
-  final bool isSelected;
-  final Color color;
+  const ColorItem({
+    required this.isSelected,
+    required this.color,
+    required this.onTap,
+    Key? key,
+  }) : super(key: key);
+  final VoidCallback? onTap;
+  final bool? isSelected;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -16,12 +20,12 @@ class ColorItem extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(2),
           decoration: BoxDecoration(
-              color: isSelected ? Colors.white70 : Colors.transparent,
+              color: isSelected! ? Colors.white70 : Colors.transparent,
               shape: BoxShape.circle,
               border: Border.all(
-                  color: isSelected ? Colors.black : Colors.grey[200])),
+                  color: isSelected! ? Colors.black : Colors.grey[200]!)),
           child: CircleAvatar(
-              radius: isSelected ? 16 : 12, backgroundColor: color),
+              radius: isSelected! ? 16 : 12, backgroundColor: color),
         ),
       ),
     );
