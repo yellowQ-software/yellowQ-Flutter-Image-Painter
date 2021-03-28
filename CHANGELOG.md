@@ -1,4 +1,10 @@
+# 0.3.2
+
+- Bumped up dependencies.
+- Generated dartdoc api documentation.
+
 # 0.3.1
+
 - Fix static analysis
 
 # 0.3.0

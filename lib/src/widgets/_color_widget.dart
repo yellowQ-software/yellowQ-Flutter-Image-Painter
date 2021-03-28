@@ -28,7 +28,7 @@ class ColorItem extends StatelessWidget {
   }
 }
 
-List<Color> editorColors = [
+const List<Color> editorColors = [
   Colors.black,
   Colors.white,
   Colors.red,

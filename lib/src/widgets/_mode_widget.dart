@@ -13,13 +13,13 @@ class SelectionItems extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 2.0),
+      margin: const EdgeInsets.symmetric(vertical: 2.0),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(4.0),
           color: isSelected ? Colors.blue : Colors.transparent),
       child: ListTile(
         leading: IconTheme(
-          data: IconThemeData(opacity: 1.0),
+          data: const IconThemeData(opacity: 1.0),
           child:
               Icon(data.icon, color: isSelected ? Colors.white : Colors.black),
         ),
@@ -31,7 +31,7 @@ class SelectionItems extends StatelessWidget {
                   : Theme.of(context).textTheme.bodyText1.color),
         ),
         onTap: onTap,
-        contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 8.0),
         selected: isSelected,
       ),
     );

@@ -241,7 +241,7 @@ class ImagePainterState extends State<ImagePainter> {
   void initState() {
     super.initState();
     _resolveAndConvertImage();
-    _controller.value = Controller();
+    _controller.value = const Controller();
     _textController = TextEditingController();
   }
 
@@ -619,7 +619,7 @@ class ImagePainterState extends State<ImagePainter> {
                     fontWeight: FontWeight.bold,
                     color: _controller.value.color),
                 textAlign: TextAlign.center,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   contentPadding: EdgeInsets.symmetric(horizontal: 10),
                   border: InputBorder.none,
                 ),
@@ -627,7 +627,7 @@ class ImagePainterState extends State<ImagePainter> {
               Align(
                 alignment: Alignment.bottomRight,
                 child: TextButton(
-                    child: Text(
+                    child: const Text(
                       "Done",
                       style: TextStyle(
                         color: Colors.white,
@@ -691,7 +691,7 @@ class ImagePainterState extends State<ImagePainter> {
                   tooltip: "Change color",
                   icon: widget.colorIcon ??
                       Container(
-                        padding: EdgeInsets.all(2.0),
+                        padding: const EdgeInsets.all(2.0),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.grey),
@@ -710,7 +710,8 @@ class ImagePainterState extends State<ImagePainter> {
                 widget.brushIcon ?? Icon(Icons.brush, color: Colors.grey[700]),
             itemBuilder: (_) => [_showRangeSlider()],
           ),
-          IconButton(icon: Icon(Icons.text_format), onPressed: _openTextDialog),
+          IconButton(
+              icon: const Icon(Icons.text_format), onPressed: _openTextDialog),
           const Spacer(),
           IconButton(
               tooltip: "Undo",
