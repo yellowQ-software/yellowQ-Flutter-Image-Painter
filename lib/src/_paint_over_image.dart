@@ -6,13 +6,13 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:image_painter/src/widgets/_text_dialog.dart';
 
 import '_image_painter.dart';
 import '_ported_interactive_viewer.dart';
 import 'widgets/_color_widget.dart';
 import 'widgets/_mode_widget.dart';
 import 'widgets/_range_slider.dart';
+import 'widgets/_text_dialog.dart';
 
 export '_image_painter.dart';
 
