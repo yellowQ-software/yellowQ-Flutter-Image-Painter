@@ -244,13 +244,14 @@ class ImagePainterState extends State<ImagePainter> {
   final _repaintKey = GlobalKey();
   ui.Image? _image;
   bool _inDrag = false;
-  late final ValueNotifier<Controller> _controller;
-  final _isLoaded = ValueNotifier<bool>(false);
   final _paintHistory = <PaintInfo>[];
   final _points = <Offset?>[];
+  late final ValueNotifier<Controller> _controller;
+  late final ValueNotifier<bool> _isLoaded;
   late final TextEditingController _textController;
   Offset? _start, _end;
   int _strokeMultiplier = 1;
+
   @override
   void initState() {
     super.initState();
@@ -263,6 +264,7 @@ class ImagePainterState extends State<ImagePainter> {
           const Controller().copyWith(mode: widget.initialPaintMode));
     }
     _textController = TextEditingController();
+    _isLoaded = ValueNotifier<bool>(false);
   }
 
   @override
@@ -378,13 +380,13 @@ class ImagePainterState extends State<ImagePainter> {
             child: FittedBox(
               alignment: FractionalOffset.center,
               child: ClipRect(
-                child: ValueListenableBuilder<Controller?>(
+                child: ValueListenableBuilder<Controller>(
                   valueListenable: _controller,
                   builder: (_, controller, __) {
                     return ImagePainterTransformer(
                       maxScale: 2.4,
                       minScale: 1,
-                      panEnabled: controller!.mode == PaintMode.none,
+                      panEnabled: controller.mode == PaintMode.none,
                       scaleEnabled: widget.isScalable!,
                       onInteractionUpdate: (details) =>
                           _scaleUpdateGesture(details, controller),
@@ -427,14 +429,13 @@ class ImagePainterState extends State<ImagePainter> {
         child: Container(
           width: widget.width ?? double.maxFinite,
           height: widget.height ?? double.maxFinite,
-          child: ValueListenableBuilder<Controller?>(
+          child: ValueListenableBuilder<Controller>(
             valueListenable: _controller,
             builder: (_, controller, __) {
               return ImagePainterTransformer(
                 panEnabled: false,
                 scaleEnabled: false,
-                onInteractionStart: (details) =>
-                    _scaleStartGesture(details, controller),
+                onInteractionStart: _scaleStartGesture,
                 onInteractionUpdate: (details) =>
                     _scaleUpdateGesture(details, controller),
                 onInteractionEnd: (details) =>
@@ -452,7 +453,7 @@ class ImagePainterState extends State<ImagePainter> {
                         start: _start,
                         end: _end,
                         painter: _painter,
-                        mode: controller!.mode),
+                        mode: controller.mode),
                   ),
                 ),
               );
@@ -463,7 +464,7 @@ class ImagePainterState extends State<ImagePainter> {
     );
   }
 
-  _scaleStartGesture(ScaleStartDetails onStart, Controller? controller) {
+  _scaleStartGesture(ScaleStartDetails onStart) {
     setState(() {
       _start = onStart.focalPoint;
       _points.add(_start);
@@ -471,13 +472,13 @@ class ImagePainterState extends State<ImagePainter> {
   }
 
   ///Fires while user is interacting with the screen to record painting.
-  void _scaleUpdateGesture(ScaleUpdateDetails onUpdate, Controller? ctrl) {
+  void _scaleUpdateGesture(ScaleUpdateDetails onUpdate, Controller ctrl) {
     setState(
       () {
         _inDrag = true;
         _start ??= onUpdate.focalPoint;
         _end = onUpdate.focalPoint;
-        if (ctrl!.mode == PaintMode.freeStyle) _points.add(_end);
+        if (ctrl.mode == PaintMode.freeStyle) _points.add(_end);
         if (ctrl.mode == PaintMode.text &&
             _paintHistory
                 .where((element) => element.mode == PaintMode.text)
@@ -491,18 +492,18 @@ class ImagePainterState extends State<ImagePainter> {
   }
 
   ///Fires when user stops interacting with the screen.
-  void _scaleEndGesture(ScaleEndDetails onEnd, Controller? controller) {
+  void _scaleEndGesture(ScaleEndDetails onEnd, Controller controller) {
     setState(() {
       _inDrag = false;
       if (_start != null &&
           _end != null &&
-          (controller!.mode == PaintMode.freeStyle)) {
+          (controller.mode == PaintMode.freeStyle)) {
         _points.add(null);
         _addFreeStylePoints();
         _points.clear();
       } else if (_start != null &&
           _end != null &&
-          controller!.mode != PaintMode.text) {
+          controller.mode != PaintMode.text) {
         _addEndPoints();
       }
       _start = null;
@@ -538,7 +539,7 @@ class ImagePainterState extends State<ImagePainter> {
         .toImage(size.width.floor(), size.height.floor());
   }
 
-  PopupMenuItem _showOptionsRow(Controller? controller) {
+  PopupMenuItem _showOptionsRow(Controller controller) {
     return PopupMenuItem(
       enabled: false,
       child: Center(
@@ -548,7 +549,7 @@ class ImagePainterState extends State<ImagePainter> {
                 .map(
                   (item) => SelectionItems(
                     data: item,
-                    isSelected: controller!.mode == item.mode,
+                    isSelected: controller.mode == item.mode,
                     onTap: () {
                       _controller.value = controller.copyWith(mode: item.mode);
                       Navigator.of(context).pop();
@@ -567,11 +568,11 @@ class ImagePainterState extends State<ImagePainter> {
       enabled: false,
       child: SizedBox(
         width: double.maxFinite,
-        child: ValueListenableBuilder<Controller?>(
+        child: ValueListenableBuilder<Controller>(
           valueListenable: _controller,
           builder: (_, ctrl, __) {
             return RangedSlider(
-              value: ctrl!.strokeWidth,
+              value: ctrl.strokeWidth,
               onChanged: (value) =>
                   _controller.value = ctrl.copyWith(strokeWidth: value),
             );
@@ -581,7 +582,7 @@ class ImagePainterState extends State<ImagePainter> {
     );
   }
 
-  PopupMenuItem _showColorPicker(Controller? controller) {
+  PopupMenuItem _showColorPicker(Controller controller) {
     return PopupMenuItem(
         enabled: false,
         child: Center(
@@ -591,7 +592,7 @@ class ImagePainterState extends State<ImagePainter> {
             runSpacing: 10,
             children: (widget.colors ?? editorColors).map((color) {
               return ColorItem(
-                isSelected: color == controller!.color,
+                isSelected: color == controller.color,
                 color: color,
                 onTap: () {
                   _controller.value = controller.copyWith(color: color);
@@ -649,7 +650,7 @@ class ImagePainterState extends State<ImagePainter> {
       color: Colors.grey[200],
       child: Row(
         children: [
-          ValueListenableBuilder<Controller?>(
+          ValueListenableBuilder<Controller>(
               valueListenable: _controller,
               builder: (_, _ctrl, __) {
                 return PopupMenuButton(
@@ -659,13 +660,13 @@ class ImagePainterState extends State<ImagePainter> {
                   ),
                   icon: Icon(
                       paintModes
-                          .firstWhere((item) => item.mode == _ctrl!.mode)
+                          .firstWhere((item) => item.mode == _ctrl.mode)
                           .icon,
                       color: Colors.grey[700]),
                   itemBuilder: (_) => [_showOptionsRow(_ctrl)],
                 );
               }),
-          ValueListenableBuilder<Controller?>(
+          ValueListenableBuilder<Controller>(
               valueListenable: _controller,
               builder: (_, controller, __) {
                 return PopupMenuButton(
@@ -680,7 +681,7 @@ class ImagePainterState extends State<ImagePainter> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.grey),
-                          color: controller!.color,
+                          color: controller.color,
                         ),
                       ),
                   itemBuilder: (_) => [_showColorPicker(controller)],
