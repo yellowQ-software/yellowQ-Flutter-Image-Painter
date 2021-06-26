@@ -25,8 +25,8 @@ dependencies:
     sdk: flutter
   image_painter:
     path: ../
-  open_file: ^3.0.3
-  path_provider: ^1.6.24
+  open_file: ^3.2.1
+  path_provider: ^2.0.2
 
 dev_dependencies:
   flutter_test:

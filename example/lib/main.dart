@@ -66,13 +66,17 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
         title: const Text("Image Painter Example"),
         actions: [
           IconButton(
-            icon: Icon(Icons.save_alt),
+            icon: const Icon(Icons.save_alt),
             onPressed: saveImage,
           )
         ],
       ),
-      body: ImagePainter.asset("assets/sample.jpg",
-          key: _imageKey, scalable: false),
+      body: ImagePainter.asset(
+        "assets/sample.jpg",
+        key: _imageKey,
+        scalable: false,
+        initialPaintMode: PaintMode.line,
+      ),
     );
   }
 }

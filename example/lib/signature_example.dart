@@ -13,13 +13,6 @@ class SignatureExample extends StatefulWidget {
 class _SignatureExampleState extends State<SignatureExample> {
   final _imageKey = GlobalKey<ImagePainterState>();
   final _key = GlobalKey<ScaffoldState>();
-  final _controller = ValueNotifier<Controller>(null);
-  @override
-  void initState() {
-    _controller.value =
-        Controller(color: Colors.black, mode: PaintMode.line, strokeWidth: 4.0);
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,16 +22,12 @@ class _SignatureExampleState extends State<SignatureExample> {
       body: Center(
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8),
-          child: ValueListenableBuilder<Controller>(
-              valueListenable: _controller,
-              builder: (_, controller, __) {
-                return ImagePainter.signature(
-                  height: 200,
-                  width: 300,
-                  key: _imageKey,
-                  signatureBgColor: Colors.grey[200],
-                );
-              }),
+          child: ImagePainter.signature(
+            height: 200,
+            width: 300,
+            key: _imageKey,
+            signatureBgColor: Colors.grey[200],
+          ),
         ),
       ),
     );

@@ -6,6 +6,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:image_painter/src/widgets/_text_dialog.dart';
 
 import '_image_painter.dart';
 import '_ported_interactive_viewer.dart';
@@ -18,38 +19,42 @@ export '_image_painter.dart';
 ///[ImagePainter] widget.
 @immutable
 class ImagePainter extends StatefulWidget {
-  const ImagePainter._({
-    Key key,
-    this.assetPath,
-    this.networkUrl,
-    this.byteArray,
-    this.file,
-    this.height,
-    this.width,
-    this.placeHolder,
-    this.isScalable,
-    this.brushIcon,
-    this.clearAllIcon,
-    this.colorIcon,
-    this.undoIcon,
-    this.isSignature = false,
-    this.controlsAtTop = true,
-    this.signatureBackgroundColor,
-    this.colors,
-  }) : super(key: key);
+  const ImagePainter._(
+      {Key? key,
+      this.assetPath,
+      this.networkUrl,
+      this.byteArray,
+      this.file,
+      this.height,
+      this.width,
+      this.placeHolder,
+      this.isScalable,
+      this.brushIcon,
+      this.clearAllIcon,
+      this.colorIcon,
+      this.undoIcon,
+      this.isSignature = false,
+      this.controlsAtTop = true,
+      this.signatureBackgroundColor,
+      this.colors,
+      this.initialPaintMode})
+      : super(key: key);
 
   ///Constructor for loading image from network url.
-  factory ImagePainter.network(String url,
-      {@required Key key,
-      double height,
-      double width,
-      Widget placeholderWidget,
-      bool scalable,
-      List<Color> colors,
-      Widget brushIcon,
-      Widget undoIcon,
-      Widget clearAllIcon,
-      Widget colorIcon}) {
+  factory ImagePainter.network(
+    String url, {
+    required Key key,
+    double? height,
+    double? width,
+    Widget? placeholderWidget,
+    bool? scalable,
+    List<Color>? colors,
+    Widget? brushIcon,
+    Widget? undoIcon,
+    Widget? clearAllIcon,
+    Widget? colorIcon,
+    PaintMode? initialPaintMode,
+  }) {
     return ImagePainter._(
       key: key,
       networkUrl: url,
@@ -61,21 +66,23 @@ class ImagePainter extends StatefulWidget {
       undoIcon: undoIcon,
       colorIcon: colorIcon,
       clearAllIcon: clearAllIcon,
+      initialPaintMode: initialPaintMode,
     );
   }
 
   ///Constructor for loading image from assetPath.
   factory ImagePainter.asset(String path,
-      {@required Key key,
-      double height,
-      double width,
-      bool scalable,
-      Widget placeholderWidget,
-      List<Color> colors,
-      Widget brushIcon,
-      Widget undoIcon,
-      Widget clearAllIcon,
-      Widget colorIcon}) {
+      {required Key key,
+      double? height,
+      double? width,
+      bool? scalable,
+      Widget? placeholderWidget,
+      List<Color>? colors,
+      Widget? brushIcon,
+      Widget? undoIcon,
+      Widget? clearAllIcon,
+      Widget? colorIcon,
+      PaintMode? initialPaintMode}) {
     return ImagePainter._(
       key: key,
       assetPath: path,
@@ -88,21 +95,23 @@ class ImagePainter extends StatefulWidget {
       undoIcon: undoIcon,
       colorIcon: colorIcon,
       clearAllIcon: clearAllIcon,
+      initialPaintMode: initialPaintMode,
     );
   }
 
   ///Constructor for loading image from [File].
   factory ImagePainter.file(File file,
-      {@required Key key,
-      double height,
-      double width,
-      bool scalable,
-      Widget placeholderWidget,
-      List<Color> colors,
-      Widget brushIcon,
-      Widget undoIcon,
-      Widget clearAllIcon,
-      Widget colorIcon}) {
+      {required Key key,
+      double? height,
+      double? width,
+      bool? scalable,
+      Widget? placeholderWidget,
+      List<Color>? colors,
+      Widget? brushIcon,
+      Widget? undoIcon,
+      Widget? clearAllIcon,
+      Widget? colorIcon,
+      PaintMode? initialPaintMode}) {
     return ImagePainter._(
       key: key,
       file: file,
@@ -115,47 +124,49 @@ class ImagePainter extends StatefulWidget {
       undoIcon: undoIcon,
       colorIcon: colorIcon,
       clearAllIcon: clearAllIcon,
+      initialPaintMode: initialPaintMode,
     );
   }
 
   ///Constructor for loading image from memory.
   factory ImagePainter.memory(Uint8List byteArray,
-      {@required Key key,
-      double height,
-      double width,
-      bool scalable,
-      Widget placeholderWidget,
-      List<Color> colors,
-      Widget brushIcon,
-      Widget undoIcon,
-      Widget clearAllIcon,
-      Widget colorIcon}) {
+      {required Key key,
+      double? height,
+      double? width,
+      bool? scalable,
+      Widget? placeholderWidget,
+      List<Color>? colors,
+      Widget? brushIcon,
+      Widget? undoIcon,
+      Widget? clearAllIcon,
+      Widget? colorIcon,
+      PaintMode? initialPaintMode}) {
     return ImagePainter._(
-      key: key,
-      byteArray: byteArray,
-      height: height,
-      width: width,
-      placeHolder: placeholderWidget,
-      isScalable: scalable ?? false,
-      colors: colors,
-      brushIcon: brushIcon,
-      undoIcon: undoIcon,
-      colorIcon: colorIcon,
-      clearAllIcon: clearAllIcon,
-    );
+        key: key,
+        byteArray: byteArray,
+        height: height,
+        width: width,
+        placeHolder: placeholderWidget,
+        isScalable: scalable ?? false,
+        colors: colors,
+        brushIcon: brushIcon,
+        undoIcon: undoIcon,
+        colorIcon: colorIcon,
+        clearAllIcon: clearAllIcon,
+        initialPaintMode: initialPaintMode);
   }
 
   ///Constructor for signature painting.
   factory ImagePainter.signature(
-      {@required Key key,
-      Color signatureBgColor,
-      double height,
-      double width,
-      List<Color> colors,
-      Widget brushIcon,
-      Widget undoIcon,
-      Widget clearAllIcon,
-      Widget colorIcon}) {
+      {required Key key,
+      Color? signatureBgColor,
+      double? height,
+      double? width,
+      List<Color>? colors,
+      Widget? brushIcon,
+      Widget? undoIcon,
+      Widget? clearAllIcon,
+      Widget? colorIcon}) {
     return ImagePainter._(
       key: key,
       height: height,
@@ -172,54 +183,57 @@ class ImagePainter extends StatefulWidget {
   }
 
   ///Only accessible through [ImagePainter.network] constructor.
-  final String networkUrl;
+  final String? networkUrl;
 
   ///Only accessible through [ImagePainter.memory] constructor.
-  final Uint8List byteArray;
+  final Uint8List? byteArray;
 
   ///Only accessible through [ImagePainter.file] constructor.
-  final File file;
+  final File? file;
 
   ///Only accessible through [ImagePainter.asset] constructor.
-  final String assetPath;
+  final String? assetPath;
 
   ///Height of the Widget. Image is subjected to fit within the given height.
-  final double height;
+  final double? height;
 
   ///Width of the widget. Image is subjected to fit within the given width.
-  final double width;
+  final double? width;
 
   ///Widget to be shown during the conversion of provided image to [ui.Image].
-  final Widget placeHolder;
+  final Widget? placeHolder;
 
   ///Defines whether the widget should be scaled or not. Defaults to [false].
-  final bool isScalable;
+  final bool? isScalable;
 
   ///Flag to determine signature or image;
   final bool isSignature;
 
   ///Signature mode background color
-  final Color signatureBackgroundColor;
+  final Color? signatureBackgroundColor;
 
   ///List of colors for color selection
   ///If not provided, default colors are used.
-  final List<Color> colors;
+  final List<Color>? colors;
 
   ///Icon Widget of strokeWidth.
-  final Widget brushIcon;
+  final Widget? brushIcon;
 
   ///Widget of Color Icon in control bar.
-  final Widget colorIcon;
+  final Widget? colorIcon;
 
   ///Widget for Undo last action on control bar.
-  final Widget undoIcon;
+  final Widget? undoIcon;
 
   ///Widget for clearing all actions on control bar.
-  final Widget clearAllIcon;
+  final Widget? clearAllIcon;
 
   ///Define where the controls is located.
   ///`true` represents top.
   final bool controlsAtTop;
+
+  ///Initial PaintMode.
+  final PaintMode? initialPaintMode;
 
   @override
   ImagePainterState createState() => ImagePainterState();
@@ -228,20 +242,26 @@ class ImagePainter extends StatefulWidget {
 ///
 class ImagePainterState extends State<ImagePainter> {
   final _repaintKey = GlobalKey();
-  ui.Image _image;
+  ui.Image? _image;
   bool _inDrag = false;
-  final _controller = ValueNotifier<Controller>(null);
+  late final ValueNotifier<Controller> _controller;
   final _isLoaded = ValueNotifier<bool>(false);
   final _paintHistory = <PaintInfo>[];
-  final _points = <Offset>[];
-  TextEditingController _textController;
-  Offset _start, _end;
+  final _points = <Offset?>[];
+  late final TextEditingController _textController;
+  Offset? _start, _end;
   int _strokeMultiplier = 1;
   @override
   void initState() {
     super.initState();
     _resolveAndConvertImage();
-    _controller.value = const Controller();
+    if (widget.isSignature) {
+      _controller = ValueNotifier(
+          const Controller(mode: PaintMode.freeStyle, color: Colors.black));
+    } else {
+      _controller = ValueNotifier(
+          const Controller().copyWith(mode: widget.initialPaintMode));
+    }
     _textController = TextEditingController();
   }
 
@@ -263,14 +283,14 @@ class ImagePainterState extends State<ImagePainter> {
   ///Converts the incoming image type from constructor to [ui.Image]
   Future<void> _resolveAndConvertImage() async {
     if (widget.networkUrl != null) {
-      _image = await _loadNetworkImage(widget.networkUrl);
+      _image = await _loadNetworkImage(widget.networkUrl!);
       if (_image == null) {
         throw ("${widget.networkUrl} couldn't be resolved.");
       } else {
         _setStrokeMultiplier();
       }
     } else if (widget.assetPath != null) {
-      final img = await rootBundle.load(widget.assetPath);
+      final img = await rootBundle.load(widget.assetPath!);
       _image = await _convertImage(Uint8List.view(img.buffer));
       if (_image == null) {
         throw ("${widget.assetPath} couldn't be resolved.");
@@ -278,7 +298,7 @@ class ImagePainterState extends State<ImagePainter> {
         _setStrokeMultiplier();
       }
     } else if (widget.file != null) {
-      final img = await widget.file.readAsBytes();
+      final img = await widget.file!.readAsBytes();
       _image = await _convertImage(img);
       if (_image == null) {
         throw ("Image couldn't be resolved from provided file.");
@@ -286,7 +306,7 @@ class ImagePainterState extends State<ImagePainter> {
         _setStrokeMultiplier();
       }
     } else if (widget.byteArray != null) {
-      _image = await _convertImage(widget.byteArray);
+      _image = await _convertImage(widget.byteArray!);
       if (_image == null) {
         throw ("Image couldn't be resolved from provided byteArray.");
       } else {
@@ -300,8 +320,8 @@ class ImagePainterState extends State<ImagePainter> {
   ///Dynamically sets stroke multiplier on the basis of widget size.
   ///Implemented to avoid thin stroke on high res images.
   _setStrokeMultiplier() {
-    if ((_image.height + _image.width) > 1000) {
-      _strokeMultiplier = (_image.height + _image.width) ~/ 1000;
+    if ((_image!.height + _image!.width) > 1000) {
+      _strokeMultiplier = (_image!.height + _image!.width) ~/ 1000;
     }
   }
 
@@ -358,21 +378,21 @@ class ImagePainterState extends State<ImagePainter> {
             child: FittedBox(
               alignment: FractionalOffset.center,
               child: ClipRect(
-                child: ValueListenableBuilder<Controller>(
+                child: ValueListenableBuilder<Controller?>(
                   valueListenable: _controller,
                   builder: (_, controller, __) {
                     return ImagePainterTransformer(
                       maxScale: 2.4,
                       minScale: 1,
-                      panEnabled: controller.mode == PaintMode.none,
-                      scaleEnabled: widget.isScalable,
+                      panEnabled: controller!.mode == PaintMode.none,
+                      scaleEnabled: widget.isScalable!,
                       onInteractionUpdate: (details) =>
                           _scaleUpdateGesture(details, controller),
                       onInteractionEnd: (details) =>
                           _scaleEndGesture(details, controller),
                       child: CustomPaint(
-                        size: Size(
-                            _image.width.toDouble(), _image.height.toDouble()),
+                        size: Size(_image!.width.toDouble(),
+                            _image!.height.toDouble()),
                         willChange: true,
                         isComplex: true,
                         painter: DrawImage(
@@ -407,7 +427,7 @@ class ImagePainterState extends State<ImagePainter> {
         child: Container(
           width: widget.width ?? double.maxFinite,
           height: widget.height ?? double.maxFinite,
-          child: ValueListenableBuilder<Controller>(
+          child: ValueListenableBuilder<Controller?>(
             valueListenable: _controller,
             builder: (_, controller, __) {
               return ImagePainterTransformer(
@@ -432,7 +452,7 @@ class ImagePainterState extends State<ImagePainter> {
                         start: _start,
                         end: _end,
                         painter: _painter,
-                        mode: controller.mode),
+                        mode: controller!.mode),
                   ),
                 ),
               );
@@ -443,7 +463,7 @@ class ImagePainterState extends State<ImagePainter> {
     );
   }
 
-  _scaleStartGesture(ScaleStartDetails onStart, Controller controller) {
+  _scaleStartGesture(ScaleStartDetails onStart, Controller? controller) {
     setState(() {
       _start = onStart.focalPoint;
       _points.add(_start);
@@ -451,13 +471,13 @@ class ImagePainterState extends State<ImagePainter> {
   }
 
   ///Fires while user is interacting with the screen to record painting.
-  void _scaleUpdateGesture(ScaleUpdateDetails onUpdate, Controller ctrl) {
+  void _scaleUpdateGesture(ScaleUpdateDetails onUpdate, Controller? ctrl) {
     setState(
       () {
         _inDrag = true;
         _start ??= onUpdate.focalPoint;
         _end = onUpdate.focalPoint;
-        if (ctrl.mode == PaintMode.freeStyle) _points.add(_end);
+        if (ctrl!.mode == PaintMode.freeStyle) _points.add(_end);
         if (ctrl.mode == PaintMode.text &&
             _paintHistory
                 .where((element) => element.mode == PaintMode.text)
@@ -471,18 +491,18 @@ class ImagePainterState extends State<ImagePainter> {
   }
 
   ///Fires when user stops interacting with the screen.
-  void _scaleEndGesture(ScaleEndDetails onEnd, Controller controller) {
+  void _scaleEndGesture(ScaleEndDetails onEnd, Controller? controller) {
     setState(() {
       _inDrag = false;
       if (_start != null &&
           _end != null &&
-          (controller.mode == PaintMode.freeStyle)) {
+          (controller!.mode == PaintMode.freeStyle)) {
         _points.add(null);
         _addFreeStylePoints();
         _points.clear();
       } else if (_start != null &&
           _end != null &&
-          controller.mode != PaintMode.text) {
+          controller!.mode != PaintMode.text) {
         _addEndPoints();
       }
       _start = null;
@@ -492,7 +512,7 @@ class ImagePainterState extends State<ImagePainter> {
 
   void _addEndPoints() => _paintHistory.add(
         PaintInfo(
-          offset: <Offset>[_start, _end],
+          offset: <Offset?>[_start, _end],
           painter: _painter,
           mode: _controller.value.mode,
         ),
@@ -500,7 +520,7 @@ class ImagePainterState extends State<ImagePainter> {
 
   void _addFreeStylePoints() => _paintHistory.add(
         PaintInfo(
-          offset: <Offset>[..._points],
+          offset: <Offset?>[..._points],
           painter: _painter,
           mode: PaintMode.freeStyle,
         ),
@@ -511,14 +531,14 @@ class ImagePainterState extends State<ImagePainter> {
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
     final painter = DrawImage(image: _image, paintHistory: _paintHistory);
-    final size = Size(_image.width.toDouble(), _image.height.toDouble());
+    final size = Size(_image!.width.toDouble(), _image!.height.toDouble());
     painter.paint(canvas, size);
     return recorder
         .endRecording()
         .toImage(size.width.floor(), size.height.floor());
   }
 
-  PopupMenuItem _showOptionsRow(Controller controller) {
+  PopupMenuItem _showOptionsRow(Controller? controller) {
     return PopupMenuItem(
       enabled: false,
       child: Center(
@@ -528,7 +548,7 @@ class ImagePainterState extends State<ImagePainter> {
                 .map(
                   (item) => SelectionItems(
                     data: item,
-                    isSelected: controller.mode == item.mode,
+                    isSelected: controller!.mode == item.mode,
                     onTap: () {
                       _controller.value = controller.copyWith(mode: item.mode);
                       Navigator.of(context).pop();
@@ -547,11 +567,11 @@ class ImagePainterState extends State<ImagePainter> {
       enabled: false,
       child: SizedBox(
         width: double.maxFinite,
-        child: ValueListenableBuilder<Controller>(
+        child: ValueListenableBuilder<Controller?>(
           valueListenable: _controller,
           builder: (_, ctrl, __) {
             return RangedSlider(
-              value: ctrl.strokeWidth,
+              value: ctrl!.strokeWidth,
               onChanged: (value) =>
                   _controller.value = ctrl.copyWith(strokeWidth: value),
             );
@@ -561,7 +581,7 @@ class ImagePainterState extends State<ImagePainter> {
     );
   }
 
-  PopupMenuItem _showColorPicker(Controller controller) {
+  PopupMenuItem _showColorPicker(Controller? controller) {
     return PopupMenuItem(
         enabled: false,
         child: Center(
@@ -571,7 +591,7 @@ class ImagePainterState extends State<ImagePainter> {
             runSpacing: 10,
             children: (widget.colors ?? editorColors).map((color) {
               return ColorItem(
-                isSelected: color == controller.color,
+                isSelected: color == controller!.color,
                 color: color,
                 onTap: () {
                   _controller.value = controller.copyWith(color: color);
@@ -585,10 +605,10 @@ class ImagePainterState extends State<ImagePainter> {
 
   ///Generates [Uint8List] of the [ui.Image] generated by the [renderImage()] method.
   ///Can be converted to image file by writing as bytes.
-  Future<Uint8List> exportImage() async {
-    ui.Image _convertedImage;
+  Future<Uint8List?> exportImage() async {
+    late ui.Image _convertedImage;
     if (widget.isSignature) {
-      final _boundary = _repaintKey.currentContext.findRenderObject()
+      final _boundary = _repaintKey.currentContext!.findRenderObject()
           as RenderRepaintBoundary;
       _convertedImage = await _boundary.toImage(pixelRatio: 3);
     } else if (widget.byteArray != null && _paintHistory.isEmpty) {
@@ -598,64 +618,29 @@ class ImagePainterState extends State<ImagePainter> {
     }
     final byteData =
         await _convertedImage.toByteData(format: ui.ImageByteFormat.png);
-    return byteData.buffer.asUint8List();
+    return byteData?.buffer.asUint8List();
   }
 
   void _openTextDialog() {
     _controller.value = _controller.value.copyWith(mode: PaintMode.text);
-    showDialog(
-      context: context,
-      builder: (_) {
-        return Material(
-          color: Colors.transparent,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextField(
-                controller: _textController,
-                autofocus: true,
-                style: TextStyle(
-                    fontSize: 6 * _controller.value.strokeWidth,
-                    fontWeight: FontWeight.bold,
-                    color: _controller.value.color),
-                textAlign: TextAlign.center,
-                decoration: const InputDecoration(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                  border: InputBorder.none,
-                ),
-              ),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: TextButton(
-                    child: const Text(
-                      "Done",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    onPressed: () {
-                      if (_textController.text != null &&
-                          _textController.text != '') {
-                        setState(() {
-                          _paintHistory.add(
-                            PaintInfo(
-                                mode: PaintMode.text,
-                                text: _textController.text,
-                                painter: _painter,
-                                offset: []),
-                          );
-                        });
-                        _textController.clear();
-                      }
-                      Navigator.pop(context);
-                    }),
-              ),
-            ],
-          ),
-        );
-      },
-    );
+    final fontSize = 6 * _controller.value.strokeWidth;
+
+    TextDialog.show(context, _textController, fontSize, _controller.value.color,
+        onFinished: () {
+      if (_textController.text != '') {
+        setState(() {
+          _paintHistory.add(
+            PaintInfo(
+                mode: PaintMode.text,
+                text: _textController.text,
+                painter: _painter,
+                offset: []),
+          );
+        });
+        _textController.clear();
+      }
+      Navigator.pop(context);
+    });
   }
 
   Widget _buildControls() {
@@ -664,7 +649,7 @@ class ImagePainterState extends State<ImagePainter> {
       color: Colors.grey[200],
       child: Row(
         children: [
-          ValueListenableBuilder<Controller>(
+          ValueListenableBuilder<Controller?>(
               valueListenable: _controller,
               builder: (_, _ctrl, __) {
                 return PopupMenuButton(
@@ -674,13 +659,13 @@ class ImagePainterState extends State<ImagePainter> {
                   ),
                   icon: Icon(
                       paintModes
-                          .firstWhere((item) => item.mode == _ctrl.mode)
+                          .firstWhere((item) => item.mode == _ctrl!.mode)
                           .icon,
                       color: Colors.grey[700]),
                   itemBuilder: (_) => [_showOptionsRow(_ctrl)],
                 );
               }),
-          ValueListenableBuilder<Controller>(
+          ValueListenableBuilder<Controller?>(
               valueListenable: _controller,
               builder: (_, controller, __) {
                 return PopupMenuButton(
@@ -695,7 +680,7 @@ class ImagePainterState extends State<ImagePainter> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.grey),
-                          color: controller.color,
+                          color: controller!.color,
                         ),
                       ),
                   itemBuilder: (_) => [_showColorPicker(controller)],
@@ -783,11 +768,11 @@ class Controller {
 
   ///copyWith Method to access immutable controller.
   Controller copyWith(
-      {double strokeWidth,
-      Color color,
-      PaintMode mode,
-      PaintingStyle paintingStyle,
-      String text}) {
+      {double? strokeWidth,
+      Color? color,
+      PaintMode? mode,
+      PaintingStyle? paintingStyle,
+      String? text}) {
     return Controller(
         strokeWidth: strokeWidth ?? this.strokeWidth,
         color: color ?? this.color,

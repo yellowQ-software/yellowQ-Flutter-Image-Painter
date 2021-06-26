@@ -1,3 +1,7 @@
+# 0.4.0
+
+- Migrate to null safety.
+- Added `initialPaintMode`.
 # 0.3.2
 
 - Bumped up dependencies.
