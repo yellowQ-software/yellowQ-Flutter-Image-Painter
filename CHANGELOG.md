@@ -1,3 +1,7 @@
+# 0.4.1
+
+-Fixed scalable on `ImagePainter.network` constructor.
+
 # 0.4.0
 
 - Migrate to null safety.
