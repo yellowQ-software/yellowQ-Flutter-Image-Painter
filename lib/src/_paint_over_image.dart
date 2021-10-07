@@ -61,6 +61,7 @@ class ImagePainter extends StatefulWidget {
       height: height,
       width: width,
       placeHolder: placeholderWidget,
+      isScalable: scalable,
       colors: colors,
       brushIcon: brushIcon,
       undoIcon: undoIcon,
