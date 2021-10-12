@@ -327,6 +327,7 @@ class ImagePainterState extends State<ImagePainter> {
   @override
   void initState() {
     super.initState();
+    _isLoaded = ValueNotifier<bool>(false);
     _resolveAndConvertImage();
     if (widget.isSignature) {
       _controller = ValueNotifier(
@@ -338,7 +339,6 @@ class ImagePainterState extends State<ImagePainter> {
           color: widget.initialColor));
     }
     _textController = TextEditingController();
-    _isLoaded = ValueNotifier<bool>(false);
   }
 
   @override
@@ -497,52 +497,82 @@ class ImagePainterState extends State<ImagePainter> {
   }
 
   Widget _paintSignature() {
-    return RepaintBoundary(
-      key: _repaintKey,
-      child: ClipRect(
-        child: Container(
-          width: widget.width ?? double.maxFinite,
-          height: widget.height ?? double.maxFinite,
-          child: ValueListenableBuilder<Controller>(
-            valueListenable: _controller,
-            builder: (_, controller, __) {
-              return ImagePainterTransformer(
-                panEnabled: false,
-                scaleEnabled: false,
-                onInteractionStart: _scaleStartGesture,
-                onInteractionUpdate: (details) =>
-                    _scaleUpdateGesture(details, controller),
-                onInteractionEnd: (details) =>
-                    _scaleEndGesture(details, controller),
-                child: CustomPaint(
-                  willChange: true,
-                  isComplex: true,
-                  painter: DrawImage(
-                    isSignature: true,
-                    backgroundColor: widget.signatureBackgroundColor,
-                    points: _points,
-                    paintHistory: _paintHistory,
-                    isDragging: _inDrag,
-                    update: UpdatePoints(
-                        start: _start,
-                        end: _end,
-                        painter: _painter,
-                        mode: controller.mode),
-                  ),
-                ),
-              );
-            },
+    return Stack(
+      children: [
+        RepaintBoundary(
+          key: _repaintKey,
+          child: ClipRect(
+            child: Container(
+              width: widget.width ?? double.maxFinite,
+              height: widget.height ?? double.maxFinite,
+              child: ValueListenableBuilder<Controller>(
+                valueListenable: _controller,
+                builder: (_, controller, __) {
+                  return ImagePainterTransformer(
+                    panEnabled: false,
+                    scaleEnabled: false,
+                    onInteractionStart: _scaleStartGesture,
+                    onInteractionUpdate: (details) =>
+                        _scaleUpdateGesture(details, controller),
+                    onInteractionEnd: (details) =>
+                        _scaleEndGesture(details, controller),
+                    child: CustomPaint(
+                      willChange: true,
+                      isComplex: true,
+                      painter: DrawImage(
+                        isSignature: true,
+                        backgroundColor: widget.signatureBackgroundColor,
+                        points: _points,
+                        paintHistory: _paintHistory,
+                        isDragging: _inDrag,
+                        update: UpdatePoints(
+                            start: _start,
+                            end: _end,
+                            painter: _painter,
+                            mode: controller.mode),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
           ),
         ),
-      ),
+        Positioned(
+          top: 0,
+          right: 0,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                  tooltip: "Undo",
+                  icon: widget.undoIcon ??
+                      Icon(Icons.reply, color: Colors.grey[700]),
+                  onPressed: () {
+                    if (_paintHistory.isNotEmpty) {
+                      setState(_paintHistory.removeLast);
+                    }
+                  }),
+              IconButton(
+                tooltip: "Clear all progress",
+                icon: widget.clearAllIcon ??
+                    Icon(Icons.clear, color: Colors.grey[700]),
+                onPressed: () => setState(_paintHistory.clear),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
   _scaleStartGesture(ScaleStartDetails onStart) {
-    setState(() {
-      _start = onStart.focalPoint;
-      _points.add(_start);
-    });
+    if (!widget.isSignature) {
+      setState(() {
+        _start = onStart.focalPoint;
+        _points.add(_start);
+      });
+    }
   }
 
   ///Fires while user is interacting with the screen to record painting.

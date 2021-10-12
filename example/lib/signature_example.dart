@@ -31,6 +31,8 @@ class _SignatureExampleState extends State<SignatureExample> {
           ),
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+          child: const Icon(Icons.save), onPressed: saveImage),
     );
   }
 
