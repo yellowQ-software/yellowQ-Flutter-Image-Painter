@@ -37,7 +37,12 @@ class ImagePainter extends StatefulWidget {
       this.controlsAtTop = true,
       this.signatureBackgroundColor,
       this.colors,
-      this.initialPaintMode})
+      this.initialPaintMode,
+      this.initialStrokeWidth,
+      this.initialColor,
+      this.onColorChanged,
+      this.onStrokeWidthChanged,
+      this.onPaintModeChanged})
       : super(key: key);
 
   ///Constructor for loading image from network url.
@@ -54,6 +59,11 @@ class ImagePainter extends StatefulWidget {
     Widget? clearAllIcon,
     Widget? colorIcon,
     PaintMode? initialPaintMode,
+    double? initialStrokeWidth,
+    Color? initialColor,
+    ValueChanged<PaintMode>? onPaintModeChanged,
+    ValueChanged<Color>? onColorChanged,
+    ValueChanged<double>? onStrokeWidthChanged,
   }) {
     return ImagePainter._(
       key: key,
@@ -67,22 +77,34 @@ class ImagePainter extends StatefulWidget {
       colorIcon: colorIcon,
       clearAllIcon: clearAllIcon,
       initialPaintMode: initialPaintMode,
+      initialColor: initialColor,
+      initialStrokeWidth: initialStrokeWidth,
+      onPaintModeChanged: onPaintModeChanged,
+      onColorChanged: onColorChanged,
+      onStrokeWidthChanged: onStrokeWidthChanged,
     );
   }
 
   ///Constructor for loading image from assetPath.
-  factory ImagePainter.asset(String path,
-      {required Key key,
-      double? height,
-      double? width,
-      bool? scalable,
-      Widget? placeholderWidget,
-      List<Color>? colors,
-      Widget? brushIcon,
-      Widget? undoIcon,
-      Widget? clearAllIcon,
-      Widget? colorIcon,
-      PaintMode? initialPaintMode}) {
+  factory ImagePainter.asset(
+    String path, {
+    required Key key,
+    double? height,
+    double? width,
+    bool? scalable,
+    Widget? placeholderWidget,
+    List<Color>? colors,
+    Widget? brushIcon,
+    Widget? undoIcon,
+    Widget? clearAllIcon,
+    Widget? colorIcon,
+    PaintMode? initialPaintMode,
+    double? initialStrokeWidth,
+    Color? initialColor,
+    ValueChanged<PaintMode>? onPaintModeChanged,
+    ValueChanged<Color>? onColorChanged,
+    ValueChanged<double>? onStrokeWidthChanged,
+  }) {
     return ImagePainter._(
       key: key,
       assetPath: path,
@@ -96,22 +118,34 @@ class ImagePainter extends StatefulWidget {
       colorIcon: colorIcon,
       clearAllIcon: clearAllIcon,
       initialPaintMode: initialPaintMode,
+      initialColor: initialColor,
+      initialStrokeWidth: initialStrokeWidth,
+      onPaintModeChanged: onPaintModeChanged,
+      onColorChanged: onColorChanged,
+      onStrokeWidthChanged: onStrokeWidthChanged,
     );
   }
 
   ///Constructor for loading image from [File].
-  factory ImagePainter.file(File file,
-      {required Key key,
-      double? height,
-      double? width,
-      bool? scalable,
-      Widget? placeholderWidget,
-      List<Color>? colors,
-      Widget? brushIcon,
-      Widget? undoIcon,
-      Widget? clearAllIcon,
-      Widget? colorIcon,
-      PaintMode? initialPaintMode}) {
+  factory ImagePainter.file(
+    File file, {
+    required Key key,
+    double? height,
+    double? width,
+    bool? scalable,
+    Widget? placeholderWidget,
+    List<Color>? colors,
+    Widget? brushIcon,
+    Widget? undoIcon,
+    Widget? clearAllIcon,
+    Widget? colorIcon,
+    PaintMode? initialPaintMode,
+    double? initialStrokeWidth,
+    Color? initialColor,
+    ValueChanged<PaintMode>? onPaintModeChanged,
+    ValueChanged<Color>? onColorChanged,
+    ValueChanged<double>? onStrokeWidthChanged,
+  }) {
     return ImagePainter._(
       key: key,
       file: file,
@@ -125,48 +159,70 @@ class ImagePainter extends StatefulWidget {
       colorIcon: colorIcon,
       clearAllIcon: clearAllIcon,
       initialPaintMode: initialPaintMode,
+      initialColor: initialColor,
+      initialStrokeWidth: initialStrokeWidth,
+      onPaintModeChanged: onPaintModeChanged,
+      onColorChanged: onColorChanged,
+      onStrokeWidthChanged: onStrokeWidthChanged,
     );
   }
 
   ///Constructor for loading image from memory.
-  factory ImagePainter.memory(Uint8List byteArray,
-      {required Key key,
-      double? height,
-      double? width,
-      bool? scalable,
-      Widget? placeholderWidget,
-      List<Color>? colors,
-      Widget? brushIcon,
-      Widget? undoIcon,
-      Widget? clearAllIcon,
-      Widget? colorIcon,
-      PaintMode? initialPaintMode}) {
+  factory ImagePainter.memory(
+    Uint8List byteArray, {
+    required Key key,
+    double? height,
+    double? width,
+    bool? scalable,
+    Widget? placeholderWidget,
+    List<Color>? colors,
+    Widget? brushIcon,
+    Widget? undoIcon,
+    Widget? clearAllIcon,
+    Widget? colorIcon,
+    PaintMode? initialPaintMode,
+    double? initialStrokeWidth,
+    Color? initialColor,
+    ValueChanged<PaintMode>? onPaintModeChanged,
+    ValueChanged<Color>? onColorChanged,
+    ValueChanged<double>? onStrokeWidthChanged,
+  }) {
     return ImagePainter._(
-        key: key,
-        byteArray: byteArray,
-        height: height,
-        width: width,
-        placeHolder: placeholderWidget,
-        isScalable: scalable ?? false,
-        colors: colors,
-        brushIcon: brushIcon,
-        undoIcon: undoIcon,
-        colorIcon: colorIcon,
-        clearAllIcon: clearAllIcon,
-        initialPaintMode: initialPaintMode);
+      key: key,
+      byteArray: byteArray,
+      height: height,
+      width: width,
+      placeHolder: placeholderWidget,
+      isScalable: scalable ?? false,
+      colors: colors,
+      brushIcon: brushIcon,
+      undoIcon: undoIcon,
+      colorIcon: colorIcon,
+      clearAllIcon: clearAllIcon,
+      initialPaintMode: initialPaintMode,
+      initialColor: initialColor,
+      initialStrokeWidth: initialStrokeWidth,
+      onPaintModeChanged: onPaintModeChanged,
+      onColorChanged: onColorChanged,
+      onStrokeWidthChanged: onStrokeWidthChanged,
+    );
   }
 
   ///Constructor for signature painting.
-  factory ImagePainter.signature(
-      {required Key key,
-      Color? signatureBgColor,
-      double? height,
-      double? width,
-      List<Color>? colors,
-      Widget? brushIcon,
-      Widget? undoIcon,
-      Widget? clearAllIcon,
-      Widget? colorIcon}) {
+  factory ImagePainter.signature({
+    required Key key,
+    Color? signatureBgColor,
+    double? height,
+    double? width,
+    List<Color>? colors,
+    Widget? brushIcon,
+    Widget? undoIcon,
+    Widget? clearAllIcon,
+    Widget? colorIcon,
+    ValueChanged<PaintMode>? onPaintModeChanged,
+    ValueChanged<Color>? onColorChanged,
+    ValueChanged<double>? onStrokeWidthChanged,
+  }) {
     return ImagePainter._(
       key: key,
       height: height,
@@ -179,6 +235,9 @@ class ImagePainter extends StatefulWidget {
       undoIcon: undoIcon,
       colorIcon: colorIcon,
       clearAllIcon: clearAllIcon,
+      onPaintModeChanged: onPaintModeChanged,
+      onColorChanged: onColorChanged,
+      onStrokeWidthChanged: onStrokeWidthChanged,
     );
   }
 
@@ -235,6 +294,18 @@ class ImagePainter extends StatefulWidget {
   ///Initial PaintMode.
   final PaintMode? initialPaintMode;
 
+  //the initial stroke width
+  final double? initialStrokeWidth;
+
+  //the initial color
+  final Color? initialColor;
+
+  final ValueChanged<Color>? onColorChanged;
+
+  final ValueChanged<double>? onStrokeWidthChanged;
+
+  final ValueChanged<PaintMode>? onPaintModeChanged;
+
   @override
   ImagePainterState createState() => ImagePainterState();
 }
@@ -260,8 +331,10 @@ class ImagePainterState extends State<ImagePainter> {
       _controller = ValueNotifier(
           const Controller(mode: PaintMode.freeStyle, color: Colors.black));
     } else {
-      _controller = ValueNotifier(
-          const Controller().copyWith(mode: widget.initialPaintMode));
+      _controller = ValueNotifier(const Controller().copyWith(
+          mode: widget.initialPaintMode,
+          strokeWidth: widget.initialStrokeWidth,
+          color: widget.initialColor));
     }
     _textController = TextEditingController();
     _isLoaded = ValueNotifier<bool>(false);
@@ -551,6 +624,10 @@ class ImagePainterState extends State<ImagePainter> {
                     data: item,
                     isSelected: controller.mode == item.mode,
                     onTap: () {
+                      if (widget.onPaintModeChanged != null &&
+                          item.mode != null) {
+                        widget.onPaintModeChanged!(item.mode!);
+                      }
                       _controller.value = controller.copyWith(mode: item.mode);
                       Navigator.of(context).pop();
                     },
@@ -573,8 +650,12 @@ class ImagePainterState extends State<ImagePainter> {
           builder: (_, ctrl, __) {
             return RangedSlider(
               value: ctrl.strokeWidth,
-              onChanged: (value) =>
-                  _controller.value = ctrl.copyWith(strokeWidth: value),
+              onChanged: (value) {
+                _controller.value = ctrl.copyWith(strokeWidth: value);
+                if (widget.onStrokeWidthChanged != null) {
+                  widget.onStrokeWidthChanged!(value);
+                }
+              },
             );
           },
         ),
@@ -596,6 +677,9 @@ class ImagePainterState extends State<ImagePainter> {
                 color: color,
                 onTap: () {
                   _controller.value = controller.copyWith(color: color);
+                  if (widget.onColorChanged != null) {
+                    widget.onColorChanged!(color);
+                  }
                   Navigator.pop(context);
                 },
               );
