@@ -1,3 +1,7 @@
+# 0.4.4+1
+
+- Fixed signature field initialization issue.
+
 # 0.4.4
 
 - Added parameters for setting initial values.
