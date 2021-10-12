@@ -1,6 +1,12 @@
+# 0.4.4
+
+- Added parameters for setting initial values.
+- Changed values are now emitted which can be saved for later use. 
+- Fixed signature field drawings. 
+
 # 0.4.1
 
--Fixed scalable on `ImagePainter.network` constructor.
+- Fixed scalable on `ImagePainter.network` constructor.
 
 # 0.4.0
 
