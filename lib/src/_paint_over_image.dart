@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 
 import '_image_painter.dart';
 import '_ported_interactive_viewer.dart';
+import 'delegates/text_delegate.dart';
 import 'widgets/_color_widget.dart';
 import 'widgets/_mode_widget.dart';
 import 'widgets/_range_slider.dart';
@@ -42,7 +43,8 @@ class ImagePainter extends StatefulWidget {
       this.initialColor,
       this.onColorChanged,
       this.onStrokeWidthChanged,
-      this.onPaintModeChanged})
+      this.onPaintModeChanged,
+      this.textDelegate})
       : super(key: key);
 
   ///Constructor for loading image from network url.
@@ -64,6 +66,7 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<PaintMode>? onPaintModeChanged,
     ValueChanged<Color>? onColorChanged,
     ValueChanged<double>? onStrokeWidthChanged,
+    TextDelegate? textDelegate,
   }) {
     return ImagePainter._(
       key: key,
@@ -83,6 +86,7 @@ class ImagePainter extends StatefulWidget {
       onPaintModeChanged: onPaintModeChanged,
       onColorChanged: onColorChanged,
       onStrokeWidthChanged: onStrokeWidthChanged,
+      textDelegate: textDelegate,
     );
   }
 
@@ -105,6 +109,7 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<PaintMode>? onPaintModeChanged,
     ValueChanged<Color>? onColorChanged,
     ValueChanged<double>? onStrokeWidthChanged,
+    TextDelegate? textDelegate,
   }) {
     return ImagePainter._(
       key: key,
@@ -124,6 +129,7 @@ class ImagePainter extends StatefulWidget {
       onPaintModeChanged: onPaintModeChanged,
       onColorChanged: onColorChanged,
       onStrokeWidthChanged: onStrokeWidthChanged,
+      textDelegate: textDelegate,
     );
   }
 
@@ -146,6 +152,7 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<PaintMode>? onPaintModeChanged,
     ValueChanged<Color>? onColorChanged,
     ValueChanged<double>? onStrokeWidthChanged,
+    TextDelegate? textDelegate,
   }) {
     return ImagePainter._(
       key: key,
@@ -165,6 +172,7 @@ class ImagePainter extends StatefulWidget {
       onPaintModeChanged: onPaintModeChanged,
       onColorChanged: onColorChanged,
       onStrokeWidthChanged: onStrokeWidthChanged,
+      textDelegate: textDelegate,
     );
   }
 
@@ -187,6 +195,7 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<PaintMode>? onPaintModeChanged,
     ValueChanged<Color>? onColorChanged,
     ValueChanged<double>? onStrokeWidthChanged,
+    TextDelegate? textDelegate,
   }) {
     return ImagePainter._(
       key: key,
@@ -206,6 +215,7 @@ class ImagePainter extends StatefulWidget {
       onPaintModeChanged: onPaintModeChanged,
       onColorChanged: onColorChanged,
       onStrokeWidthChanged: onStrokeWidthChanged,
+      textDelegate: textDelegate,
     );
   }
 
@@ -223,6 +233,7 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<PaintMode>? onPaintModeChanged,
     ValueChanged<Color>? onColorChanged,
     ValueChanged<double>? onStrokeWidthChanged,
+    TextDelegate? textDelegate,
   }) {
     return ImagePainter._(
       key: key,
@@ -239,6 +250,7 @@ class ImagePainter extends StatefulWidget {
       onPaintModeChanged: onPaintModeChanged,
       onColorChanged: onColorChanged,
       onStrokeWidthChanged: onStrokeWidthChanged,
+      textDelegate: textDelegate,
     );
   }
 
@@ -307,6 +319,9 @@ class ImagePainter extends StatefulWidget {
 
   final ValueChanged<PaintMode>? onPaintModeChanged;
 
+  //the text delegate
+  final TextDelegate? textDelegate;
+
   @override
   ImagePainterState createState() => ImagePainterState();
 }
@@ -323,7 +338,7 @@ class ImagePainterState extends State<ImagePainter> {
   late final TextEditingController _textController;
   Offset? _start, _end;
   int _strokeMultiplier = 1;
-
+  late TextDelegate textDelegate;
   @override
   void initState() {
     super.initState();
@@ -339,6 +354,7 @@ class ImagePainterState extends State<ImagePainter> {
           color: widget.initialColor));
     }
     _textController = TextEditingController();
+    textDelegate = widget.textDelegate ?? TextDelegate();
   }
 
   @override
@@ -545,7 +561,7 @@ class ImagePainterState extends State<ImagePainter> {
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
-                  tooltip: "Undo",
+                  tooltip: textDelegate.undo,
                   icon: widget.undoIcon ??
                       Icon(Icons.reply, color: Colors.grey[700]),
                   onPressed: () {
@@ -554,7 +570,7 @@ class ImagePainterState extends State<ImagePainter> {
                     }
                   }),
               IconButton(
-                tooltip: "Clear all progress",
+                tooltip: textDelegate.clearAllProgress,
                 icon: widget.clearAllIcon ??
                     Icon(Icons.clear, color: Colors.grey[700]),
                 onPressed: () => setState(_paintHistory.clear),
@@ -649,7 +665,7 @@ class ImagePainterState extends State<ImagePainter> {
       child: Center(
         child: SizedBox(
           child: Wrap(
-            children: paintModes
+            children: paintModes(textDelegate)
                 .map(
                   (item) => SelectionItems(
                     data: item,
@@ -742,7 +758,7 @@ class ImagePainterState extends State<ImagePainter> {
     final fontSize = 6 * _controller.value.strokeWidth;
 
     TextDialog.show(context, _textController, fontSize, _controller.value.color,
-        onFinished: () {
+        textDelegate, onFinished: () {
       if (_textController.text != '') {
         setState(() {
           _paintHistory.add(
@@ -769,12 +785,12 @@ class ImagePainterState extends State<ImagePainter> {
               valueListenable: _controller,
               builder: (_, _ctrl, __) {
                 return PopupMenuButton(
-                  tooltip: "Change mode",
+                  tooltip: textDelegate.changeMode,
                   shape: ContinuousRectangleBorder(
                     borderRadius: BorderRadius.circular(40),
                   ),
                   icon: Icon(
-                      paintModes
+                      paintModes(textDelegate)
                           .firstWhere((item) => item.mode == _ctrl.mode)
                           .icon,
                       color: Colors.grey[700]),
@@ -789,7 +805,7 @@ class ImagePainterState extends State<ImagePainter> {
                   shape: ContinuousRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  tooltip: "Change color",
+                  tooltip: textDelegate.changeColor,
                   icon: widget.colorIcon ??
                       Container(
                         padding: const EdgeInsets.all(2.0),
@@ -803,7 +819,7 @@ class ImagePainterState extends State<ImagePainter> {
                 );
               }),
           PopupMenuButton(
-            tooltip: "Change Brush Size",
+            tooltip: textDelegate.changeBrushSize,
             shape: ContinuousRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
@@ -815,7 +831,7 @@ class ImagePainterState extends State<ImagePainter> {
               icon: const Icon(Icons.text_format), onPressed: _openTextDialog),
           const Spacer(),
           IconButton(
-              tooltip: "Undo",
+              tooltip: textDelegate.undo,
               icon:
                   widget.undoIcon ?? Icon(Icons.reply, color: Colors.grey[700]),
               onPressed: () {
@@ -824,7 +840,7 @@ class ImagePainterState extends State<ImagePainter> {
                 }
               }),
           IconButton(
-            tooltip: "Clear all progress",
+            tooltip: textDelegate.undo,
             icon: widget.clearAllIcon ??
                 Icon(Icons.clear, color: Colors.grey[700]),
             onPressed: () => setState(_paintHistory.clear),

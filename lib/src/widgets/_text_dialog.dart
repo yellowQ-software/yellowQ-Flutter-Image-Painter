@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../delegates/text_delegate.dart';
 
 class TextDialog extends StatelessWidget {
   const TextDialog(
@@ -6,14 +7,16 @@ class TextDialog extends StatelessWidget {
       required this.controller,
       required this.fontSize,
       required this.onFinished,
-      required this.color})
+      required this.color,
+      required this.textDelegate})
       : super(key: key);
   final TextEditingController controller;
   final double fontSize;
   final VoidCallback onFinished;
   final Color color;
+  final TextDelegate textDelegate;
   static void show(BuildContext context, TextEditingController controller,
-      double fontSize, Color color,
+      double fontSize, Color color, TextDelegate textDelegate,
       {required VoidCallback onFinished}) {
     showDialog(
         context: context,
@@ -23,6 +26,7 @@ class TextDialog extends StatelessWidget {
             fontSize: fontSize,
             onFinished: onFinished,
             color: color,
+            textDelegate: textDelegate,
           );
         });
   }
@@ -48,9 +52,9 @@ class TextDialog extends StatelessWidget {
           Align(
             alignment: Alignment.bottomRight,
             child: TextButton(
-                child: const Text(
-                  "Done",
-                  style: TextStyle(
+                child: Text(
+                  textDelegate.done,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
