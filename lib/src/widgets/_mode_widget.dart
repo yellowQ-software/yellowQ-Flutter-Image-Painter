@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:image_painter/src/delegates/text_delegate.dart';
 
 import '../../image_painter.dart';
 

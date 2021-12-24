@@ -1,3 +1,8 @@
+# 0.4.5
+- Added text delegates thanks to [avinath1998](https://github.com/avinath1998). Check example for implementation.
+- Minor fixes.
+
+
 # 0.4.4+1
 
 - Fixed signature field initialization issue.

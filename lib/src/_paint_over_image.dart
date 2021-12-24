@@ -631,7 +631,7 @@ class ImagePainterState extends State<ImagePainter> {
     });
   }
 
-  void _addEndPoints() => _paintHistory.add(
+  void _addEndPoints() => _addPaintHistory(
         PaintInfo(
           offset: <Offset?>[_start, _end],
           painter: _painter,
@@ -639,7 +639,7 @@ class ImagePainterState extends State<ImagePainter> {
         ),
       );
 
-  void _addFreeStylePoints() => _paintHistory.add(
+  void _addFreeStylePoints() => _addPaintHistory(
         PaintInfo(
           offset: <Offset?>[..._points],
           painter: _painter,
@@ -753,6 +753,12 @@ class ImagePainterState extends State<ImagePainter> {
     return byteData?.buffer.asUint8List();
   }
 
+  void _addPaintHistory(PaintInfo info) {
+    if (info.mode != PaintMode.none) {
+      _paintHistory.add(info);
+    }
+  }
+
   void _openTextDialog() {
     _controller.value = _controller.value.copyWith(mode: PaintMode.text);
     final fontSize = 6 * _controller.value.strokeWidth;
@@ -761,7 +767,7 @@ class ImagePainterState extends State<ImagePainter> {
         textDelegate, onFinished: () {
       if (_textController.text != '') {
         setState(() {
-          _paintHistory.add(
+          _addPaintHistory(
             PaintInfo(
                 mode: PaintMode.text,
                 text: _textController.text,
@@ -835,12 +841,13 @@ class ImagePainterState extends State<ImagePainter> {
               icon:
                   widget.undoIcon ?? Icon(Icons.reply, color: Colors.grey[700]),
               onPressed: () {
+                print(_paintHistory.length);
                 if (_paintHistory.isNotEmpty) {
                   setState(_paintHistory.removeLast);
                 }
               }),
           IconButton(
-            tooltip: textDelegate.undo,
+            tooltip: textDelegate.clearAllProgress,
             icon: widget.clearAllIcon ??
                 Icon(Icons.clear, color: Colors.grey[700]),
             onPressed: () => setState(_paintHistory.clear),
