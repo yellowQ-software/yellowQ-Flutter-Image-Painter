@@ -1,11 +1,11 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_painter/image_painter.dart';
-import 'package:image_painter_example/dutch_text_delegate.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
+
+import 'dutch_text_delegate.dart';
 
 void main() => runApp(ExampleApp());
 
@@ -50,8 +50,14 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
             const Text("Image Exported successfully.",
                 style: TextStyle(color: Colors.white)),
             TextButton(
-                onPressed: () => OpenFile.open("$fullPath"),
-                child: Text("Open", style: TextStyle(color: Colors.blue[200])))
+              onPressed: () => OpenFile.open("$fullPath"),
+              child: Text(
+                "Open",
+                style: TextStyle(
+                  color: Colors.blue[200],
+                ),
+              ),
+            )
           ],
         ),
       ),
@@ -74,9 +80,9 @@ class _ImagePainterExampleState extends State<ImagePainterExample> {
       body: ImagePainter.asset(
         "assets/sample.jpg",
         key: _imageKey,
-        scalable: false,
-        textDelegate: DutchTextDelegate(),
+        scalable: true,
         initialStrokeWidth: 2,
+        textDelegate: DutchTextDelegate(),
         initialColor: Colors.green,
         initialPaintMode: PaintMode.line,
       ),
