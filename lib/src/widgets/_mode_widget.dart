@@ -70,7 +70,7 @@ List<ModeData> paintModes(TextDelegate textDelegate) => [
       ModeData(
           icon: Icons.text_format,
           mode: PaintMode.text,
-          label: textDelegate.arrow),
+          label: textDelegate.text),
     ];
 
 @immutable
