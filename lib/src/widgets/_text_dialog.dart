@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../delegates/text_delegate.dart';
 
 class TextDialog extends StatelessWidget {
@@ -15,10 +16,12 @@ class TextDialog extends StatelessWidget {
   final VoidCallback onFinished;
   final Color color;
   final TextDelegate textDelegate;
+
   static void show(BuildContext context, TextEditingController controller,
       double fontSize, Color color, TextDelegate textDelegate,
-      {required VoidCallback onFinished}) {
+      {required VoidCallback onFinished, required bool useRootNavigator}) {
     showDialog(
+        useRootNavigator: useRootNavigator,
         context: context,
         builder: (context) {
           return TextDialog(

@@ -44,7 +44,8 @@ class ImagePainter extends StatefulWidget {
       this.onColorChanged,
       this.onStrokeWidthChanged,
       this.onPaintModeChanged,
-      this.textDelegate})
+      this.textDelegate,
+      this.useRootNavigator = true})
       : super(key: key);
 
   ///Constructor for loading image from network url.
@@ -67,6 +68,7 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<Color>? onColorChanged,
     ValueChanged<double>? onStrokeWidthChanged,
     TextDelegate? textDelegate,
+    bool useRootNavigator = true,
   }) {
     return ImagePainter._(
       key: key,
@@ -87,6 +89,7 @@ class ImagePainter extends StatefulWidget {
       onColorChanged: onColorChanged,
       onStrokeWidthChanged: onStrokeWidthChanged,
       textDelegate: textDelegate,
+      useRootNavigator: useRootNavigator,
     );
   }
 
@@ -110,6 +113,7 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<Color>? onColorChanged,
     ValueChanged<double>? onStrokeWidthChanged,
     TextDelegate? textDelegate,
+    bool useRootNavigator = true,
   }) {
     return ImagePainter._(
       key: key,
@@ -130,6 +134,7 @@ class ImagePainter extends StatefulWidget {
       onColorChanged: onColorChanged,
       onStrokeWidthChanged: onStrokeWidthChanged,
       textDelegate: textDelegate,
+      useRootNavigator: useRootNavigator,
     );
   }
 
@@ -153,6 +158,7 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<Color>? onColorChanged,
     ValueChanged<double>? onStrokeWidthChanged,
     TextDelegate? textDelegate,
+    bool useRootNavigator = true,
   }) {
     return ImagePainter._(
       key: key,
@@ -173,6 +179,7 @@ class ImagePainter extends StatefulWidget {
       onColorChanged: onColorChanged,
       onStrokeWidthChanged: onStrokeWidthChanged,
       textDelegate: textDelegate,
+      useRootNavigator: useRootNavigator,
     );
   }
 
@@ -322,6 +329,8 @@ class ImagePainter extends StatefulWidget {
   //the text delegate
   final TextDelegate? textDelegate;
 
+  final bool useRootNavigator;
+
   @override
   ImagePainterState createState() => ImagePainterState();
 }
@@ -339,6 +348,7 @@ class ImagePainterState extends State<ImagePainter> {
   Offset? _start, _end;
   int _strokeMultiplier = 1;
   late TextDelegate textDelegate;
+
   @override
   void initState() {
     super.initState();
@@ -778,7 +788,7 @@ class ImagePainterState extends State<ImagePainter> {
         _textController.clear();
       }
       Navigator.pop(context);
-    });
+    }, useRootNavigator: widget.useRootNavigator);
   }
 
   Widget _buildControls() {
