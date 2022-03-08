@@ -20,6 +20,7 @@ class TextDialog extends StatelessWidget {
       {required VoidCallback onFinished}) {
     showDialog(
         context: context,
+        useRootNavigator: true,
         builder: (context) {
           return TextDialog(
             controller: controller,
