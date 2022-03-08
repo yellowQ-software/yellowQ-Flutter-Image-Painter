@@ -764,7 +764,7 @@ class ImagePainterState extends State<ImagePainter> {
     final fontSize = 6 * _controller.value.strokeWidth;
 
     TextDialog.show(context, _textController, fontSize, _controller.value.color,
-        textDelegate, onFinished: () {
+        textDelegate, onFinished: (context) {
       if (_textController.text != '') {
         setState(() {
           _addPaintHistory(
@@ -777,7 +777,7 @@ class ImagePainterState extends State<ImagePainter> {
         });
         _textController.clear();
       }
-      Navigator.pop(context);
+      Navigator.of(context).pop();
     });
   }
 
