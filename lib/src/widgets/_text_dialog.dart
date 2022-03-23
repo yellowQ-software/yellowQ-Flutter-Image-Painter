@@ -17,14 +17,14 @@ class TextDialog extends StatelessWidget {
   final TextDelegate textDelegate;
   static void show(BuildContext context, TextEditingController controller,
       double fontSize, Color color, TextDelegate textDelegate,
-      {required VoidCallback onFinished}) {
+      {required ValueChanged<BuildContext> onFinished}) {
     showDialog(
         context: context,
         builder: (context) {
           return TextDialog(
             controller: controller,
             fontSize: fontSize,
-            onFinished: onFinished,
+            onFinished: () => onFinished(context),
             color: color,
             textDelegate: textDelegate,
           );
