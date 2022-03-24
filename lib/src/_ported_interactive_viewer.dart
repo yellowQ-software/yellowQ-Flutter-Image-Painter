@@ -314,7 +314,7 @@ class ImagePainterTransformer extends StatefulWidget {
   ///  * [ValueNotifier], the parent class of TransformationController.
   ///  * [TextEditingController] for an example of another similar pattern.
   final TransformationController? transformationController;
-
+  
   /// Returns the closest point to the given point on the given line segment.
   @visibleForTesting
   static Vector3 getNearestPointOnLine(Vector3 point, Vector3 l1, Vector3 l2) {
@@ -699,6 +699,7 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
         ),
         scale: details.scale,
         rotation: details.rotation,
+        pointerCount: details.pointerCount
       ));
     }
     final focalPointScene = _transformationController!.toScene(
@@ -997,6 +998,7 @@ class _ImagePainterTransformerState extends State<ImagePainterTransformer>
         onScaleEnd: _onScaleEnd,
         onScaleStart: _onScaleStart,
         onScaleUpdate: _onScaleUpdate,
+        
         child: child,
       ),
     );

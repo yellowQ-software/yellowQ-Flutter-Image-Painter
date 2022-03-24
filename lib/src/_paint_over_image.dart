@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 
 import '_image_painter.dart';
 import '_ported_interactive_viewer.dart';
@@ -339,6 +342,8 @@ class ImagePainterState extends State<ImagePainter> {
   Offset? _start, _end;
   int _strokeMultiplier = 1;
   late TextDelegate textDelegate;
+
+  // bool _isScaling = false;
   @override
   void initState() {
     super.initState();
@@ -492,6 +497,7 @@ class ImagePainterState extends State<ImagePainter> {
                           points: _points,
                           paintHistory: _paintHistory,
                           isDragging: _inDrag,
+                          // isScaling: _isScaling,
                           update: UpdatePoints(
                               start: _start,
                               end: _end,
@@ -583,6 +589,10 @@ class ImagePainterState extends State<ImagePainter> {
   }
 
   _scaleStartGesture(ScaleStartDetails onStart) {
+    print('scale start pointer counttt ${onStart.pointerCount}');
+    if (onStart.pointerCount > 1) {
+      return;
+    }
     if (!widget.isSignature) {
       setState(() {
         _start = onStart.focalPoint;
@@ -591,8 +601,37 @@ class ImagePainterState extends State<ImagePainter> {
     }
   }
 
+  int? prevScaleUpdateTime;
+  int? maxPointerCount;
+  bool? isScaling;
+
   ///Fires while user is interacting with the screen to record painting.
   void _scaleUpdateGesture(ScaleUpdateDetails onUpdate, Controller ctrl) {
+    if (isScaling == null) {
+      print('scaling null');
+      var now = DateTime.now().millisecondsSinceEpoch;
+
+      prevScaleUpdateTime = now;
+      maxPointerCount = onUpdate.pointerCount;
+      isScaling = false;
+      return;
+    } else if (isScaling!) {
+      return;
+    } else if (!isScaling!) {
+      var now = DateTime.now().millisecondsSinceEpoch;
+      maxPointerCount = max(onUpdate.pointerCount, maxPointerCount!);
+      print('minus ${now - prevScaleUpdateTime!} $maxPointerCount');
+      if (now - prevScaleUpdateTime! < 60) {
+        return;
+      } else if (maxPointerCount! > 1) {
+        isScaling = true;
+      } else {
+        isScaling = false;
+      }
+      if (isScaling!) {
+        return;
+      }
+    }
     setState(
       () {
         _inDrag = true;
@@ -615,6 +654,11 @@ class ImagePainterState extends State<ImagePainter> {
   void _scaleEndGesture(ScaleEndDetails onEnd, Controller controller) {
     setState(() {
       _inDrag = false;
+      if (onEnd.pointerCount < 2) {
+        print('on end');
+        isScaling = null;
+        prevScaleUpdateTime = null;
+      }
       if (_start != null &&
           _end != null &&
           (controller.mode == PaintMode.freeStyle)) {

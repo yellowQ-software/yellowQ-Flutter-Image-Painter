@@ -24,7 +24,7 @@ class DrawImage extends CustomPainter {
 
   ///The background for signature painting.
   final Color? backgroundColor;
-
+  
   ///Constructor for the canvas
   DrawImage(
       {this.image,
@@ -56,7 +56,6 @@ class DrawImage extends CustomPainter {
         ),
       );
     }
-
     ///paints all the previoud paintInfo history recorded on [PaintHistory]
     for (var item in paintHistory!) {
       final _offset = item.offset;
