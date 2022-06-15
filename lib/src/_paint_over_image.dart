@@ -372,6 +372,8 @@ class ImagePainterState extends State<ImagePainter> {
         ? PaintingStyle.stroke
         : _controller.value.paintStyle;
 
+  bool get isEdited => _paintHistory.isNotEmpty;
+
   ///Converts the incoming image type from constructor to [ui.Image]
   Future<void> _resolveAndConvertImage() async {
     if (widget.networkUrl != null) {
