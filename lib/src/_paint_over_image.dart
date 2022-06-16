@@ -67,6 +67,7 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<Color>? onColorChanged,
     ValueChanged<double>? onStrokeWidthChanged,
     TextDelegate? textDelegate,
+    bool? controlsAtTop,
   }) {
     return ImagePainter._(
       key: key,
@@ -87,6 +88,7 @@ class ImagePainter extends StatefulWidget {
       onColorChanged: onColorChanged,
       onStrokeWidthChanged: onStrokeWidthChanged,
       textDelegate: textDelegate,
+      controlsAtTop: controlsAtTop ?? true,
     );
   }
 
@@ -110,6 +112,7 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<Color>? onColorChanged,
     ValueChanged<double>? onStrokeWidthChanged,
     TextDelegate? textDelegate,
+    bool? controlsAtTop,
   }) {
     return ImagePainter._(
       key: key,
@@ -130,6 +133,7 @@ class ImagePainter extends StatefulWidget {
       onColorChanged: onColorChanged,
       onStrokeWidthChanged: onStrokeWidthChanged,
       textDelegate: textDelegate,
+      controlsAtTop: controlsAtTop ?? true,
     );
   }
 
@@ -153,6 +157,7 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<Color>? onColorChanged,
     ValueChanged<double>? onStrokeWidthChanged,
     TextDelegate? textDelegate,
+    bool? controlsAtTop,
   }) {
     return ImagePainter._(
       key: key,
@@ -173,6 +178,7 @@ class ImagePainter extends StatefulWidget {
       onColorChanged: onColorChanged,
       onStrokeWidthChanged: onStrokeWidthChanged,
       textDelegate: textDelegate,
+      controlsAtTop: controlsAtTop ?? true,
     );
   }
 
@@ -196,6 +202,7 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<Color>? onColorChanged,
     ValueChanged<double>? onStrokeWidthChanged,
     TextDelegate? textDelegate,
+    bool? controlsAtTop,
   }) {
     return ImagePainter._(
       key: key,
@@ -216,6 +223,7 @@ class ImagePainter extends StatefulWidget {
       onColorChanged: onColorChanged,
       onStrokeWidthChanged: onStrokeWidthChanged,
       textDelegate: textDelegate,
+      controlsAtTop: controlsAtTop ?? true,
     );
   }
 
@@ -234,6 +242,7 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<Color>? onColorChanged,
     ValueChanged<double>? onStrokeWidthChanged,
     TextDelegate? textDelegate,
+    bool? controlsAtTop,
   }) {
     return ImagePainter._(
       key: key,
@@ -251,6 +260,7 @@ class ImagePainter extends StatefulWidget {
       onColorChanged: onColorChanged,
       onStrokeWidthChanged: onStrokeWidthChanged,
       textDelegate: textDelegate,
+      controlsAtTop: controlsAtTop ?? true,
     );
   }
 
