@@ -890,7 +890,7 @@ class Controller {
   const Controller(
       {this.strokeWidth = 4.0,
       this.color = Colors.red,
-      this.mode = PaintMode.line,
+      this.mode = PaintMode.freeStyle,
       this.paintStyle = PaintingStyle.stroke,
       this.text = ""});
 
