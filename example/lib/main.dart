@@ -63,7 +63,7 @@ class _NewWidgetState extends State<NewWidget> {
                     });
                   }
                 },
-                child: const Text("Elegir y editar imagen"),
+                child: const Text("Choose and edit image"),
               )
             : Stack(
                 alignment: AlignmentDirectional.bottomCenter,
