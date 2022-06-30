@@ -36,12 +36,12 @@ class _SignatureExampleState extends State<SignatureExample> {
   }
 
   void saveImage() async {
-    final image = await _imageKey.currentState.exportImage();
+    final image = await _imageKey.currentState?.exportImage();
     final directory = (await getApplicationDocumentsDirectory()).path;
     await Directory('$directory/sample').create(recursive: true);
     final fullPath = '$directory/sample/image.png';
     final imgFile = File('$fullPath');
-    imgFile.writeAsBytesSync(image);
+    imgFile.writeAsBytesSync(image!);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: Colors.grey[700],

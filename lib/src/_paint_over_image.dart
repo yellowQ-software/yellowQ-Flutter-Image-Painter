@@ -44,7 +44,8 @@ class ImagePainter extends StatefulWidget {
       this.onColorChanged,
       this.onStrokeWidthChanged,
       this.onPaintModeChanged,
-      this.textDelegate})
+      this.textDelegate,
+      this.controlsBackgroundColor})
       : super(key: key);
 
   ///Constructor for loading image from network url.
@@ -68,6 +69,7 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<double>? onStrokeWidthChanged,
     TextDelegate? textDelegate,
     bool? controlsAtTop,
+    Color? controlsBackgroundColor,
   }) {
     return ImagePainter._(
       key: key,
@@ -89,6 +91,7 @@ class ImagePainter extends StatefulWidget {
       onStrokeWidthChanged: onStrokeWidthChanged,
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
+      controlsBackgroundColor: controlsBackgroundColor ?? Colors.grey[200],
     );
   }
 
@@ -113,28 +116,29 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<double>? onStrokeWidthChanged,
     TextDelegate? textDelegate,
     bool? controlsAtTop,
+    Color? controlsBackgroundColor,
   }) {
     return ImagePainter._(
-      key: key,
-      assetPath: path,
-      height: height,
-      width: width,
-      isScalable: scalable ?? false,
-      placeHolder: placeholderWidget,
-      colors: colors,
-      brushIcon: brushIcon,
-      undoIcon: undoIcon,
-      colorIcon: colorIcon,
-      clearAllIcon: clearAllIcon,
-      initialPaintMode: initialPaintMode,
-      initialColor: initialColor,
-      initialStrokeWidth: initialStrokeWidth,
-      onPaintModeChanged: onPaintModeChanged,
-      onColorChanged: onColorChanged,
-      onStrokeWidthChanged: onStrokeWidthChanged,
-      textDelegate: textDelegate,
-      controlsAtTop: controlsAtTop ?? true,
-    );
+        key: key,
+        assetPath: path,
+        height: height,
+        width: width,
+        isScalable: scalable ?? false,
+        placeHolder: placeholderWidget,
+        colors: colors,
+        brushIcon: brushIcon,
+        undoIcon: undoIcon,
+        colorIcon: colorIcon,
+        clearAllIcon: clearAllIcon,
+        initialPaintMode: initialPaintMode,
+        initialColor: initialColor,
+        initialStrokeWidth: initialStrokeWidth,
+        onPaintModeChanged: onPaintModeChanged,
+        onColorChanged: onColorChanged,
+        onStrokeWidthChanged: onStrokeWidthChanged,
+        textDelegate: textDelegate,
+        controlsAtTop: controlsAtTop ?? true,
+        controlsBackgroundColor: controlsBackgroundColor ?? Colors.grey[200]);
   }
 
   ///Constructor for loading image from [File].
@@ -158,28 +162,29 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<double>? onStrokeWidthChanged,
     TextDelegate? textDelegate,
     bool? controlsAtTop,
+    Color? controlsBackgroundColor,
   }) {
     return ImagePainter._(
-      key: key,
-      file: file,
-      height: height,
-      width: width,
-      placeHolder: placeholderWidget,
-      colors: colors,
-      isScalable: scalable ?? false,
-      brushIcon: brushIcon,
-      undoIcon: undoIcon,
-      colorIcon: colorIcon,
-      clearAllIcon: clearAllIcon,
-      initialPaintMode: initialPaintMode,
-      initialColor: initialColor,
-      initialStrokeWidth: initialStrokeWidth,
-      onPaintModeChanged: onPaintModeChanged,
-      onColorChanged: onColorChanged,
-      onStrokeWidthChanged: onStrokeWidthChanged,
-      textDelegate: textDelegate,
-      controlsAtTop: controlsAtTop ?? true,
-    );
+        key: key,
+        file: file,
+        height: height,
+        width: width,
+        placeHolder: placeholderWidget,
+        colors: colors,
+        isScalable: scalable ?? false,
+        brushIcon: brushIcon,
+        undoIcon: undoIcon,
+        colorIcon: colorIcon,
+        clearAllIcon: clearAllIcon,
+        initialPaintMode: initialPaintMode,
+        initialColor: initialColor,
+        initialStrokeWidth: initialStrokeWidth,
+        onPaintModeChanged: onPaintModeChanged,
+        onColorChanged: onColorChanged,
+        onStrokeWidthChanged: onStrokeWidthChanged,
+        textDelegate: textDelegate,
+        controlsAtTop: controlsAtTop ?? true,
+        controlsBackgroundColor: controlsBackgroundColor ?? Colors.grey[200]);
   }
 
   ///Constructor for loading image from memory.
@@ -203,28 +208,29 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<double>? onStrokeWidthChanged,
     TextDelegate? textDelegate,
     bool? controlsAtTop,
+    Color? controlsBackgroundColor,
   }) {
     return ImagePainter._(
-      key: key,
-      byteArray: byteArray,
-      height: height,
-      width: width,
-      placeHolder: placeholderWidget,
-      isScalable: scalable ?? false,
-      colors: colors,
-      brushIcon: brushIcon,
-      undoIcon: undoIcon,
-      colorIcon: colorIcon,
-      clearAllIcon: clearAllIcon,
-      initialPaintMode: initialPaintMode,
-      initialColor: initialColor,
-      initialStrokeWidth: initialStrokeWidth,
-      onPaintModeChanged: onPaintModeChanged,
-      onColorChanged: onColorChanged,
-      onStrokeWidthChanged: onStrokeWidthChanged,
-      textDelegate: textDelegate,
-      controlsAtTop: controlsAtTop ?? true,
-    );
+        key: key,
+        byteArray: byteArray,
+        height: height,
+        width: width,
+        placeHolder: placeholderWidget,
+        isScalable: scalable ?? false,
+        colors: colors,
+        brushIcon: brushIcon,
+        undoIcon: undoIcon,
+        colorIcon: colorIcon,
+        clearAllIcon: clearAllIcon,
+        initialPaintMode: initialPaintMode,
+        initialColor: initialColor,
+        initialStrokeWidth: initialStrokeWidth,
+        onPaintModeChanged: onPaintModeChanged,
+        onColorChanged: onColorChanged,
+        onStrokeWidthChanged: onStrokeWidthChanged,
+        textDelegate: textDelegate,
+        controlsAtTop: controlsAtTop ?? true,
+        controlsBackgroundColor: controlsBackgroundColor ?? Colors.grey[200]);
   }
 
   ///Constructor for signature painting.
@@ -243,25 +249,26 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<double>? onStrokeWidthChanged,
     TextDelegate? textDelegate,
     bool? controlsAtTop,
+    Color? controlsBackgroundColor,
   }) {
     return ImagePainter._(
-      key: key,
-      height: height,
-      width: width,
-      isSignature: true,
-      isScalable: false,
-      colors: colors,
-      signatureBackgroundColor: signatureBgColor ?? Colors.white,
-      brushIcon: brushIcon,
-      undoIcon: undoIcon,
-      colorIcon: colorIcon,
-      clearAllIcon: clearAllIcon,
-      onPaintModeChanged: onPaintModeChanged,
-      onColorChanged: onColorChanged,
-      onStrokeWidthChanged: onStrokeWidthChanged,
-      textDelegate: textDelegate,
-      controlsAtTop: controlsAtTop ?? true,
-    );
+        key: key,
+        height: height,
+        width: width,
+        isSignature: true,
+        isScalable: false,
+        colors: colors,
+        signatureBackgroundColor: signatureBgColor ?? Colors.white,
+        brushIcon: brushIcon,
+        undoIcon: undoIcon,
+        colorIcon: colorIcon,
+        clearAllIcon: clearAllIcon,
+        onPaintModeChanged: onPaintModeChanged,
+        onColorChanged: onColorChanged,
+        onStrokeWidthChanged: onStrokeWidthChanged,
+        textDelegate: textDelegate,
+        controlsAtTop: controlsAtTop ?? true,
+        controlsBackgroundColor: controlsBackgroundColor ?? Colors.grey[200]);
   }
 
   ///Only accessible through [ImagePainter.network] constructor.
@@ -331,6 +338,8 @@ class ImagePainter extends StatefulWidget {
 
   //the text delegate
   final TextDelegate? textDelegate;
+
+  final Color? controlsBackgroundColor;
 
   @override
   ImagePainterState createState() => ImagePainterState();
@@ -796,7 +805,7 @@ class ImagePainterState extends State<ImagePainter> {
   Widget _buildControls() {
     return Container(
       padding: const EdgeInsets.all(4),
-      color: Colors.grey[200],
+      color: widget.controlsBackgroundColor,
       child: Row(
         children: [
           ValueListenableBuilder<Controller>(
