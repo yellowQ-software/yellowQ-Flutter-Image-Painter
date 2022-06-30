@@ -56,10 +56,12 @@ class _NewWidgetState extends State<NewWidget> {
                 onPressed: () async {
                   final selectedFile = await widget._picker
                       .pickImage(source: ImageSource.gallery);
-                  setState(() {
-                    file = selectedFile;
-                    editing = true;
-                  });
+                  if (selectedFile != null) {
+                    setState(() {
+                      file = selectedFile;
+                      editing = true;
+                    });
+                  }
                 },
                 child: const Text("Elegir y editar imagen"),
               )
