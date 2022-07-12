@@ -20,33 +20,35 @@ export '_image_painter.dart';
 ///[ImagePainter] widget.
 @immutable
 class ImagePainter extends StatefulWidget {
-  const ImagePainter._(
-      {Key? key,
-      this.assetPath,
-      this.networkUrl,
-      this.byteArray,
-      this.file,
-      this.height,
-      this.width,
-      this.placeHolder,
-      this.isScalable,
-      this.brushIcon,
-      this.clearAllIcon,
-      this.colorIcon,
-      this.undoIcon,
-      this.isSignature = false,
-      this.controlsAtTop = true,
-      this.signatureBackgroundColor,
-      this.colors,
-      this.initialPaintMode,
-      this.initialStrokeWidth,
-      this.initialColor,
-      this.onColorChanged,
-      this.onStrokeWidthChanged,
-      this.onPaintModeChanged,
-      this.textDelegate,
-      this.controlsBackgroundColor})
-      : super(key: key);
+  const ImagePainter._({
+    Key? key,
+    this.assetPath,
+    this.networkUrl,
+    this.byteArray,
+    this.file,
+    this.height,
+    this.width,
+    this.placeHolder,
+    this.isScalable,
+    this.brushIcon,
+    this.clearAllIcon,
+    this.colorIcon,
+    this.undoIcon,
+    this.isSignature = false,
+    this.controlsAtTop = true,
+    this.signatureBackgroundColor,
+    this.colors,
+    this.initialPaintMode,
+    this.initialStrokeWidth,
+    this.initialColor,
+    this.onColorChanged,
+    this.onStrokeWidthChanged,
+    this.onPaintModeChanged,
+    this.textDelegate,
+    this.controlsBackgroundColor,
+    this.iconsColor,
+    this.selectedColor,
+  }) : super(key: key);
 
   ///Constructor for loading image from network url.
   factory ImagePainter.network(
@@ -70,6 +72,8 @@ class ImagePainter extends StatefulWidget {
     TextDelegate? textDelegate,
     bool? controlsAtTop,
     Color? controlsBackgroundColor,
+    Color? iconsColor,
+    Color? selectedColor,
   }) {
     return ImagePainter._(
       key: key,
@@ -92,6 +96,8 @@ class ImagePainter extends StatefulWidget {
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
       controlsBackgroundColor: controlsBackgroundColor ?? Colors.grey[200],
+      iconsColor: iconsColor ?? Colors.grey,
+      selectedColor: selectedColor,
     );
   }
 
@@ -117,28 +123,33 @@ class ImagePainter extends StatefulWidget {
     TextDelegate? textDelegate,
     bool? controlsAtTop,
     Color? controlsBackgroundColor,
+    Color? iconsColor,
+    Color? selectedColor,
   }) {
     return ImagePainter._(
-        key: key,
-        assetPath: path,
-        height: height,
-        width: width,
-        isScalable: scalable ?? false,
-        placeHolder: placeholderWidget,
-        colors: colors,
-        brushIcon: brushIcon,
-        undoIcon: undoIcon,
-        colorIcon: colorIcon,
-        clearAllIcon: clearAllIcon,
-        initialPaintMode: initialPaintMode,
-        initialColor: initialColor,
-        initialStrokeWidth: initialStrokeWidth,
-        onPaintModeChanged: onPaintModeChanged,
-        onColorChanged: onColorChanged,
-        onStrokeWidthChanged: onStrokeWidthChanged,
-        textDelegate: textDelegate,
-        controlsAtTop: controlsAtTop ?? true,
-        controlsBackgroundColor: controlsBackgroundColor ?? Colors.grey[200]);
+      key: key,
+      assetPath: path,
+      height: height,
+      width: width,
+      isScalable: scalable ?? false,
+      placeHolder: placeholderWidget,
+      colors: colors,
+      brushIcon: brushIcon,
+      undoIcon: undoIcon,
+      colorIcon: colorIcon,
+      clearAllIcon: clearAllIcon,
+      initialPaintMode: initialPaintMode,
+      initialColor: initialColor,
+      initialStrokeWidth: initialStrokeWidth,
+      onPaintModeChanged: onPaintModeChanged,
+      onColorChanged: onColorChanged,
+      onStrokeWidthChanged: onStrokeWidthChanged,
+      textDelegate: textDelegate,
+      controlsAtTop: controlsAtTop ?? true,
+      controlsBackgroundColor: controlsBackgroundColor ?? Colors.grey[200],
+      iconsColor: iconsColor ?? Colors.grey,
+      selectedColor: selectedColor,
+    );
   }
 
   ///Constructor for loading image from [File].
@@ -163,28 +174,33 @@ class ImagePainter extends StatefulWidget {
     TextDelegate? textDelegate,
     bool? controlsAtTop,
     Color? controlsBackgroundColor,
+    Color? iconsColor,
+    Color? selectedColor,
   }) {
     return ImagePainter._(
-        key: key,
-        file: file,
-        height: height,
-        width: width,
-        placeHolder: placeholderWidget,
-        colors: colors,
-        isScalable: scalable ?? false,
-        brushIcon: brushIcon,
-        undoIcon: undoIcon,
-        colorIcon: colorIcon,
-        clearAllIcon: clearAllIcon,
-        initialPaintMode: initialPaintMode,
-        initialColor: initialColor,
-        initialStrokeWidth: initialStrokeWidth,
-        onPaintModeChanged: onPaintModeChanged,
-        onColorChanged: onColorChanged,
-        onStrokeWidthChanged: onStrokeWidthChanged,
-        textDelegate: textDelegate,
-        controlsAtTop: controlsAtTop ?? true,
-        controlsBackgroundColor: controlsBackgroundColor ?? Colors.grey[200]);
+      key: key,
+      file: file,
+      height: height,
+      width: width,
+      placeHolder: placeholderWidget,
+      colors: colors,
+      isScalable: scalable ?? false,
+      brushIcon: brushIcon,
+      undoIcon: undoIcon,
+      colorIcon: colorIcon,
+      clearAllIcon: clearAllIcon,
+      initialPaintMode: initialPaintMode,
+      initialColor: initialColor,
+      initialStrokeWidth: initialStrokeWidth,
+      onPaintModeChanged: onPaintModeChanged,
+      onColorChanged: onColorChanged,
+      onStrokeWidthChanged: onStrokeWidthChanged,
+      textDelegate: textDelegate,
+      controlsAtTop: controlsAtTop ?? true,
+      controlsBackgroundColor: controlsBackgroundColor ?? Colors.grey[200],
+      iconsColor: iconsColor ?? Colors.grey,
+      selectedColor: selectedColor,
+    );
   }
 
   ///Constructor for loading image from memory.
@@ -209,28 +225,33 @@ class ImagePainter extends StatefulWidget {
     TextDelegate? textDelegate,
     bool? controlsAtTop,
     Color? controlsBackgroundColor,
+    Color? iconsColor,
+    Color? selectedColor,
   }) {
     return ImagePainter._(
-        key: key,
-        byteArray: byteArray,
-        height: height,
-        width: width,
-        placeHolder: placeholderWidget,
-        isScalable: scalable ?? false,
-        colors: colors,
-        brushIcon: brushIcon,
-        undoIcon: undoIcon,
-        colorIcon: colorIcon,
-        clearAllIcon: clearAllIcon,
-        initialPaintMode: initialPaintMode,
-        initialColor: initialColor,
-        initialStrokeWidth: initialStrokeWidth,
-        onPaintModeChanged: onPaintModeChanged,
-        onColorChanged: onColorChanged,
-        onStrokeWidthChanged: onStrokeWidthChanged,
-        textDelegate: textDelegate,
-        controlsAtTop: controlsAtTop ?? true,
-        controlsBackgroundColor: controlsBackgroundColor ?? Colors.grey[200]);
+      key: key,
+      byteArray: byteArray,
+      height: height,
+      width: width,
+      placeHolder: placeholderWidget,
+      isScalable: scalable ?? false,
+      colors: colors,
+      brushIcon: brushIcon,
+      undoIcon: undoIcon,
+      colorIcon: colorIcon,
+      clearAllIcon: clearAllIcon,
+      initialPaintMode: initialPaintMode,
+      initialColor: initialColor,
+      initialStrokeWidth: initialStrokeWidth,
+      onPaintModeChanged: onPaintModeChanged,
+      onColorChanged: onColorChanged,
+      onStrokeWidthChanged: onStrokeWidthChanged,
+      textDelegate: textDelegate,
+      controlsAtTop: controlsAtTop ?? true,
+      controlsBackgroundColor: controlsBackgroundColor ?? Colors.grey[200],
+      iconsColor: iconsColor ?? Colors.grey,
+      selectedColor: selectedColor,
+    );
   }
 
   ///Constructor for signature painting.
@@ -250,25 +271,30 @@ class ImagePainter extends StatefulWidget {
     TextDelegate? textDelegate,
     bool? controlsAtTop,
     Color? controlsBackgroundColor,
+    Color? iconsColor,
+    Color? selectedColor,
   }) {
     return ImagePainter._(
-        key: key,
-        height: height,
-        width: width,
-        isSignature: true,
-        isScalable: false,
-        colors: colors,
-        signatureBackgroundColor: signatureBgColor ?? Colors.white,
-        brushIcon: brushIcon,
-        undoIcon: undoIcon,
-        colorIcon: colorIcon,
-        clearAllIcon: clearAllIcon,
-        onPaintModeChanged: onPaintModeChanged,
-        onColorChanged: onColorChanged,
-        onStrokeWidthChanged: onStrokeWidthChanged,
-        textDelegate: textDelegate,
-        controlsAtTop: controlsAtTop ?? true,
-        controlsBackgroundColor: controlsBackgroundColor ?? Colors.grey[200]);
+      key: key,
+      height: height,
+      width: width,
+      isSignature: true,
+      isScalable: false,
+      colors: colors,
+      signatureBackgroundColor: signatureBgColor ?? Colors.white,
+      brushIcon: brushIcon,
+      undoIcon: undoIcon,
+      colorIcon: colorIcon,
+      clearAllIcon: clearAllIcon,
+      onPaintModeChanged: onPaintModeChanged,
+      onColorChanged: onColorChanged,
+      onStrokeWidthChanged: onStrokeWidthChanged,
+      textDelegate: textDelegate,
+      controlsAtTop: controlsAtTop ?? true,
+      controlsBackgroundColor: controlsBackgroundColor ?? Colors.grey[200],
+      iconsColor: iconsColor ?? Colors.grey,
+      selectedColor: selectedColor,
+    );
   }
 
   ///Only accessible through [ImagePainter.network] constructor.
@@ -340,6 +366,10 @@ class ImagePainter extends StatefulWidget {
   final TextDelegate? textDelegate;
 
   final Color? controlsBackgroundColor;
+
+  final Color? iconsColor;
+
+  final Color? selectedColor;
 
   @override
   ImagePainterState createState() => ImagePainterState();
@@ -689,6 +719,7 @@ class ImagePainterState extends State<ImagePainter> {
             children: paintModes(textDelegate)
                 .map(
                   (item) => SelectionItems(
+                    selectedColor: widget.selectedColor,
                     data: item,
                     isSelected: controller.mode == item.mode,
                     onTap: () {
@@ -741,6 +772,7 @@ class ImagePainterState extends State<ImagePainter> {
             runSpacing: 10,
             children: (widget.colors ?? editorColors).map((color) {
               return ColorItem(
+                selectedColor: widget.selectedColor!,
                 isSelected: color == controller.color,
                 color: color,
                 onTap: () {
@@ -820,7 +852,7 @@ class ImagePainterState extends State<ImagePainter> {
                       paintModes(textDelegate)
                           .firstWhere((item) => item.mode == _ctrl.mode)
                           .icon,
-                      color: Colors.grey[700]),
+                      color: widget.iconsColor),
                   itemBuilder: (_) => [_showOptionsRow(_ctrl)],
                 );
               }),
@@ -838,7 +870,8 @@ class ImagePainterState extends State<ImagePainter> {
                         padding: const EdgeInsets.all(2.0),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.grey),
+                          border: Border.all(
+                              color: widget.iconsColor ?? Colors.grey),
                           color: controller.color,
                         ),
                       ),
@@ -851,16 +884,17 @@ class ImagePainterState extends State<ImagePainter> {
               borderRadius: BorderRadius.circular(20),
             ),
             icon:
-                widget.brushIcon ?? Icon(Icons.brush, color: Colors.grey[700]),
+                widget.brushIcon ?? Icon(Icons.brush, color: widget.iconsColor),
             itemBuilder: (_) => [_showRangeSlider()],
           ),
           IconButton(
-              icon: const Icon(Icons.text_format), onPressed: _openTextDialog),
+              icon: Icon(Icons.text_format, color: widget.iconsColor),
+              onPressed: _openTextDialog),
           const Spacer(),
           IconButton(
               tooltip: textDelegate.undo,
-              icon:
-                  widget.undoIcon ?? Icon(Icons.reply, color: Colors.grey[700]),
+              icon: widget.undoIcon ??
+                  Icon(Icons.reply, color: widget.iconsColor),
               onPressed: () {
                 print(_paintHistory.length);
                 if (_paintHistory.isNotEmpty) {
@@ -870,7 +904,7 @@ class ImagePainterState extends State<ImagePainter> {
           IconButton(
             tooltip: textDelegate.clearAllProgress,
             icon: widget.clearAllIcon ??
-                Icon(Icons.clear, color: Colors.grey[700]),
+                Icon(Icons.clear, color: widget.iconsColor),
             onPressed: () => setState(_paintHistory.clear),
           ),
         ],

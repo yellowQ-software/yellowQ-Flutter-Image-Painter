@@ -6,8 +6,10 @@ class SelectionItems extends StatelessWidget {
   final bool? isSelected;
   final ModeData? data;
   final VoidCallback? onTap;
+  final Color? selectedColor;
 
-  const SelectionItems({Key? key, this.isSelected, this.data, this.onTap})
+  const SelectionItems(
+      {Key? key, this.isSelected, this.data, this.onTap, this.selectedColor})
       : super(key: key);
 
   @override
@@ -16,7 +18,8 @@ class SelectionItems extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 2.0),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(4.0),
-          color: isSelected! ? Colors.blue : Colors.transparent),
+          color:
+              isSelected! ? selectedColor ?? Colors.blue : Colors.transparent),
       child: ListTile(
         leading: IconTheme(
           data: const IconThemeData(opacity: 1.0),

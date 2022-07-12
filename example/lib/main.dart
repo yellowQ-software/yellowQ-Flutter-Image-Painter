@@ -78,8 +78,11 @@ class _NewWidgetState extends State<NewWidget> {
                   ),
                   ImagePainter.file(File(file!.path),
                       key: _imageKey,
+                      selectedColor: Colors.red,
+                      iconsColor: Colors.white,
                       scalable: true,
-                      clearAllIcon: const Icon(Icons.cancel, color: Colors.red),
+                      clearAllIcon:
+                          const Icon(Icons.cancel, color: Colors.white),
                       placeholderWidget: const CircularProgressIndicator(),
                       controlsBackgroundColor: Colors.blue),
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: [

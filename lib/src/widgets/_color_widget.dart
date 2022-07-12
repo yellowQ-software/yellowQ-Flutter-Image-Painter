@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 
 class ColorItem extends StatelessWidget {
-  const ColorItem({Key? key, this.onTap, this.isSelected, this.color})
+  const ColorItem(
+      {Key? key,
+      this.onTap,
+      this.isSelected,
+      this.color,
+      this.selectedColor = Colors.black})
       : super(key: key);
   final VoidCallback? onTap;
   final bool? isSelected;
   final Color? color;
+  final Color selectedColor;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +25,7 @@ class ColorItem extends StatelessWidget {
             color: isSelected! ? Colors.white70 : Colors.transparent,
             shape: BoxShape.circle,
             border: Border.all(
-                color: isSelected! ? Colors.black : Colors.grey[200]!),
+                color: isSelected! ? selectedColor : Colors.grey[200]!),
           ),
           child: CircleAvatar(
               radius: isSelected! ? 16 : 12, backgroundColor: color),
