@@ -48,6 +48,8 @@ class ImagePainter extends StatefulWidget {
     this.controlsBackgroundColor,
     this.iconsColor,
     this.selectedColor,
+    this.showClearAllButton,
+    this.addTextIcon,
   }) : super(key: key);
 
   ///Constructor for loading image from network url.
@@ -74,6 +76,8 @@ class ImagePainter extends StatefulWidget {
     Color? controlsBackgroundColor,
     Color? iconsColor,
     Color? selectedColor,
+    bool? showClearAllButton,
+    Widget? addTextIcon,
   }) {
     return ImagePainter._(
       key: key,
@@ -98,6 +102,8 @@ class ImagePainter extends StatefulWidget {
       controlsBackgroundColor: controlsBackgroundColor ?? Colors.grey[200],
       iconsColor: iconsColor ?? Colors.grey,
       selectedColor: selectedColor,
+      showClearAllButton: showClearAllButton ?? true,
+      addTextIcon: addTextIcon,
     );
   }
 
@@ -125,6 +131,8 @@ class ImagePainter extends StatefulWidget {
     Color? controlsBackgroundColor,
     Color? iconsColor,
     Color? selectedColor,
+    bool? showClearAllButton,
+    Widget? addTextIcon,
   }) {
     return ImagePainter._(
       key: key,
@@ -149,6 +157,8 @@ class ImagePainter extends StatefulWidget {
       controlsBackgroundColor: controlsBackgroundColor ?? Colors.grey[200],
       iconsColor: iconsColor ?? Colors.grey,
       selectedColor: selectedColor,
+      showClearAllButton: showClearAllButton ?? true,
+      addTextIcon: addTextIcon,
     );
   }
 
@@ -176,6 +186,8 @@ class ImagePainter extends StatefulWidget {
     Color? controlsBackgroundColor,
     Color? iconsColor,
     Color? selectedColor,
+    bool? showClearAllButton,
+    Widget? addTextIcon,
   }) {
     return ImagePainter._(
       key: key,
@@ -200,6 +212,8 @@ class ImagePainter extends StatefulWidget {
       controlsBackgroundColor: controlsBackgroundColor ?? Colors.grey[200],
       iconsColor: iconsColor ?? Colors.grey,
       selectedColor: selectedColor,
+      showClearAllButton: showClearAllButton ?? true,
+      addTextIcon: addTextIcon,
     );
   }
 
@@ -227,6 +241,8 @@ class ImagePainter extends StatefulWidget {
     Color? controlsBackgroundColor,
     Color? iconsColor,
     Color? selectedColor,
+    bool? showClearAllButton,
+    Widget? addTextIcon,
   }) {
     return ImagePainter._(
       key: key,
@@ -251,6 +267,8 @@ class ImagePainter extends StatefulWidget {
       controlsBackgroundColor: controlsBackgroundColor ?? Colors.grey[200],
       iconsColor: iconsColor ?? Colors.grey,
       selectedColor: selectedColor,
+      showClearAllButton: showClearAllButton ?? true,
+      addTextIcon: addTextIcon,
     );
   }
 
@@ -273,6 +291,8 @@ class ImagePainter extends StatefulWidget {
     Color? controlsBackgroundColor,
     Color? iconsColor,
     Color? selectedColor,
+    bool? showClearAllButton,
+    Widget? addTextIcon,
   }) {
     return ImagePainter._(
       key: key,
@@ -294,6 +314,8 @@ class ImagePainter extends StatefulWidget {
       controlsBackgroundColor: controlsBackgroundColor ?? Colors.grey[200],
       iconsColor: iconsColor ?? Colors.grey,
       selectedColor: selectedColor,
+      showClearAllButton: showClearAllButton ?? true,
+      addTextIcon: addTextIcon,
     );
   }
 
@@ -343,6 +365,8 @@ class ImagePainter extends StatefulWidget {
   ///Widget for clearing all actions on control bar.
   final Widget? clearAllIcon;
 
+  final Widget? addTextIcon;
+
   ///Define where the controls is located.
   ///`true` represents top.
   final bool controlsAtTop;
@@ -370,6 +394,8 @@ class ImagePainter extends StatefulWidget {
   final Color? iconsColor;
 
   final Color? selectedColor;
+
+  final bool? showClearAllButton;
 
   @override
   ImagePainterState createState() => ImagePainterState();
@@ -883,12 +909,19 @@ class ImagePainterState extends State<ImagePainter> {
             shape: ContinuousRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
-            icon:
-                widget.brushIcon ?? Icon(Icons.brush, color: widget.iconsColor),
+            icon: widget.brushIcon ??
+                Icon(
+                  Icons.brush,
+                  color: widget.iconsColor,
+                ),
             itemBuilder: (_) => [_showRangeSlider()],
           ),
           IconButton(
-              icon: Icon(Icons.text_format, color: widget.iconsColor),
+              icon: widget.addTextIcon ??
+                  Icon(
+                    Icons.text_format,
+                    color: widget.iconsColor,
+                  ),
               onPressed: _openTextDialog),
           const Spacer(),
           IconButton(
@@ -901,12 +934,14 @@ class ImagePainterState extends State<ImagePainter> {
                   setState(_paintHistory.removeLast);
                 }
               }),
-          IconButton(
-            tooltip: textDelegate.clearAllProgress,
-            icon: widget.clearAllIcon ??
-                Icon(Icons.clear, color: widget.iconsColor),
-            onPressed: () => setState(_paintHistory.clear),
-          ),
+          widget.showClearAllButton!
+              ? IconButton(
+                  tooltip: textDelegate.clearAllProgress,
+                  icon: widget.clearAllIcon ??
+                      Icon(Icons.clear, color: widget.iconsColor),
+                  onPressed: () => setState(_paintHistory.clear),
+                )
+              : Container(),
         ],
       ),
     );

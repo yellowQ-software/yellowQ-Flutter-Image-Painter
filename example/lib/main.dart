@@ -78,6 +78,9 @@ class _NewWidgetState extends State<NewWidget> {
                   ),
                   ImagePainter.file(File(file!.path),
                       key: _imageKey,
+                      addTextIcon:
+                          Icon(Icons.text_fields_outlined, color: Colors.white),
+                      showClearAllButton: false,
                       selectedColor: Colors.red,
                       iconsColor: Colors.white,
                       scalable: true,
