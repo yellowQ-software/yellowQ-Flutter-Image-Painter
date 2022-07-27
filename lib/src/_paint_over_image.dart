@@ -876,7 +876,11 @@ class ImagePainterState extends State<ImagePainter> {
                   ),
                   icon: Icon(
                       paintModes(textDelegate)
-                          .firstWhere((item) => item.mode == _ctrl.mode)
+                          .firstWhere((item) => item.mode == _ctrl.mode,
+                              orElse: () => ModeData(
+                                  icon: Icons.text_format,
+                                  mode: PaintMode.text,
+                                  label: textDelegate.text))
                           .icon,
                       color: widget.iconsColor),
                   itemBuilder: (_) => [_showOptionsRow(_ctrl)],

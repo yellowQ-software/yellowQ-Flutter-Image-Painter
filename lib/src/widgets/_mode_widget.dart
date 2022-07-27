@@ -70,6 +70,10 @@ List<ModeData> paintModes(TextDelegate textDelegate) => [
       //     icon: Icons.power_input,
       //     mode: PaintMode.dashLine,
       //     label: textDelegate.dashLine),
+      // ModeData(
+      //     icon: Icons.text_format,
+      //     mode: PaintMode.text,
+      //     label: textDelegate.text)
     ];
 
 @immutable
