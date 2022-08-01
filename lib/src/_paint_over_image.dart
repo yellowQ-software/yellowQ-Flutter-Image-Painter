@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -544,41 +545,52 @@ class ImagePainterState extends State<ImagePainter> {
         children: [
           if (widget.controlsAtTop) _buildControls(),
           Expanded(
-            child: FittedBox(
-              alignment: FractionalOffset.center,
-              child: ClipRect(
-                child: ValueListenableBuilder<Controller>(
-                  valueListenable: _controller,
-                  builder: (_, controller, __) {
-                    return ImagePainterTransformer(
-                      maxScale: 2.4,
-                      minScale: 1,
-                      panEnabled: controller.mode == PaintMode.none,
-                      scaleEnabled: widget.isScalable!,
-                      onInteractionUpdate: (details) =>
-                          _scaleUpdateGesture(details, controller),
-                      onInteractionEnd: (details) =>
-                          _scaleEndGesture(details, controller),
-                      child: CustomPaint(
-                        size: Size(_image!.width.toDouble(),
-                            _image!.height.toDouble()),
-                        willChange: true,
-                        isComplex: true,
-                        painter: DrawImage(
-                          image: _image,
-                          points: _points,
-                          paintHistory: _paintHistory,
-                          isDragging: _inDrag,
-                          update: UpdatePoints(
-                              start: _start,
-                              end: _end,
-                              painter: _painter,
-                              mode: controller.mode),
+            child: InteractiveViewer(
+              child: ValueListenableBuilder<Controller>(
+                valueListenable: _controller,
+                builder: (_, parentController, __) {
+                  return AbsorbPointer(
+                    absorbing:
+                        parentController.mode == PaintMode.none ? true : false,
+                    child: FittedBox(
+                      alignment: FractionalOffset.center,
+                      child: ClipRect(
+                        child: ValueListenableBuilder<Controller>(
+                          valueListenable: _controller,
+                          builder: (_, controller, __) {
+                            return ImagePainterTransformer(
+                              maxScale: 2.4,
+                              minScale: 1,
+                              panEnabled: false,
+                              scaleEnabled: false,
+                              onInteractionUpdate: (details) =>
+                                  _scaleUpdateGesture(details, controller),
+                              onInteractionEnd: (details) =>
+                                  _scaleEndGesture(details, controller),
+                              child: CustomPaint(
+                                size: Size(_image!.width.toDouble(),
+                                    _image!.height.toDouble()),
+                                willChange: true,
+                                isComplex: true,
+                                painter: DrawImage(
+                                  image: _image,
+                                  points: _points,
+                                  paintHistory: _paintHistory,
+                                  isDragging: _inDrag,
+                                  update: UpdatePoints(
+                                      start: _start,
+                                      end: _end,
+                                      painter: _painter,
+                                      mode: controller.mode),
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               ),
             ),
           ),

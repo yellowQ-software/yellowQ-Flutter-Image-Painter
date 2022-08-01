@@ -51,69 +51,32 @@ class _NewWidgetState extends State<NewWidget> {
   @override
   Widget build(BuildContext context) {
     return Center(
-        child: file == null
-            ? ElevatedButton(
-                onPressed: () async {
-                  final selectedFile = await widget._picker
-                      .pickImage(source: ImageSource.gallery);
-                  if (selectedFile != null) {
-                    setState(() {
-                      file = selectedFile;
-                      editing = true;
-                    });
-                  }
-                },
-                child: const Text("Choose and edit image"),
-              )
-            : Stack(
-                alignment: AlignmentDirectional.bottomCenter,
-                children: [
-                  Column(
-                    children: [
-                      Expanded(
-                          child: Container(
-                        color: Colors.black,
-                      ))
-                    ],
-                  ),
-                  ImagePainter.file(File(file!.path),
-                      key: _imageKey,
-                      addTextIcon:
-                          Icon(Icons.text_fields_outlined, color: Colors.white),
-                      showClearAllButton: false,
-                      selectedColor: Colors.red,
-                      iconsColor: Colors.white,
-                      scalable: true,
-                      clearAllIcon:
-                          const Icon(Icons.cancel, color: Colors.white),
-                      placeholderWidget: const CircularProgressIndicator(),
-                      controlsBackgroundColor: Colors.blue),
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Expanded(
-                        flex: 1,
-                        child: InkWell(
-                          splashColor: Colors.white,
-                          onTap: saveImage,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 5),
-                            color: Colors.green,
-                            child: const Icon(Icons.save),
-                          ),
-                        )),
-                    Expanded(
-                        flex: 1,
-                        child: InkWell(
-                          splashColor: Colors.white,
-                          onTap: closeImage,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 5),
-                            color: Colors.red,
-                            child: const Icon(Icons.delete_forever),
-                          ),
-                        ))
-                  ])
-                ],
-              ));
+      child: file == null
+          ? ElevatedButton(
+              onPressed: () async {
+                final selectedFile =
+                    await widget._picker.pickImage(source: ImageSource.gallery);
+                if (selectedFile != null) {
+                  setState(() {
+                    file = selectedFile;
+                    editing = true;
+                  });
+                }
+              },
+              child: const Text("Choose and edit image"),
+            )
+          : ImagePainter.file(File(file!.path),
+              key: _imageKey,
+              addTextIcon:
+                  Icon(Icons.text_fields_outlined, color: Colors.white),
+              showClearAllButton: false,
+              selectedColor: Colors.red,
+              iconsColor: Colors.white,
+              scalable: false,
+              clearAllIcon: const Icon(Icons.cancel, color: Colors.white),
+              placeholderWidget: const CircularProgressIndicator(),
+              controlsBackgroundColor: Colors.blue),
+    );
   }
 
   void saveImage() async {
