@@ -3,7 +3,6 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -874,82 +873,145 @@ class ImagePainterState extends State<ImagePainter> {
 
   Widget _buildControls() {
     return Container(
-      padding: const EdgeInsets.all(4),
+      padding: const EdgeInsets.fromLTRB(4, 0, 4, 4),
       color: widget.controlsBackgroundColor,
       child: Row(
         children: [
           ValueListenableBuilder<Controller>(
               valueListenable: _controller,
-              builder: (_, _ctrl, __) {
-                return PopupMenuButton(
-                  tooltip: textDelegate.changeMode,
-                  shape: ContinuousRectangleBorder(
-                    borderRadius: BorderRadius.circular(40),
-                  ),
-                  icon: Icon(
-                      paintModes(textDelegate)
-                          .firstWhere((item) => item.mode == _ctrl.mode,
-                              orElse: () => ModeData(
-                                  icon: Icons.text_format,
-                                  mode: PaintMode.text,
-                                  label: textDelegate.text))
-                          .icon,
-                      color: widget.iconsColor),
-                  itemBuilder: (_) => [_showOptionsRow(_ctrl)],
+              builder: (_, controller, __) {
+                return Stack(
+                  alignment: AlignmentDirectional.bottomCenter,
+                  children: [
+                    PopupMenuButton(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: ContinuousRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      tooltip: textDelegate.changeColor,
+                      icon: widget.colorIcon ??
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                  color: widget.iconsColor ?? Colors.grey),
+                              color: controller.color,
+                            ),
+                          ),
+                      itemBuilder: (_) => [_showColorPicker(controller)],
+                    ),
+                    Text(
+                      textDelegate.changeColor,
+                      style: const TextStyle(color: Colors.white, fontSize: 9),
+                    )
+                  ],
                 );
               }),
-          ValueListenableBuilder<Controller>(
-              valueListenable: _controller,
-              builder: (_, controller, __) {
-                return PopupMenuButton(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
+          Stack(
+            alignment: AlignmentDirectional.bottomCenter,
+            children: [
+              Container(
+                child: PopupMenuButton(
+                  tooltip: textDelegate.changeBrushSize,
                   shape: ContinuousRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  tooltip: textDelegate.changeColor,
-                  icon: widget.colorIcon ??
-                      Container(
-                        padding: const EdgeInsets.all(2.0),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                              color: widget.iconsColor ?? Colors.grey),
-                          color: controller.color,
-                        ),
+                  icon: widget.brushIcon ??
+                      Icon(
+                        Icons.brush,
+                        color: widget.iconsColor,
                       ),
-                  itemBuilder: (_) => [_showColorPicker(controller)],
+                  itemBuilder: (_) => [_showRangeSlider()],
+                ),
+              ),
+              Text(
+                textDelegate.changeBrushSize,
+                style: const TextStyle(color: Colors.white, fontSize: 9),
+              )
+            ],
+          ),
+          Stack(
+            alignment: AlignmentDirectional.bottomCenter,
+            children: [
+              IconButton(
+                  icon: widget.addTextIcon ??
+                      Icon(
+                        Icons.text_format,
+                        color: widget.iconsColor,
+                      ),
+                  onPressed: _openTextDialog),
+              Text(
+                textDelegate.text,
+                style: const TextStyle(color: Colors.white, fontSize: 9),
+              )
+            ],
+          ),
+          ValueListenableBuilder<Controller>(
+              valueListenable: _controller,
+              builder: (_, _ctrl, __) {
+                return Stack(
+                  alignment: AlignmentDirectional.bottomCenter,
+                  children: [
+                    PopupMenuButton(
+                      padding: const EdgeInsets.all(0),
+                      tooltip: textDelegate.changeMode,
+                      shape: ContinuousRectangleBorder(
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                      icon: Row(
+                        children: [
+                          Icon(
+                              paintModes(textDelegate)
+                                  .firstWhere((item) => item.mode == _ctrl.mode,
+                                      orElse: () => ModeData(
+                                          icon: Icons.text_format,
+                                          mode: PaintMode.text,
+                                          label: textDelegate.text))
+                                  .icon,
+                              color: widget.iconsColor),
+                          Expanded(
+                              child: Icon(
+                            Icons.keyboard_arrow_down,
+                            color: widget.iconsColor,
+                          )),
+                        ],
+                      ),
+                      itemBuilder: (_) => [_showOptionsRow(_ctrl)],
+                    ),
+                    ValueListenableBuilder<Controller>(
+                      valueListenable: _controller,
+                      builder: (_, value, __) {
+                        return Text(
+                          value.mode.name,
+                          style:
+                              const TextStyle(color: Colors.white, fontSize: 9),
+                        );
+                      },
+                    )
+                  ],
                 );
               }),
-          PopupMenuButton(
-            tooltip: textDelegate.changeBrushSize,
-            shape: ContinuousRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            icon: widget.brushIcon ??
-                Icon(
-                  Icons.brush,
-                  color: widget.iconsColor,
-                ),
-            itemBuilder: (_) => [_showRangeSlider()],
-          ),
-          IconButton(
-              icon: widget.addTextIcon ??
-                  Icon(
-                    Icons.text_format,
-                    color: widget.iconsColor,
-                  ),
-              onPressed: _openTextDialog),
           const Spacer(),
-          IconButton(
-              tooltip: textDelegate.undo,
-              icon: widget.undoIcon ??
-                  Icon(Icons.reply, color: widget.iconsColor),
-              onPressed: () {
-                print(_paintHistory.length);
-                if (_paintHistory.isNotEmpty) {
-                  setState(_paintHistory.removeLast);
-                }
-              }),
+          Stack(
+            alignment: AlignmentDirectional.bottomCenter,
+            children: [
+              IconButton(
+                  padding: EdgeInsets.zero,
+                  tooltip: textDelegate.undo,
+                  icon: widget.undoIcon ??
+                      Icon(Icons.reply, color: widget.iconsColor),
+                  onPressed: () {
+                    print(_paintHistory.length);
+                    if (_paintHistory.isNotEmpty) {
+                      setState(_paintHistory.removeLast);
+                    }
+                  }),
+              Text(
+                textDelegate.undo,
+                style: const TextStyle(color: Colors.white, fontSize: 9),
+              )
+            ],
+          ),
           widget.showClearAllButton!
               ? IconButton(
                   tooltip: textDelegate.clearAllProgress,

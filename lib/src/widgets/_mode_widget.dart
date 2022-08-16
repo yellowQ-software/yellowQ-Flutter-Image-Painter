@@ -43,7 +43,7 @@ class SelectionItems extends StatelessWidget {
 
 List<ModeData> paintModes(TextDelegate textDelegate) => [
       ModeData(
-          icon: Icons.zoom_out_map,
+          icon: Icons.zoom_in,
           mode: PaintMode.none,
           label: textDelegate.noneZoom),
       ModeData(

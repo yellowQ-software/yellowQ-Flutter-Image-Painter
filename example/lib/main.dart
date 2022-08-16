@@ -28,6 +28,7 @@ class MyApp extends StatelessWidget {
       title: 'Welcome to Flutter',
       scaffoldMessengerKey: snackbarKey,
       home: Scaffold(
+        backgroundColor: Colors.black,
         body: SafeArea(child: NewWidget(picker: _picker)),
       ),
     );
