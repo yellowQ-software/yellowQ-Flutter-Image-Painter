@@ -981,8 +981,11 @@ class ImagePainterState extends State<ImagePainter> {
                     ValueListenableBuilder<Controller>(
                       valueListenable: _controller,
                       builder: (_, value, __) {
+                        final algo = paintModes(textDelegate)
+                            .firstWhere((item) => item.mode == _ctrl.mode);
+
                         return Text(
-                          textDelegate.changeMode,
+                          algo.label ?? "",
                           style:
                               const TextStyle(color: Colors.white, fontSize: 9),
                         );
