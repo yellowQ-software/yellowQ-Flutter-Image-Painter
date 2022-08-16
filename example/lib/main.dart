@@ -6,6 +6,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_painter/image_painter.dart';
+import 'package:image_painter_example/dutch_text_delegate.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -67,6 +68,7 @@ class _NewWidgetState extends State<NewWidget> {
               child: const Text("Choose and edit image"),
             )
           : ImagePainter.file(File(file!.path),
+              textDelegate: DutchTextDelegate(),
               key: _imageKey,
               addTextIcon:
                   Icon(Icons.text_fields_outlined, color: Colors.white),

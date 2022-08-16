@@ -982,7 +982,7 @@ class ImagePainterState extends State<ImagePainter> {
                       valueListenable: _controller,
                       builder: (_, value, __) {
                         return Text(
-                          value.mode.name,
+                          textDelegate.changeMode,
                           style:
                               const TextStyle(color: Colors.white, fontSize: 9),
                         );
