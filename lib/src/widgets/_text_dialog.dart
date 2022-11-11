@@ -40,7 +40,7 @@ class TextDialog extends StatelessWidget {
         children: [
           TextField(
             controller: controller,
-            maxLines: null,
+            // maxLines: null,
             keyboardType: TextInputType.multiline,
             autofocus: true,
             style: TextStyle(
