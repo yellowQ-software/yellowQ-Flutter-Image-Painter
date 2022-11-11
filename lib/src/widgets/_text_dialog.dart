@@ -41,7 +41,6 @@ class TextDialog extends StatelessWidget {
           TextField(
             controller: controller,
             maxLines: null,
-            expands: true,
             keyboardType: TextInputType.multiline,
             autofocus: true,
             style: TextStyle(
