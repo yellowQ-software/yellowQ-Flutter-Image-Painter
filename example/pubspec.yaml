@@ -26,7 +26,7 @@ dependencies:
   image_painter:
     path: ../
   open_file: ^3.2.1
-  path_provider: ^2.0.9
+  path_provider: ^2.0.11
 
 dev_dependencies:
   flutter_test:

@@ -2,22 +2,12 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart' hide Image;
 
+import '_controller.dart';
+
 ///Handles all the painting ongoing on the canvas.
 class DrawImage extends CustomPainter {
   ///Converted image from [ImagePainter] constructor.
   final Image? image;
-
-  ///Keeps track of all the units of [PaintHistory].
-  final List<PaintInfo>? paintHistory;
-
-  ///Keeps track of points on currently drawing state.
-  final UpdatePoints? update;
-
-  ///Keeps track of freestyle points on currently drawing state.
-  final List<Offset?>? points;
-
-  ///Keeps track whether the paint action is running or not.
-  final bool isDragging;
 
   ///Flag for triggering signature mode.
   final bool isSignature;
@@ -25,15 +15,18 @@ class DrawImage extends CustomPainter {
   ///The background for signature painting.
   final Color? backgroundColor;
 
+  //Controller is a listenable with all of the paint details.
+  late Controller _controller;
+
   ///Constructor for the canvas
-  DrawImage(
-      {this.image,
-      this.update,
-      this.points,
-      this.isDragging = false,
-      this.isSignature = false,
-      this.backgroundColor,
-      this.paintHistory});
+  DrawImage({
+    required Controller controller,
+    this.image,
+    this.isSignature = false,
+    this.backgroundColor,
+  }) : super(repaint: controller) {
+    _controller = controller;
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -58,9 +51,9 @@ class DrawImage extends CustomPainter {
     }
 
     ///paints all the previoud paintInfo history recorded on [PaintHistory]
-    for (var item in paintHistory!) {
+    for (var item in _controller.paintHistory) {
       final _offset = item.offset;
-      final _painter = item.painter;
+      final _painter = item.paint;
       switch (item.mode) {
         case PaintMode.rect:
           canvas.drawRect(
@@ -126,42 +119,43 @@ class DrawImage extends CustomPainter {
     }
 
     ///Draws ongoing action on the canvas while indrag.
-    if (isDragging) {
-      final _start = update!.start;
-      final _end = update!.end;
-      final _painter = update!.painter;
-      switch (update!.mode) {
+    if (_controller.busy) {
+      final _start = _controller.start;
+      final _end = _controller.end;
+      final _paint = _controller.brush;
+      switch (_controller.mode) {
         case PaintMode.rect:
-          canvas.drawRect(Rect.fromPoints(_start!, _end!), _painter!);
+          canvas.drawRect(Rect.fromPoints(_start!, _end!), _paint);
           break;
         case PaintMode.line:
-          canvas.drawLine(_start!, _end!, _painter!);
+          canvas.drawLine(_start!, _end!, _paint);
           break;
         case PaintMode.circle:
           final path = Path();
           path.addOval(Rect.fromCircle(
               center: _end!, radius: (_end - _start!).distance));
-          canvas.drawPath(path, _painter!);
+          canvas.drawPath(path, _paint);
           break;
         case PaintMode.arrow:
-          drawArrow(canvas, _start!, _end!, _painter!);
+          drawArrow(canvas, _start!, _end!, _paint);
           break;
         case PaintMode.dashLine:
           final path = Path()
             ..moveTo(_start!.dx, _start.dy)
             ..lineTo(_end!.dx, _end.dy);
-          canvas.drawPath(_dashPath(path, _painter!.strokeWidth), _painter);
+          canvas.drawPath(_dashPath(path, _paint.strokeWidth), _paint);
           break;
         case PaintMode.freeStyle:
-          for (var i = 0; i < points!.length - 1; i++) {
-            if (points![i] != null && points![i + 1] != null) {
+          final points = _controller.offsets;
+          for (var i = 0; i < _controller.offsets.length - 1; i++) {
+            if (points[i] != null && points[i + 1] != null) {
               canvas.drawLine(
-                  Offset(points![i]!.dx, points![i]!.dy),
-                  Offset(points![i + 1]!.dx, points![i + 1]!.dy),
-                  _painter!..strokeCap = StrokeCap.round);
-            } else if (points![i] != null && points![i + 1] == null) {
+                  Offset(points[i]!.dx, points[i]!.dy),
+                  Offset(points[i + 1]!.dx, points[i + 1]!.dy),
+                  _paint..strokeCap = StrokeCap.round);
+            } else if (points[i] != null && points[i + 1] == null) {
               canvas.drawPoints(PointMode.points,
-                  [Offset(points![i]!.dx, points![i]!.dy)], _painter!);
+                  [Offset(points[i]!.dx, points[i]!.dy)], _paint);
             }
           }
           break;
@@ -214,8 +208,7 @@ class DrawImage extends CustomPainter {
 
   @override
   bool shouldRepaint(DrawImage oldInfo) {
-    return (oldInfo.update != update ||
-        oldInfo.paintHistory!.length == paintHistory!.length);
+    return oldInfo._controller != _controller;
   }
 }
 
@@ -253,7 +246,7 @@ class PaintInfo {
   PaintMode? mode;
 
   ///Used to save specific paint utils used for the specific shape.
-  Paint? painter;
+  Paint? paint;
 
   ///Used to save offsets.
   ///Two point in case of other shapes and list of points for [FreeStyle].
@@ -263,7 +256,12 @@ class PaintInfo {
   String? text;
 
   ///In case of string, it is used to save string value entered.
-  PaintInfo({this.offset, this.painter, this.text, this.mode});
+  PaintInfo({
+    this.offset,
+    this.paint,
+    this.text,
+    this.mode,
+  });
 }
 
 @immutable
@@ -277,13 +275,13 @@ class UpdatePoints {
   final Offset? end;
 
   ///Records [Paint] method of the ongoing painting.
-  final Paint? painter;
+  final Paint? paint;
 
   ///Records [PaintMode] of the ongoing painting.
   final PaintMode? mode;
 
   ///Constructor for ongoing painthistory.
-  UpdatePoints({this.start, this.end, this.painter, this.mode});
+  UpdatePoints({this.start, this.end, this.paint, this.mode});
 
   @override
   bool operator ==(Object o) {
@@ -292,12 +290,12 @@ class UpdatePoints {
     return o is UpdatePoints &&
         o.start == start &&
         o.end == end &&
-        o.painter == painter &&
+        o.paint == paint &&
         o.mode == mode;
   }
 
   @override
   int get hashCode {
-    return start.hashCode ^ end.hashCode ^ painter.hashCode ^ mode.hashCode;
+    return start.hashCode ^ end.hashCode ^ paint.hashCode ^ mode.hashCode;
   }
 }
