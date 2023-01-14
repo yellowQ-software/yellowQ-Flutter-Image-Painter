@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 
 import '_controller.dart';
 import '_image_painter.dart';
-import '_ported_interactive_viewer.dart';
 import 'delegates/text_delegate.dart';
 import 'widgets/_color_widget.dart';
 import 'widgets/_mode_widget.dart';
@@ -343,6 +342,7 @@ class ImagePainterState extends State<ImagePainter> {
   late Controller _controller;
   late final ValueNotifier<bool> _isLoaded;
   late final TextEditingController _textController;
+  late final TransformationController _transformationController;
 
   int _strokeMultiplier = 1;
   late TextDelegate textDelegate;
@@ -366,6 +366,7 @@ class ImagePainterState extends State<ImagePainter> {
     _resolveAndConvertImage();
 
     _textController = TextEditingController();
+    _transformationController = TransformationController();
     textDelegate = widget.textDelegate ?? TextDelegate();
   }
 
@@ -374,6 +375,7 @@ class ImagePainterState extends State<ImagePainter> {
     _controller.dispose();
     _isLoaded.dispose();
     _textController.dispose();
+    _transformationController.dispose();
     super.dispose();
   }
 
@@ -486,7 +488,8 @@ class ImagePainterState extends State<ImagePainter> {
                 child: AnimatedBuilder(
                   animation: _controller,
                   builder: (context, child) {
-                    return ImagePainterTransformer(
+                    return InteractiveViewer(
+                      transformationController: _transformationController,
                       maxScale: 2.4,
                       minScale: 1,
                       panEnabled: _controller.mode == PaintMode.none,
@@ -527,7 +530,8 @@ class ImagePainterState extends State<ImagePainter> {
               child: AnimatedBuilder(
                 animation: _controller,
                 builder: (_, __) {
-                  return ImagePainterTransformer(
+                  return InteractiveViewer(
+                    transformationController: _transformationController,
                     panEnabled: false,
                     scaleEnabled: false,
                     onInteractionStart: _scaleStartGesture,
@@ -573,26 +577,30 @@ class ImagePainterState extends State<ImagePainter> {
   }
 
   _scaleStartGesture(ScaleStartDetails onStart) {
+    final _zoomAdjustedOffset =
+        _transformationController.toScene(onStart.localFocalPoint);
     if (!widget.isSignature) {
-      _controller.setStart(onStart.focalPoint);
-      _controller.addOffsets(onStart.focalPoint);
+      _controller.setStart(_zoomAdjustedOffset);
+      _controller.addOffsets(_zoomAdjustedOffset);
     }
   }
 
   ///Fires while user is interacting with the screen to record painting.
   void _scaleUpdateGesture(ScaleUpdateDetails onUpdate) {
+    final _zoomAdjustedOffset =
+        _transformationController.toScene(onUpdate.localFocalPoint);
     _controller.setInProgress(true);
     if (_controller.start == null) {
-      _controller.setStart(onUpdate.focalPoint);
+      _controller.setStart(_zoomAdjustedOffset);
     }
-    _controller.setEnd(onUpdate.focalPoint);
+    _controller.setEnd(_zoomAdjustedOffset);
     if (_controller.mode == PaintMode.freeStyle) {
-      _controller.addOffsets(onUpdate.focalPoint);
+      _controller.addOffsets(_zoomAdjustedOffset);
     }
     if (_controller.onTextUpdateMode) {
       _controller.paintHistory
           .lastWhere((element) => element.mode == PaintMode.text)
-          .offset = [onUpdate.focalPoint];
+          .offset = [_zoomAdjustedOffset];
     }
   }
 
