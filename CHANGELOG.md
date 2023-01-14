@@ -1,4 +1,15 @@
+# 0.5.0
+
+- Refactored controller to act as listenable for canvas repaint.
+- Removed dependency on depreciated copy of `InteractiveViewer`.
+- Removed vector math dependency.
+- Bug fixes.
+# 0.4.6
+
+- Minor improvements
+
 # 0.4.5
+
 - Added text delegates thanks to [avinath1998](https://github.com/avinath1998). Check example for implementation.
 - Minor fixes.
 
