@@ -20,32 +20,32 @@ export '_image_painter.dart';
 ///[ImagePainter] widget.
 @immutable
 class ImagePainter extends StatefulWidget {
-  const ImagePainter._(
-      {Key? key,
-      this.assetPath,
-      this.networkUrl,
-      this.byteArray,
-      this.file,
-      this.height,
-      this.width,
-      this.placeHolder,
-      this.isScalable,
-      this.brushIcon,
-      this.clearAllIcon,
-      this.colorIcon,
-      this.undoIcon,
-      this.isSignature = false,
-      this.controlsAtTop = true,
-      this.signatureBackgroundColor,
-      this.colors,
-      this.initialPaintMode,
-      this.initialStrokeWidth,
-      this.initialColor,
-      this.onColorChanged,
-      this.onStrokeWidthChanged,
-      this.onPaintModeChanged,
-      this.textDelegate})
-      : super(key: key);
+  const ImagePainter._({
+    Key? key,
+    this.assetPath,
+    this.networkUrl,
+    this.byteArray,
+    this.file,
+    this.height,
+    this.width,
+    this.placeHolder,
+    this.isScalable,
+    this.brushIcon,
+    this.clearAllIcon,
+    this.colorIcon,
+    this.undoIcon,
+    this.isSignature = false,
+    this.controlsAtTop = true,
+    this.signatureBackgroundColor,
+    this.colors,
+    this.initialPaintMode,
+    this.initialStrokeWidth,
+    this.initialColor,
+    this.onColorChanged,
+    this.onStrokeWidthChanged,
+    this.onPaintModeChanged,
+    this.textDelegate,
+  }) : super(key: key);
 
   ///Constructor for loading image from network url.
   factory ImagePainter.network(
@@ -381,6 +381,9 @@ class ImagePainterState extends State<ImagePainter> {
 
   bool get isEdited => _controller.paintHistory.isNotEmpty;
 
+  Size get imageSize =>
+      Size(_image?.width.toDouble() ?? 0, _image?.height.toDouble() ?? 0);
+
   ///Converts the incoming image type from constructor to [ui.Image]
   Future<void> _resolveAndConvertImage() async {
     if (widget.networkUrl != null) {
@@ -491,10 +494,7 @@ class ImagePainterState extends State<ImagePainter> {
                       onInteractionUpdate: _scaleUpdateGesture,
                       onInteractionEnd: _scaleEndGesture,
                       child: CustomPaint(
-                        size: Size(
-                          _image!.width.toDouble(),
-                          _image!.height.toDouble(),
-                        ),
+                        size: imageSize,
                         willChange: true,
                         isComplex: true,
                         painter: DrawImage(
@@ -558,9 +558,7 @@ class ImagePainterState extends State<ImagePainter> {
                   tooltip: textDelegate.undo,
                   icon: widget.undoIcon ??
                       Icon(Icons.reply, color: Colors.grey[700]),
-                  onPressed: () {
-                    _controller.undo();
-                  }),
+                  onPressed: () => _controller.undo()),
               IconButton(
                 tooltip: textDelegate.clearAllProgress,
                 icon: widget.clearAllIcon ??
@@ -783,45 +781,41 @@ class ImagePainterState extends State<ImagePainter> {
           AnimatedBuilder(
             animation: _controller,
             builder: (_, __) {
+              final icon = paintModes(textDelegate)
+                  .firstWhere((item) => item.mode == _controller.mode)
+                  .icon;
               return PopupMenuButton(
                 tooltip: textDelegate.changeMode,
                 shape: ContinuousRectangleBorder(
                   borderRadius: BorderRadius.circular(40),
                 ),
-                icon: Icon(
-                    paintModes(textDelegate)
-                        .firstWhere((item) => item.mode == _controller.mode)
-                        .icon,
-                    color: Colors.grey[700]),
-                itemBuilder: (_) => [
-                  _showOptionsRow(),
-                ],
+                icon: Icon(icon, color: Colors.grey[700]),
+                itemBuilder: (_) => [_showOptionsRow()],
               );
             },
           ),
           AnimatedBuilder(
-              animation: _controller,
-              builder: (_, __) {
-                return PopupMenuButton(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  shape: ContinuousRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  tooltip: textDelegate.changeColor,
-                  icon: widget.colorIcon ??
-                      Container(
-                        padding: const EdgeInsets.all(2.0),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.grey),
-                          color: _controller.color,
-                        ),
+            animation: _controller,
+            builder: (_, __) {
+              return PopupMenuButton(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                shape: ContinuousRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                tooltip: textDelegate.changeColor,
+                icon: widget.colorIcon ??
+                    Container(
+                      padding: const EdgeInsets.all(2.0),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.grey),
+                        color: _controller.color,
                       ),
-                  itemBuilder: (_) => [
-                    _showColorPicker(),
-                  ],
-                );
-              }),
+                    ),
+                itemBuilder: (_) => [_showColorPicker()],
+              );
+            },
+          ),
           PopupMenuButton(
             tooltip: textDelegate.changeBrushSize,
             shape: ContinuousRectangleBorder(
@@ -835,12 +829,10 @@ class ImagePainterState extends State<ImagePainter> {
               icon: const Icon(Icons.text_format), onPressed: _openTextDialog),
           const Spacer(),
           IconButton(
-              tooltip: textDelegate.undo,
-              icon:
-                  widget.undoIcon ?? Icon(Icons.reply, color: Colors.grey[700]),
-              onPressed: () {
-                _controller.undo();
-              }),
+            tooltip: textDelegate.undo,
+            icon: widget.undoIcon ?? Icon(Icons.reply, color: Colors.grey[700]),
+            onPressed: () => _controller.undo(),
+          ),
           IconButton(
             tooltip: textDelegate.clearAllProgress,
             icon: widget.clearAllIcon ??
