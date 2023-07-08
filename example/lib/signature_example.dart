@@ -12,12 +12,10 @@ class SignatureExample extends StatefulWidget {
 
 class _SignatureExampleState extends State<SignatureExample> {
   final _imageKey = GlobalKey<ImagePainterState>();
-  final _key = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _key,
       appBar: AppBar(title: const Text("Image Painter Example")),
       body: Center(
         child: ClipRRect(
@@ -31,36 +29,40 @@ class _SignatureExampleState extends State<SignatureExample> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.save), onPressed: saveImage),
+        child: const Icon(Icons.save),
+        onPressed: saveImage,
+      ),
     );
   }
 
   void saveImage() async {
-    final image = await _imageKey.currentState.exportImage();
+    final image = await _imageKey.currentState?.exportImage();
     final directory = (await getApplicationDocumentsDirectory()).path;
     await Directory('$directory/sample').create(recursive: true);
     final fullPath = '$directory/sample/image.png';
     final imgFile = File('$fullPath');
-    imgFile.writeAsBytesSync(image);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: Colors.grey[700],
-        padding: const EdgeInsets.only(left: 10),
-        content: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text("Image Exported successfully.",
-                style: TextStyle(color: Colors.white)),
-            TextButton(
-              onPressed: () => OpenFile.open("$fullPath"),
-              child: Text(
-                "Open",
-                style: TextStyle(color: Colors.blue[200]),
-              ),
-            )
-          ],
+    if (image != null) {
+      imgFile.writeAsBytesSync(image);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.grey[700],
+          padding: const EdgeInsets.only(left: 10),
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text("Image Exported successfully.",
+                  style: TextStyle(color: Colors.white)),
+              TextButton(
+                onPressed: () => OpenFile.open("$fullPath"),
+                child: Text(
+                  "Open",
+                  style: TextStyle(color: Colors.blue[200]),
+                ),
+              )
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 }

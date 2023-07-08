@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 
 import '_controller.dart';
 import '_image_painter.dart';
+import '_signature_painter.dart';
 import 'delegates/text_delegate.dart';
 import 'widgets/_color_widget.dart';
 import 'widgets/_mode_widget.dart';
@@ -35,7 +36,7 @@ class ImagePainter extends StatefulWidget {
     this.undoIcon,
     this.isSignature = false,
     this.controlsAtTop = true,
-    this.signatureBackgroundColor,
+    this.signatureBackgroundColor = Colors.white,
     this.colors,
     this.initialPaintMode,
     this.initialStrokeWidth,
@@ -291,7 +292,7 @@ class ImagePainter extends StatefulWidget {
   final bool isSignature;
 
   ///Signature mode background color
-  final Color? signatureBackgroundColor;
+  final Color signatureBackgroundColor;
 
   ///List of colors for color selection
   ///If not provided, default colors are used.
@@ -379,8 +380,6 @@ class ImagePainterState extends State<ImagePainter> {
     super.dispose();
   }
 
-  Paint get _paint => _controller.brush;
-
   bool get isEdited => _controller.paintHistory.isNotEmpty;
 
   Size get imageSize =>
@@ -445,7 +444,7 @@ class ImagePainterState extends State<ImagePainter> {
   ///Completer function to convert network image to [ui.Image] before drawing on custompainter.
   Future<ui.Image> _loadNetworkImage(String path) async {
     final completer = Completer<ImageInfo>();
-    var img = NetworkImage(path);
+    final img = NetworkImage(path);
     img.resolve(const ImageConfiguration()).addListener(
         ImageStreamListener((info, _) => completer.complete(info)));
     final imageInfo = await completer.future;
@@ -540,8 +539,7 @@ class ImagePainterState extends State<ImagePainter> {
                     child: CustomPaint(
                       willChange: true,
                       isComplex: true,
-                      painter: DrawImage(
-                        isSignature: true,
+                      painter: SignaturePainter(
                         backgroundColor: widget.signatureBackgroundColor,
                         controller: _controller,
                       ),
@@ -559,10 +557,11 @@ class ImagePainterState extends State<ImagePainter> {
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
-                  tooltip: textDelegate.undo,
-                  icon: widget.undoIcon ??
-                      Icon(Icons.reply, color: Colors.grey[700]),
-                  onPressed: () => _controller.undo()),
+                tooltip: textDelegate.undo,
+                icon: widget.undoIcon ??
+                    Icon(Icons.reply, color: Colors.grey[700]),
+                onPressed: () => _controller.undo(),
+              ),
               IconButton(
                 tooltip: textDelegate.clearAllProgress,
                 icon: widget.clearAllIcon ??
@@ -600,7 +599,7 @@ class ImagePainterState extends State<ImagePainter> {
     if (_controller.onTextUpdateMode) {
       _controller.paintHistory
           .lastWhere((element) => element.mode == PaintMode.text)
-          .offset = [_zoomAdjustedOffset];
+          .offsets = [_zoomAdjustedOffset];
     }
   }
 
@@ -623,17 +622,20 @@ class ImagePainterState extends State<ImagePainter> {
 
   void _addEndPoints() => _addPaintHistory(
         PaintInfo(
-          offset: <Offset?>[_controller.start, _controller.end],
-          paint: _paint,
+          offsets: <Offset?>[_controller.start, _controller.end],
           mode: _controller.mode,
+          color: _controller.color,
+          strokeWidth: _controller.scaledStrokeWidth,
+          fill: _controller.fill,
         ),
       );
 
   void _addFreeStylePoints() => _addPaintHistory(
         PaintInfo(
-          offset: <Offset?>[..._controller.offsets],
-          paint: _paint,
+          offsets: <Offset?>[..._controller.offsets],
           mode: PaintMode.freeStyle,
+          color: _controller.color,
+          strokeWidth: _controller.scaledStrokeWidth,
         ),
       );
 
@@ -661,12 +663,15 @@ class ImagePainterState extends State<ImagePainter> {
                     data: item,
                     isSelected: _controller.mode == item.mode,
                     onTap: () {
-                      if (widget.onPaintModeChanged != null &&
-                          item.mode != null) {
-                        widget.onPaintModeChanged!(item.mode!);
+                      if (widget.onPaintModeChanged != null) {
+                        widget.onPaintModeChanged!(item.mode);
                       }
-                      _controller.setMode(item.mode!);
+                      _controller.setMode(item.mode);
+
                       Navigator.of(context).pop();
+                      if (item.mode == PaintMode.text) {
+                        _openTextDialog();
+                      }
                     },
                   ),
                 )
@@ -702,27 +707,28 @@ class ImagePainterState extends State<ImagePainter> {
 
   PopupMenuItem _showColorPicker() {
     return PopupMenuItem(
-        enabled: false,
-        child: Center(
-          child: Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 10,
-            runSpacing: 10,
-            children: (widget.colors ?? editorColors).map((color) {
-              return ColorItem(
-                isSelected: color == _controller.color,
-                color: color,
-                onTap: () {
-                  _controller.setColor(color);
-                  if (widget.onColorChanged != null) {
-                    widget.onColorChanged!(color);
-                  }
-                  Navigator.pop(context);
-                },
-              );
-            }).toList(),
-          ),
-        ));
+      enabled: false,
+      child: Center(
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 10,
+          runSpacing: 10,
+          children: (widget.colors ?? editorColors).map((color) {
+            return ColorItem(
+              isSelected: color == _controller.color,
+              color: color,
+              onTap: () {
+                _controller.setColor(color);
+                if (widget.onColorChanged != null) {
+                  widget.onColorChanged!(color);
+                }
+                Navigator.pop(context);
+              },
+            );
+          }).toList(),
+        ),
+      ),
+    );
   }
 
   ///Generates [Uint8List] of the [ui.Image] generated by the [renderImage()] method.
@@ -752,7 +758,6 @@ class ImagePainterState extends State<ImagePainter> {
   void _openTextDialog() {
     _controller.setMode(PaintMode.text);
     final fontSize = 6 * _controller.strokeWidth;
-
     TextDialog.show(
       context,
       _textController,
@@ -760,18 +765,15 @@ class ImagePainterState extends State<ImagePainter> {
       _controller.color,
       textDelegate,
       onFinished: (context) {
-        if (_textController.text != '') {
-          setState(
-            () {
-              _addPaintHistory(
-                PaintInfo(
-                  mode: PaintMode.text,
-                  text: _textController.text,
-                  paint: _paint,
-                  offset: [],
-                ),
-              );
-            },
+        if (_textController.text.isNotEmpty) {
+          _addPaintHistory(
+            PaintInfo(
+              mode: PaintMode.text,
+              text: _textController.text,
+              offsets: [],
+              color: _controller.color,
+              strokeWidth: _controller.scaledStrokeWidth,
+            ),
           );
           _textController.clear();
         }
@@ -833,8 +835,29 @@ class ImagePainterState extends State<ImagePainter> {
                 widget.brushIcon ?? Icon(Icons.brush, color: Colors.grey[700]),
             itemBuilder: (_) => [_showRangeSlider()],
           ),
-          IconButton(
-              icon: const Icon(Icons.text_format), onPressed: _openTextDialog),
+          AnimatedBuilder(
+            animation: _controller,
+            builder: (_, __) {
+              if (_controller.canFill()) {
+                return Row(
+                  children: [
+                    Checkbox.adaptive(
+                      value: _controller.shouldFill,
+                      onChanged: (val) {
+                        _controller.update(fill: val);
+                      },
+                    ),
+                    Text(
+                      'Fill',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    )
+                  ],
+                );
+              } else {
+                return const SizedBox();
+              }
+            },
+          ),
           const Spacer(),
           IconButton(
             tooltip: textDelegate.undo,

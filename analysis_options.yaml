@@ -1,13 +1,8 @@
-
-analyzer:
-  strong-mode:
-    implicit-casts: false
 linter:
   rules:
     await_only_futures: true
     avoid_positional_boolean_parameters: false
     constant_identifier_names: true
-    include_file_not_found: false
 
     # STYLE
     camel_case_types: true
@@ -59,10 +54,8 @@ linter:
     prefer_final_fields: true # prefer
     use_setters_to_change_properties: true
     avoid_setters_without_getters: true
-    avoid_returning_null: true
     avoid_returning_this: true
     type_annotate_public_apis: true
-    omit_local_variable_types: true
     avoid_types_on_closure_parameters: true
     avoid_return_types_on_setters: true
     prefer_generic_function_type_aliases: true

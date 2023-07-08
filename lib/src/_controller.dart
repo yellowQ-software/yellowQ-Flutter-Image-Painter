@@ -5,9 +5,9 @@ import '../image_painter.dart';
 class Controller extends ChangeNotifier {
   late double _strokeWidth;
   late Color _color;
-  late PaintingStyle _style;
   late PaintMode _mode;
   late String _text;
+  late bool _fill;
 
   final List<Offset?> _offsets = [];
 
@@ -21,13 +21,17 @@ class Controller extends ChangeNotifier {
   Paint get brush => Paint()
     ..color = _color
     ..strokeWidth = _strokeWidth * _strokeMultiplier
-    ..style = _mode == PaintMode.dashLine ? PaintingStyle.stroke : _style;
+    ..style = shouldFill ? PaintingStyle.fill : PaintingStyle.stroke;
 
   PaintMode get mode => _mode;
 
   double get strokeWidth => _strokeWidth;
 
+  double get scaledStrokeWidth => _strokeWidth * _strokeMultiplier;
+
   bool get busy => _paintInProgress;
+
+  bool get fill => _fill;
 
   Color get color => _color;
 
@@ -48,15 +52,15 @@ class Controller extends ChangeNotifier {
   Controller({
     double strokeWidth = 4.0,
     Color color = Colors.red,
-    PaintingStyle style = PaintingStyle.stroke,
     PaintMode mode = PaintMode.freeStyle,
     String text = '',
+    bool fill = false,
   }) {
     _strokeWidth = strokeWidth;
     _color = color;
-    _style = style;
     _mode = mode;
     _text = text;
+    _fill = fill;
   }
 
   void addPaintInfo(PaintInfo paintInfo) {
@@ -119,16 +123,17 @@ class Controller extends ChangeNotifier {
     notifyListeners();
   }
 
-  void update(
-      {double? strokeWidth,
-      Color? color,
-      PaintingStyle? style,
-      PaintMode? mode,
-      String? text,
-      int? strokeMultiplier}) {
+  void update({
+    double? strokeWidth,
+    Color? color,
+    bool? fill,
+    PaintMode? mode,
+    String? text,
+    int? strokeMultiplier,
+  }) {
     _strokeWidth = strokeWidth ?? _strokeWidth;
     _color = color ?? _color;
-    _style = style ?? _style;
+    _fill = fill ?? _fill;
     _mode = mode ?? _mode;
     _text = text ?? _text;
     _strokeMultiplier = strokeMultiplier ?? _strokeMultiplier;
@@ -138,5 +143,19 @@ class Controller extends ChangeNotifier {
   void setInProgress(bool val) {
     _paintInProgress = val;
     notifyListeners();
+  }
+
+  bool get shouldFill {
+    if (mode == PaintMode.circle || mode == PaintMode.rect) {
+      return _fill;
+    } else {
+      return false;
+    }
+  }
+}
+
+extension ControllerExt on Controller {
+  bool canFill() {
+    return mode == PaintMode.circle || mode == PaintMode.rect;
   }
 }
