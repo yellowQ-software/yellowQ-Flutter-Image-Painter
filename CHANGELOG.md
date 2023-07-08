@@ -1,9 +1,19 @@
+# 0.6.0
+
+- Added fill support.
+- Refactored lots of methods.
+- Added support for flutter web.
+- Refactored unnecessary null calls.
+- Refactored signature painter into it's own custompainter class.
+- Bug Fixes.
+
 # 0.5.0
 
 - Refactored controller to act as listenable for canvas repaint.
 - Removed dependency on depreciated copy of `InteractiveViewer`.
 - Removed vector math dependency.
 - Bug fixes.
+
 # 0.4.6
 
 - Minor improvements
