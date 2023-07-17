@@ -45,6 +45,7 @@ class ImagePainter extends StatefulWidget {
     this.onStrokeWidthChanged,
     this.onPaintModeChanged,
     this.textDelegate,
+    this.hideControlBar = false,
   }) : super(key: key);
 
   ///Constructor for loading image from network url.
@@ -68,6 +69,7 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<double>? onStrokeWidthChanged,
     TextDelegate? textDelegate,
     bool? controlsAtTop,
+    bool? hideControlBar,
   }) {
     return ImagePainter._(
       key: key,
@@ -89,6 +91,7 @@ class ImagePainter extends StatefulWidget {
       onStrokeWidthChanged: onStrokeWidthChanged,
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
+      hideControlBar: hideControlBar ?? false,
     );
   }
 
@@ -113,6 +116,7 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<double>? onStrokeWidthChanged,
     TextDelegate? textDelegate,
     bool? controlsAtTop,
+    bool? hideControlBar,
   }) {
     return ImagePainter._(
       key: key,
@@ -134,6 +138,7 @@ class ImagePainter extends StatefulWidget {
       onStrokeWidthChanged: onStrokeWidthChanged,
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
+      hideControlBar: hideControlBar ?? false,
     );
   }
 
@@ -158,6 +163,7 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<double>? onStrokeWidthChanged,
     TextDelegate? textDelegate,
     bool? controlsAtTop,
+    bool? hideControlBar,
   }) {
     return ImagePainter._(
       key: key,
@@ -179,6 +185,7 @@ class ImagePainter extends StatefulWidget {
       onStrokeWidthChanged: onStrokeWidthChanged,
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
+      hideControlBar: hideControlBar ?? false,
     );
   }
 
@@ -203,6 +210,7 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<double>? onStrokeWidthChanged,
     TextDelegate? textDelegate,
     bool? controlsAtTop,
+    bool? hideControlBar,
   }) {
     return ImagePainter._(
       key: key,
@@ -224,6 +232,7 @@ class ImagePainter extends StatefulWidget {
       onStrokeWidthChanged: onStrokeWidthChanged,
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
+      hideControlBar: hideControlBar ?? false,
     );
   }
 
@@ -243,6 +252,7 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<double>? onStrokeWidthChanged,
     TextDelegate? textDelegate,
     bool? controlsAtTop,
+    bool? hideControlBar,
   }) {
     return ImagePainter._(
       key: key,
@@ -261,6 +271,7 @@ class ImagePainter extends StatefulWidget {
       onStrokeWidthChanged: onStrokeWidthChanged,
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
+      hideControlBar: hideControlBar ?? false,
     );
   }
 
@@ -331,6 +342,9 @@ class ImagePainter extends StatefulWidget {
 
   //the text delegate
   final TextDelegate? textDelegate;
+
+  ///It will hide the Control Bar
+  final bool hideControlBar;
 
   @override
   ImagePainterState createState() => ImagePainterState();
@@ -479,7 +493,7 @@ class ImagePainterState extends State<ImagePainter> {
       width: widget.width ?? double.maxFinite,
       child: Column(
         children: [
-          if (widget.controlsAtTop) _buildControls(),
+          if (widget.controlsAtTop && !widget.hideControlBar) _buildControls(),
           Expanded(
             child: FittedBox(
               alignment: FractionalOffset.center,
@@ -510,7 +524,7 @@ class ImagePainterState extends State<ImagePainter> {
               ),
             ),
           ),
-          if (!widget.controlsAtTop) _buildControls(),
+          if (!widget.controlsAtTop && !widget.hideControlBar) _buildControls(),
           SizedBox(height: MediaQuery.of(context).padding.bottom)
         ],
       ),
@@ -550,27 +564,28 @@ class ImagePainterState extends State<ImagePainter> {
             ),
           ),
         ),
-        Positioned(
-          top: 0,
-          right: 0,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
-                tooltip: textDelegate.undo,
-                icon: widget.undoIcon ??
-                    Icon(Icons.reply, color: Colors.grey[700]),
-                onPressed: () => _controller.undo(),
-              ),
-              IconButton(
-                tooltip: textDelegate.clearAllProgress,
-                icon: widget.clearAllIcon ??
-                    Icon(Icons.clear, color: Colors.grey[700]),
-                onPressed: () => _controller.clear(),
-              ),
-            ],
+        if (!widget.hideControlBar)
+          Positioned(
+            top: 0,
+            right: 0,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  tooltip: textDelegate.undo,
+                  icon: widget.undoIcon ??
+                      Icon(Icons.reply, color: Colors.grey[700]),
+                  onPressed: () => _controller.undo(),
+                ),
+                IconButton(
+                  tooltip: textDelegate.clearAllProgress,
+                  icon: widget.clearAllIcon ??
+                      Icon(Icons.clear, color: Colors.grey[700]),
+                  onPressed: () => _controller.clear(),
+                ),
+              ],
+            ),
           ),
-        ),
       ],
     );
   }
