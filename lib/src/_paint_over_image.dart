@@ -46,7 +46,7 @@ class ImagePainter extends StatefulWidget {
     this.onPaintModeChanged,
     this.textDelegate,
     this.showControls = true,
-    required this.onDrawCallback,
+    this.onDrawCallback,
   }) : super(key: key);
 
   ///Constructor for loading image from network url.
