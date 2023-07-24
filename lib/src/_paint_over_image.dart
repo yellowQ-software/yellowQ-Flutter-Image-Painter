@@ -380,7 +380,7 @@ class ImagePainterState extends State<ImagePainter> {
   void initState() {
     super.initState();
     _isLoaded = ValueNotifier<bool>(false);
-    _controller = Controller();
+    _controller = Controller(onDrawCallback: widget.onDrawCallback);
     if (widget.isSignature) {
       _controller.update(
         mode: PaintMode.freeStyle,
