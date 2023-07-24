@@ -564,7 +564,7 @@ class ImagePainterState extends State<ImagePainter> {
             ),
           ),
         ),
-        if (!widget.showControls)
+        if (widget.showControls)
           Positioned(
             top: 0,
             right: 0,
