@@ -69,7 +69,7 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<double>? onStrokeWidthChanged,
     TextDelegate? textDelegate,
     bool? controlsAtTop,
-    bool? hideControlBar,
+    bool? showControls,
   }) {
     return ImagePainter._(
       key: key,
@@ -91,7 +91,7 @@ class ImagePainter extends StatefulWidget {
       onStrokeWidthChanged: onStrokeWidthChanged,
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
-      showControls: hideControlBar ?? false,
+      showControls: showControls ?? true,
     );
   }
 
@@ -116,7 +116,7 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<double>? onStrokeWidthChanged,
     TextDelegate? textDelegate,
     bool? controlsAtTop,
-    bool? hideControlBar,
+    bool? showControls,
   }) {
     return ImagePainter._(
       key: key,
@@ -138,7 +138,7 @@ class ImagePainter extends StatefulWidget {
       onStrokeWidthChanged: onStrokeWidthChanged,
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
-      showControls: hideControlBar ?? false,
+      showControls: showControls ?? true,
     );
   }
 
@@ -163,7 +163,7 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<double>? onStrokeWidthChanged,
     TextDelegate? textDelegate,
     bool? controlsAtTop,
-    bool? hideControlBar,
+    bool? showControls,
   }) {
     return ImagePainter._(
       key: key,
@@ -185,7 +185,7 @@ class ImagePainter extends StatefulWidget {
       onStrokeWidthChanged: onStrokeWidthChanged,
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
-      showControls: hideControlBar ?? false,
+      showControls: showControls ?? true,
     );
   }
 
@@ -210,7 +210,7 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<double>? onStrokeWidthChanged,
     TextDelegate? textDelegate,
     bool? controlsAtTop,
-    bool? hideControlBar,
+    bool? showControls,
   }) {
     return ImagePainter._(
       key: key,
@@ -232,7 +232,7 @@ class ImagePainter extends StatefulWidget {
       onStrokeWidthChanged: onStrokeWidthChanged,
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
-      showControls: hideControlBar ?? false,
+      showControls: showControls ?? true,
     );
   }
 
@@ -252,7 +252,7 @@ class ImagePainter extends StatefulWidget {
     ValueChanged<double>? onStrokeWidthChanged,
     TextDelegate? textDelegate,
     bool? controlsAtTop,
-    bool? hideControlBar,
+    bool? showControls,
   }) {
     return ImagePainter._(
       key: key,
@@ -271,7 +271,7 @@ class ImagePainter extends StatefulWidget {
       onStrokeWidthChanged: onStrokeWidthChanged,
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
-      showControls: hideControlBar ?? false,
+      showControls: showControls ?? true,
     );
   }
 
