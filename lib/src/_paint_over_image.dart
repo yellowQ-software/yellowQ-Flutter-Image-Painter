@@ -46,6 +46,7 @@ class ImagePainter extends StatefulWidget {
     this.onPaintModeChanged,
     this.textDelegate,
     this.showControls = true,
+    required this.onDrawCallback,
   }) : super(key: key);
 
   ///Constructor for loading image from network url.
@@ -70,6 +71,7 @@ class ImagePainter extends StatefulWidget {
     TextDelegate? textDelegate,
     bool? controlsAtTop,
     bool? showControls,
+    VoidCallback? onDrawCallback,
   }) {
     return ImagePainter._(
       key: key,
@@ -92,6 +94,7 @@ class ImagePainter extends StatefulWidget {
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
+      onDrawCallback: onDrawCallback,
     );
   }
 
@@ -117,6 +120,7 @@ class ImagePainter extends StatefulWidget {
     TextDelegate? textDelegate,
     bool? controlsAtTop,
     bool? showControls,
+    VoidCallback? onDrawCallback,
   }) {
     return ImagePainter._(
       key: key,
@@ -139,6 +143,7 @@ class ImagePainter extends StatefulWidget {
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
+      onDrawCallback: onDrawCallback,
     );
   }
 
@@ -164,6 +169,7 @@ class ImagePainter extends StatefulWidget {
     TextDelegate? textDelegate,
     bool? controlsAtTop,
     bool? showControls,
+    VoidCallback? onDrawCallback,
   }) {
     return ImagePainter._(
       key: key,
@@ -186,6 +192,7 @@ class ImagePainter extends StatefulWidget {
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
+      onDrawCallback: onDrawCallback,
     );
   }
 
@@ -211,6 +218,7 @@ class ImagePainter extends StatefulWidget {
     TextDelegate? textDelegate,
     bool? controlsAtTop,
     bool? showControls,
+    VoidCallback? onDrawCallback,
   }) {
     return ImagePainter._(
       key: key,
@@ -233,6 +241,7 @@ class ImagePainter extends StatefulWidget {
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
+      onDrawCallback: onDrawCallback,
     );
   }
 
@@ -253,6 +262,7 @@ class ImagePainter extends StatefulWidget {
     TextDelegate? textDelegate,
     bool? controlsAtTop,
     bool? showControls,
+    VoidCallback? onDrawCallback,
   }) {
     return ImagePainter._(
       key: key,
@@ -272,6 +282,7 @@ class ImagePainter extends StatefulWidget {
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
+      onDrawCallback: onDrawCallback,
     );
   }
 
@@ -345,6 +356,10 @@ class ImagePainter extends StatefulWidget {
 
   ///It will control displaying the Control Bar
   final bool showControls;
+
+  ///It will be called each time a drawing is made,
+  ///undo or when all drawings are cleared
+  final VoidCallback? onDrawCallback;
 
   @override
   ImagePainterState createState() => ImagePainterState();

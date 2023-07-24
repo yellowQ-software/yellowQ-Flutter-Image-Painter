@@ -26,7 +26,6 @@ class DrawImage extends CustomPainter {
     this.backgroundColor,
   }) : super(repaint: controller) {
     _controller = controller;
-    _controller.addListener(() {print('>>> here');});
   }
 
   @override
