@@ -493,7 +493,7 @@ class ImagePainterState extends State<ImagePainter> {
       width: widget.width ?? double.maxFinite,
       child: Column(
         children: [
-          if (widget.controlsAtTop && !widget.showControls) _buildControls(),
+          if (widget.controlsAtTop && widget.showControls) _buildControls(),
           Expanded(
             child: FittedBox(
               alignment: FractionalOffset.center,
@@ -524,7 +524,7 @@ class ImagePainterState extends State<ImagePainter> {
               ),
             ),
           ),
-          if (!widget.controlsAtTop && !widget.showControls) _buildControls(),
+          if (!widget.controlsAtTop && widget.showControls) _buildControls(),
           SizedBox(height: MediaQuery.of(context).padding.bottom)
         ],
       ),
