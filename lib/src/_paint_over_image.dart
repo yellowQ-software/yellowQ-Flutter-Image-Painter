@@ -45,7 +45,7 @@ class ImagePainter extends StatefulWidget {
     this.onStrokeWidthChanged,
     this.onPaintModeChanged,
     this.textDelegate,
-    this.hideControlBar = false,
+    this.showControls = false,
   }) : super(key: key);
 
   ///Constructor for loading image from network url.
@@ -91,7 +91,7 @@ class ImagePainter extends StatefulWidget {
       onStrokeWidthChanged: onStrokeWidthChanged,
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
-      hideControlBar: hideControlBar ?? false,
+      showControls: hideControlBar ?? false,
     );
   }
 
@@ -138,7 +138,7 @@ class ImagePainter extends StatefulWidget {
       onStrokeWidthChanged: onStrokeWidthChanged,
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
-      hideControlBar: hideControlBar ?? false,
+      showControls: hideControlBar ?? false,
     );
   }
 
@@ -185,7 +185,7 @@ class ImagePainter extends StatefulWidget {
       onStrokeWidthChanged: onStrokeWidthChanged,
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
-      hideControlBar: hideControlBar ?? false,
+      showControls: hideControlBar ?? false,
     );
   }
 
@@ -232,7 +232,7 @@ class ImagePainter extends StatefulWidget {
       onStrokeWidthChanged: onStrokeWidthChanged,
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
-      hideControlBar: hideControlBar ?? false,
+      showControls: hideControlBar ?? false,
     );
   }
 
@@ -271,7 +271,7 @@ class ImagePainter extends StatefulWidget {
       onStrokeWidthChanged: onStrokeWidthChanged,
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
-      hideControlBar: hideControlBar ?? false,
+      showControls: hideControlBar ?? false,
     );
   }
 
@@ -343,8 +343,8 @@ class ImagePainter extends StatefulWidget {
   //the text delegate
   final TextDelegate? textDelegate;
 
-  ///It will hide the Control Bar
-  final bool hideControlBar;
+  ///It will control displaying the Control Bar
+  final bool showControls;
 
   @override
   ImagePainterState createState() => ImagePainterState();
@@ -493,7 +493,7 @@ class ImagePainterState extends State<ImagePainter> {
       width: widget.width ?? double.maxFinite,
       child: Column(
         children: [
-          if (widget.controlsAtTop && !widget.hideControlBar) _buildControls(),
+          if (widget.controlsAtTop && !widget.showControls) _buildControls(),
           Expanded(
             child: FittedBox(
               alignment: FractionalOffset.center,
@@ -524,7 +524,7 @@ class ImagePainterState extends State<ImagePainter> {
               ),
             ),
           ),
-          if (!widget.controlsAtTop && !widget.hideControlBar) _buildControls(),
+          if (!widget.controlsAtTop && !widget.showControls) _buildControls(),
           SizedBox(height: MediaQuery.of(context).padding.bottom)
         ],
       ),
@@ -564,7 +564,7 @@ class ImagePainterState extends State<ImagePainter> {
             ),
           ),
         ),
-        if (!widget.hideControlBar)
+        if (!widget.showControls)
           Positioned(
             top: 0,
             right: 0,
