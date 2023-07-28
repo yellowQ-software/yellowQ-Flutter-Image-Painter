@@ -50,7 +50,7 @@ class DrawImage extends CustomPainter {
       );
     }
 
-    ///paints all the previoud paintInfo history recorded on [PaintHistory]
+    ///paints all the previous paintInfo history recorded on [PaintHistory]
     for (final item in _controller.paintHistory) {
       final _offset = item.offsets;
       final _painter = item.paint;
@@ -248,7 +248,7 @@ class PaintInfo {
   //Used to save color
   final Color color;
 
-  //Used to store strokesize of the mode.
+  //Used to store stroke size of the mode.
   final double strokeWidth;
 
   ///Used to save offsets.
