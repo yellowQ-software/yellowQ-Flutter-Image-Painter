@@ -8,6 +8,7 @@ class Controller extends ChangeNotifier {
   late PaintMode _mode;
   late String _text;
   late bool _fill;
+  final VoidCallback? onDrawCallback;
 
   final List<Offset?> _offsets = [];
 
@@ -50,6 +51,7 @@ class Controller extends ChangeNotifier {
           .isNotEmpty;
 
   Controller({
+    this.onDrawCallback,
     double strokeWidth = 4.0,
     Color color = Colors.red,
     PaintMode mode = PaintMode.freeStyle,
@@ -65,12 +67,14 @@ class Controller extends ChangeNotifier {
 
   void addPaintInfo(PaintInfo paintInfo) {
     _paintHistory.add(paintInfo);
+    onDrawCallback?.call();
     notifyListeners();
   }
 
   void undo() {
     if (_paintHistory.isNotEmpty) {
       _paintHistory.removeLast();
+      onDrawCallback?.call();
       notifyListeners();
     }
   }
@@ -78,6 +82,7 @@ class Controller extends ChangeNotifier {
   void clear() {
     if (_paintHistory.isNotEmpty) {
       _paintHistory.clear();
+      onDrawCallback?.call();
       notifyListeners();
     }
   }
