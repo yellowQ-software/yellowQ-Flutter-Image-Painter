@@ -46,6 +46,7 @@ class ImagePainter extends StatefulWidget {
     this.onPaintModeChanged,
     this.textDelegate,
     this.showControls = true,
+    this.controlsBackgroundColor,
   }) : super(key: key);
 
   ///Constructor for loading image from network url.
@@ -70,6 +71,7 @@ class ImagePainter extends StatefulWidget {
     TextDelegate? textDelegate,
     bool? controlsAtTop,
     bool? showControls,
+    Color? controlsBackgroundColor,
   }) {
     return ImagePainter._(
       key: key,
@@ -92,6 +94,7 @@ class ImagePainter extends StatefulWidget {
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
+      controlsBackgroundColor: controlsBackgroundColor,
     );
   }
 
@@ -117,6 +120,7 @@ class ImagePainter extends StatefulWidget {
     TextDelegate? textDelegate,
     bool? controlsAtTop,
     bool? showControls,
+    Color? controlsBackgroundColor,
   }) {
     return ImagePainter._(
       key: key,
@@ -139,6 +143,7 @@ class ImagePainter extends StatefulWidget {
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
+      controlsBackgroundColor: controlsBackgroundColor,
     );
   }
 
@@ -164,6 +169,7 @@ class ImagePainter extends StatefulWidget {
     TextDelegate? textDelegate,
     bool? controlsAtTop,
     bool? showControls,
+    Color? controlsBackgroundColor,
   }) {
     return ImagePainter._(
       key: key,
@@ -186,6 +192,7 @@ class ImagePainter extends StatefulWidget {
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
+      controlsBackgroundColor: controlsBackgroundColor,
     );
   }
 
@@ -211,6 +218,7 @@ class ImagePainter extends StatefulWidget {
     TextDelegate? textDelegate,
     bool? controlsAtTop,
     bool? showControls,
+    Color? controlsBackgroundColor,
   }) {
     return ImagePainter._(
       key: key,
@@ -233,6 +241,7 @@ class ImagePainter extends StatefulWidget {
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
+      controlsBackgroundColor: controlsBackgroundColor,
     );
   }
 
@@ -253,6 +262,7 @@ class ImagePainter extends StatefulWidget {
     TextDelegate? textDelegate,
     bool? controlsAtTop,
     bool? showControls,
+    Color? controlsBackgroundColor,
   }) {
     return ImagePainter._(
       key: key,
@@ -272,6 +282,7 @@ class ImagePainter extends StatefulWidget {
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
+      controlsBackgroundColor: controlsBackgroundColor,
     );
   }
 
@@ -345,6 +356,8 @@ class ImagePainter extends StatefulWidget {
 
   ///It will control displaying the Control Bar
   final bool showControls;
+
+  final Color? controlsBackgroundColor;
 
   @override
   ImagePainterState createState() => ImagePainterState();
@@ -800,7 +813,7 @@ class ImagePainterState extends State<ImagePainter> {
   Widget _buildControls() {
     return Container(
       padding: const EdgeInsets.all(4),
-      color: Colors.grey[200],
+      color: widget.controlsBackgroundColor ?? Colors.grey[200],
       child: Row(
         children: [
           AnimatedBuilder(
