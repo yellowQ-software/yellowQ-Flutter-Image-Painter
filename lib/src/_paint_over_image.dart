@@ -47,6 +47,9 @@ class ImagePainter extends StatefulWidget {
     this.textDelegate,
     this.showControls = true,
     this.controlsBackgroundColor,
+    this.optionSelectedColor,
+    this.optionUnselectedColor,
+    this.optionColor,
   }) : super(key: key);
 
   ///Constructor for loading image from network url.
@@ -72,6 +75,9 @@ class ImagePainter extends StatefulWidget {
     bool? controlsAtTop,
     bool? showControls,
     Color? controlsBackgroundColor,
+    Color? selectedColor,
+    Color? unselectedColor,
+    Color? optionColor,
   }) {
     return ImagePainter._(
       key: key,
@@ -95,6 +101,9 @@ class ImagePainter extends StatefulWidget {
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
       controlsBackgroundColor: controlsBackgroundColor,
+      optionSelectedColor: selectedColor,
+      optionUnselectedColor: unselectedColor,
+      optionColor: optionColor,
     );
   }
 
@@ -121,6 +130,9 @@ class ImagePainter extends StatefulWidget {
     bool? controlsAtTop,
     bool? showControls,
     Color? controlsBackgroundColor,
+    Color? selectedColor,
+    Color? unselectedColor,
+    Color? optionColor,
   }) {
     return ImagePainter._(
       key: key,
@@ -144,6 +156,9 @@ class ImagePainter extends StatefulWidget {
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
       controlsBackgroundColor: controlsBackgroundColor,
+      optionSelectedColor: selectedColor,
+      optionUnselectedColor: unselectedColor,
+      optionColor: optionColor,
     );
   }
 
@@ -170,6 +185,9 @@ class ImagePainter extends StatefulWidget {
     bool? controlsAtTop,
     bool? showControls,
     Color? controlsBackgroundColor,
+    Color? selectedColor,
+    Color? unselectedColor,
+    Color? optionColor,
   }) {
     return ImagePainter._(
       key: key,
@@ -193,6 +211,9 @@ class ImagePainter extends StatefulWidget {
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
       controlsBackgroundColor: controlsBackgroundColor,
+      optionSelectedColor: selectedColor,
+      optionUnselectedColor: unselectedColor,
+      optionColor: optionColor,
     );
   }
 
@@ -219,6 +240,9 @@ class ImagePainter extends StatefulWidget {
     bool? controlsAtTop,
     bool? showControls,
     Color? controlsBackgroundColor,
+    Color? selectedColor,
+    Color? unselectedColor,
+    Color? optionColor,
   }) {
     return ImagePainter._(
       key: key,
@@ -242,6 +266,9 @@ class ImagePainter extends StatefulWidget {
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
       controlsBackgroundColor: controlsBackgroundColor,
+      optionSelectedColor: selectedColor,
+      optionUnselectedColor: unselectedColor,
+      optionColor: optionColor,
     );
   }
 
@@ -263,6 +290,9 @@ class ImagePainter extends StatefulWidget {
     bool? controlsAtTop,
     bool? showControls,
     Color? controlsBackgroundColor,
+    Color? selectedColor,
+    Color? unselectedColor,
+    Color? optionColor,
   }) {
     return ImagePainter._(
       key: key,
@@ -283,6 +313,9 @@ class ImagePainter extends StatefulWidget {
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
       controlsBackgroundColor: controlsBackgroundColor,
+      optionSelectedColor: selectedColor,
+      optionUnselectedColor: unselectedColor,
+      optionColor: optionColor,
     );
   }
 
@@ -358,6 +391,12 @@ class ImagePainter extends StatefulWidget {
   final bool showControls;
 
   final Color? controlsBackgroundColor;
+
+  final Color? optionSelectedColor;
+
+  final Color? optionUnselectedColor;
+
+  final Color? optionColor;
 
   @override
   ImagePainterState createState() => ImagePainterState();
@@ -690,6 +729,8 @@ class ImagePainterState extends State<ImagePainter> {
                   (item) => SelectionItems(
                     data: item,
                     isSelected: _controller.mode == item.mode,
+                    selectedColor: widget.optionSelectedColor,
+                    unselectedColor: widget.optionUnselectedColor,
                     onTap: () {
                       if (widget.onPaintModeChanged != null) {
                         widget.onPaintModeChanged!(item.mode);
@@ -827,7 +868,7 @@ class ImagePainterState extends State<ImagePainter> {
                 shape: ContinuousRectangleBorder(
                   borderRadius: BorderRadius.circular(40),
                 ),
-                icon: Icon(icon, color: Colors.grey[700]),
+                icon: Icon(icon, color: widget.optionColor ?? Colors.grey[700]),
                 itemBuilder: (_) => [_showOptionsRow()],
               );
             },
