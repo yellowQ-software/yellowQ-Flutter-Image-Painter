@@ -50,6 +50,8 @@ class ImagePainter extends StatefulWidget {
     this.optionSelectedColor,
     this.optionUnselectedColor,
     this.optionColor,
+    this.onUndo,
+    this.onClear,
   }) : super(key: key);
 
   ///Constructor for loading image from network url.
@@ -78,6 +80,8 @@ class ImagePainter extends StatefulWidget {
     Color? selectedColor,
     Color? unselectedColor,
     Color? optionColor,
+        VoidCallback? onUndo,
+    VoidCallback? onClear,
   }) {
     return ImagePainter._(
       key: key,
@@ -104,6 +108,8 @@ class ImagePainter extends StatefulWidget {
       optionSelectedColor: selectedColor,
       optionUnselectedColor: unselectedColor,
       optionColor: optionColor,
+      onUndo: onUndo,
+      onClear: onClear,
     );
   }
 
@@ -133,6 +139,8 @@ class ImagePainter extends StatefulWidget {
     Color? selectedColor,
     Color? unselectedColor,
     Color? optionColor,
+        VoidCallback? onUndo,
+        VoidCallback? onClear,
   }) {
     return ImagePainter._(
       key: key,
@@ -159,6 +167,8 @@ class ImagePainter extends StatefulWidget {
       optionSelectedColor: selectedColor,
       optionUnselectedColor: unselectedColor,
       optionColor: optionColor,
+      onUndo: onUndo,
+      onClear: onClear,
     );
   }
 
@@ -188,6 +198,8 @@ class ImagePainter extends StatefulWidget {
     Color? selectedColor,
     Color? unselectedColor,
     Color? optionColor,
+        VoidCallback? onUndo,
+        VoidCallback? onClear,
   }) {
     return ImagePainter._(
       key: key,
@@ -214,6 +226,8 @@ class ImagePainter extends StatefulWidget {
       optionSelectedColor: selectedColor,
       optionUnselectedColor: unselectedColor,
       optionColor: optionColor,
+      onUndo: onUndo,
+      onClear: onClear,
     );
   }
 
@@ -243,6 +257,8 @@ class ImagePainter extends StatefulWidget {
     Color? selectedColor,
     Color? unselectedColor,
     Color? optionColor,
+        VoidCallback? onUndo,
+        VoidCallback? onClear,
   }) {
     return ImagePainter._(
       key: key,
@@ -269,6 +285,8 @@ class ImagePainter extends StatefulWidget {
       optionSelectedColor: selectedColor,
       optionUnselectedColor: unselectedColor,
       optionColor: optionColor,
+      onUndo: onUndo,
+      onClear: onClear,
     );
   }
 
@@ -293,6 +311,9 @@ class ImagePainter extends StatefulWidget {
     Color? selectedColor,
     Color? unselectedColor,
     Color? optionColor,
+    VoidCallback? onUndo,
+    VoidCallback? onClear,
+
   }) {
     return ImagePainter._(
       key: key,
@@ -316,6 +337,8 @@ class ImagePainter extends StatefulWidget {
       optionSelectedColor: selectedColor,
       optionUnselectedColor: unselectedColor,
       optionColor: optionColor,
+      onUndo: onUndo,
+      onClear: onClear,
     );
   }
 
@@ -397,6 +420,10 @@ class ImagePainter extends StatefulWidget {
   final Color? optionUnselectedColor;
 
   final Color? optionColor;
+
+  final VoidCallback? onUndo;
+
+  final VoidCallback? onClear;
 
   @override
   ImagePainterState createState() => ImagePainterState();
@@ -931,13 +958,19 @@ class ImagePainterState extends State<ImagePainter> {
           IconButton(
             tooltip: textDelegate.undo,
             icon: widget.undoIcon ?? Icon(Icons.reply, color: Colors.grey[700]),
-            onPressed: () => _controller.undo(),
+            onPressed: () {
+              widget.onUndo?.call();
+              _controller.undo();
+            },
           ),
           IconButton(
             tooltip: textDelegate.clearAllProgress,
             icon: widget.clearAllIcon ??
                 Icon(Icons.clear, color: Colors.grey[700]),
-            onPressed: () => _controller.clear(),
+            onPressed: () {
+              widget.onClear?.call();
+              _controller.clear();
+            },
           ),
         ],
       ),
