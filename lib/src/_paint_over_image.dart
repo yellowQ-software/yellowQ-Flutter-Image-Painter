@@ -80,7 +80,7 @@ class ImagePainter extends StatefulWidget {
     Color? selectedColor,
     Color? unselectedColor,
     Color? optionColor,
-        VoidCallback? onUndo,
+    VoidCallback? onUndo,
     VoidCallback? onClear,
   }) {
     return ImagePainter._(
@@ -139,8 +139,8 @@ class ImagePainter extends StatefulWidget {
     Color? selectedColor,
     Color? unselectedColor,
     Color? optionColor,
-        VoidCallback? onUndo,
-        VoidCallback? onClear,
+    VoidCallback? onUndo,
+    VoidCallback? onClear,
   }) {
     return ImagePainter._(
       key: key,
@@ -198,8 +198,8 @@ class ImagePainter extends StatefulWidget {
     Color? selectedColor,
     Color? unselectedColor,
     Color? optionColor,
-        VoidCallback? onUndo,
-        VoidCallback? onClear,
+    VoidCallback? onUndo,
+    VoidCallback? onClear,
   }) {
     return ImagePainter._(
       key: key,
@@ -257,8 +257,8 @@ class ImagePainter extends StatefulWidget {
     Color? selectedColor,
     Color? unselectedColor,
     Color? optionColor,
-        VoidCallback? onUndo,
-        VoidCallback? onClear,
+    VoidCallback? onUndo,
+    VoidCallback? onClear,
   }) {
     return ImagePainter._(
       key: key,
@@ -313,7 +313,6 @@ class ImagePainter extends StatefulWidget {
     Color? optionColor,
     VoidCallback? onUndo,
     VoidCallback? onClear,
-
   }) {
     return ImagePainter._(
       key: key,
