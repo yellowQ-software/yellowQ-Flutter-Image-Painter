@@ -46,6 +46,7 @@ class ImagePainter extends StatefulWidget {
     this.onPaintModeChanged,
     this.textDelegate,
     this.showControls = true,
+    this.bottomPadding,
   }) : super(key: key);
 
   ///Constructor for loading image from network url.
@@ -70,6 +71,7 @@ class ImagePainter extends StatefulWidget {
     TextDelegate? textDelegate,
     bool? controlsAtTop,
     bool? showControls,
+    double? bottomPadding,
   }) {
     return ImagePainter._(
       key: key,
@@ -92,6 +94,7 @@ class ImagePainter extends StatefulWidget {
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
+      bottomPadding: bottomPadding,
     );
   }
 
@@ -117,6 +120,7 @@ class ImagePainter extends StatefulWidget {
     TextDelegate? textDelegate,
     bool? controlsAtTop,
     bool? showControls,
+    double? bottomPadding,
   }) {
     return ImagePainter._(
       key: key,
@@ -139,6 +143,7 @@ class ImagePainter extends StatefulWidget {
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
+      bottomPadding: bottomPadding,
     );
   }
 
@@ -164,6 +169,7 @@ class ImagePainter extends StatefulWidget {
     TextDelegate? textDelegate,
     bool? controlsAtTop,
     bool? showControls,
+    double? bottomPadding,
   }) {
     return ImagePainter._(
       key: key,
@@ -186,6 +192,7 @@ class ImagePainter extends StatefulWidget {
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
+      bottomPadding: bottomPadding,
     );
   }
 
@@ -211,6 +218,7 @@ class ImagePainter extends StatefulWidget {
     TextDelegate? textDelegate,
     bool? controlsAtTop,
     bool? showControls,
+    double? bottomPadding,
   }) {
     return ImagePainter._(
       key: key,
@@ -233,6 +241,7 @@ class ImagePainter extends StatefulWidget {
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
+      bottomPadding: bottomPadding,
     );
   }
 
@@ -253,6 +262,7 @@ class ImagePainter extends StatefulWidget {
     TextDelegate? textDelegate,
     bool? controlsAtTop,
     bool? showControls,
+    double? bottomPadding,
   }) {
     return ImagePainter._(
       key: key,
@@ -272,6 +282,7 @@ class ImagePainter extends StatefulWidget {
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
+      bottomPadding: bottomPadding,
     );
   }
 
@@ -346,6 +357,9 @@ class ImagePainter extends StatefulWidget {
   ///It will control displaying the Control Bar
   final bool showControls;
 
+  ///sets the bottom padding if set, else MediaQuery.padding.bottom is used
+  final double? bottomPadding;
+
   @override
   ImagePainterState createState() => ImagePainterState();
 }
@@ -361,6 +375,7 @@ class ImagePainterState extends State<ImagePainter> {
 
   int _strokeMultiplier = 1;
   late TextDelegate textDelegate;
+
   @override
   void initState() {
     super.initState();
@@ -525,7 +540,10 @@ class ImagePainterState extends State<ImagePainter> {
             ),
           ),
           if (!widget.controlsAtTop && widget.showControls) _buildControls(),
-          SizedBox(height: MediaQuery.of(context).padding.bottom)
+          SizedBox(
+            height:
+                widget.bottomPadding ?? MediaQuery.of(context).padding.bottom,
+          )
         ],
       ),
     );
