@@ -1,3 +1,8 @@
+# 0.6.1
+
+- Added parameters for hardcoded values thanks to [eduardokuhn](https://github.com/eduardokuhn).
+- Added the ability to hide controls thanks to [ousvat](https://github.com/ousvat).
+
 # 0.6.0
 
 - Added fill support.
