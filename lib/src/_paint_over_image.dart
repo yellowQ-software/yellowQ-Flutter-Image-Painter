@@ -47,8 +47,13 @@ class ImagePainter extends StatefulWidget {
     this.textDelegate,
     this.showControls = true,
     this.bottomPadding,
-    this.controlsBackgroundColor,
     this.iconColor,
+    this.controlsBackgroundColor,
+    this.optionSelectedColor,
+    this.optionUnselectedColor,
+    this.optionColor,
+    this.onUndo,
+    this.onClear,
   }) : super(key: key);
 
   ///Constructor for loading image from network url.
@@ -74,8 +79,13 @@ class ImagePainter extends StatefulWidget {
     bool? controlsAtTop,
     bool? showControls,
     double? bottomPadding,
-    Color? controlsBackgroundColor,
     Color? iconColor,
+    Color? controlsBackgroundColor,
+    Color? selectedColor,
+    Color? unselectedColor,
+    Color? optionColor,
+    VoidCallback? onUndo,
+    VoidCallback? onClear,
   }) {
     return ImagePainter._(
       key: key,
@@ -99,8 +109,13 @@ class ImagePainter extends StatefulWidget {
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
       bottomPadding: bottomPadding,
-      controlsBackgroundColor: controlsBackgroundColor,
       iconColor: iconColor,
+      controlsBackgroundColor: controlsBackgroundColor,
+      optionSelectedColor: selectedColor,
+      optionUnselectedColor: unselectedColor,
+      optionColor: optionColor,
+      onUndo: onUndo,
+      onClear: onClear,
     );
   }
 
@@ -127,8 +142,13 @@ class ImagePainter extends StatefulWidget {
     bool? controlsAtTop,
     bool? showControls,
     double? bottomPadding,
-    Color? controlsBackgroundColor,
     Color? iconColor,
+    Color? controlsBackgroundColor,
+    Color? selectedColor,
+    Color? unselectedColor,
+    Color? optionColor,
+    VoidCallback? onUndo,
+    VoidCallback? onClear,
   }) {
     return ImagePainter._(
       key: key,
@@ -152,8 +172,13 @@ class ImagePainter extends StatefulWidget {
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
       bottomPadding: bottomPadding,
-      controlsBackgroundColor: controlsBackgroundColor,
       iconColor: iconColor,
+      controlsBackgroundColor: controlsBackgroundColor,
+      optionSelectedColor: selectedColor,
+      optionUnselectedColor: unselectedColor,
+      optionColor: optionColor,
+      onUndo: onUndo,
+      onClear: onClear,
     );
   }
 
@@ -180,8 +205,13 @@ class ImagePainter extends StatefulWidget {
     bool? controlsAtTop,
     bool? showControls,
     double? bottomPadding,
-    Color? controlsBackgroundColor,
     Color? iconColor,
+    Color? controlsBackgroundColor,
+    Color? selectedColor,
+    Color? unselectedColor,
+    Color? optionColor,
+    VoidCallback? onUndo,
+    VoidCallback? onClear,
   }) {
     return ImagePainter._(
       key: key,
@@ -205,8 +235,13 @@ class ImagePainter extends StatefulWidget {
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
       bottomPadding: bottomPadding,
-      controlsBackgroundColor: controlsBackgroundColor,
       iconColor: iconColor,
+      controlsBackgroundColor: controlsBackgroundColor,
+      optionSelectedColor: selectedColor,
+      optionUnselectedColor: unselectedColor,
+      optionColor: optionColor,
+      onUndo: onUndo,
+      onClear: onClear,
     );
   }
 
@@ -233,8 +268,13 @@ class ImagePainter extends StatefulWidget {
     bool? controlsAtTop,
     bool? showControls,
     double? bottomPadding,
-    Color? controlsBackgroundColor,
     Color? iconColor,
+    Color? controlsBackgroundColor,
+    Color? selectedColor,
+    Color? unselectedColor,
+    Color? optionColor,
+    VoidCallback? onUndo,
+    VoidCallback? onClear,
   }) {
     return ImagePainter._(
       key: key,
@@ -258,8 +298,13 @@ class ImagePainter extends StatefulWidget {
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
       bottomPadding: bottomPadding,
-      controlsBackgroundColor: controlsBackgroundColor,
       iconColor: iconColor,
+      controlsBackgroundColor: controlsBackgroundColor,
+      optionSelectedColor: selectedColor,
+      optionUnselectedColor: unselectedColor,
+      optionColor: optionColor,
+      onUndo: onUndo,
+      onClear: onClear,
     );
   }
 
@@ -281,8 +326,13 @@ class ImagePainter extends StatefulWidget {
     bool? controlsAtTop,
     bool? showControls,
     double? bottomPadding,
-    Color? controlsBackgroundColor,
     Color? iconColor,
+    Color? controlsBackgroundColor,
+    Color? selectedColor,
+    Color? unselectedColor,
+    Color? optionColor,
+    VoidCallback? onUndo,
+    VoidCallback? onClear,
   }) {
     return ImagePainter._(
       key: key,
@@ -303,8 +353,13 @@ class ImagePainter extends StatefulWidget {
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
       bottomPadding: bottomPadding,
-      controlsBackgroundColor: controlsBackgroundColor,
       iconColor: iconColor,
+      controlsBackgroundColor: controlsBackgroundColor,
+      optionSelectedColor: selectedColor,
+      optionUnselectedColor: unselectedColor,
+      optionColor: optionColor,
+      onUndo: onUndo,
+      onClear: onClear,
     );
   }
 
@@ -382,9 +437,19 @@ class ImagePainter extends StatefulWidget {
   ///sets the bottom padding if set, else MediaQuery.padding.bottom is used
   final double? bottomPadding;
 
+  final Color? iconColor;
+  
   final Color? controlsBackgroundColor;
 
-  final Color? iconColor;
+  final Color? optionSelectedColor;
+
+  final Color? optionUnselectedColor;
+
+  final Color? optionColor;
+
+  final VoidCallback? onUndo;
+
+  final VoidCallback? onClear;
 
   @override
   ImagePainterState createState() => ImagePainterState();
@@ -721,6 +786,8 @@ class ImagePainterState extends State<ImagePainter> {
                   (item) => SelectionItems(
                     data: item,
                     isSelected: _controller.mode == item.mode,
+                    selectedColor: widget.optionSelectedColor,
+                    unselectedColor: widget.optionUnselectedColor,
                     onTap: () {
                       if (widget.onPaintModeChanged != null) {
                         widget.onPaintModeChanged!(item.mode);
@@ -844,7 +911,7 @@ class ImagePainterState extends State<ImagePainter> {
   Widget _buildControls() {
     return Container(
       padding: const EdgeInsets.all(4),
-      color: Colors.grey[200],
+      color: widget.controlsBackgroundColor ?? Colors.grey[200],
       child: Row(
         children: [
           AnimatedBuilder(
@@ -858,7 +925,7 @@ class ImagePainterState extends State<ImagePainter> {
                 shape: ContinuousRectangleBorder(
                   borderRadius: BorderRadius.circular(40),
                 ),
-                icon: Icon(icon, color: widget.iconColor ?? Colors.grey[700]),
+                icon: Icon(icon, color: widget.optionColor ?? Colors.grey[700]),
                 itemBuilder: (_) => [_showOptionsRow()],
               );
             },
@@ -922,13 +989,19 @@ class ImagePainterState extends State<ImagePainter> {
             tooltip: textDelegate.undo,
             icon: widget.undoIcon ??
                 Icon(Icons.reply, color: widget.iconColor ?? Colors.grey[700]),
-            onPressed: () => _controller.undo(),
+            onPressed: () {
+              widget.onUndo?.call();
+              _controller.undo();
+            },
           ),
           IconButton(
             tooltip: textDelegate.clearAllProgress,
             icon: widget.clearAllIcon ??
                 Icon(Icons.clear, color: widget.iconColor ?? Colors.grey[700]),
-            onPressed: () => _controller.clear(),
+            onPressed: () {
+              widget.onClear?.call();
+              _controller.clear();
+            },
           ),
         ],
       ),

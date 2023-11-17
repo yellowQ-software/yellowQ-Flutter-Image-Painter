@@ -6,12 +6,16 @@ class SelectionItems extends StatelessWidget {
   final bool isSelected;
   final ModeData data;
   final VoidCallback? onTap;
+  final Color? selectedColor;
+  final Color? unselectedColor;
 
   const SelectionItems({
     required this.data,
     Key? key,
     this.isSelected = false,
     this.onTap,
+    this.selectedColor,
+    this.unselectedColor,
   }) : super(key: key);
 
   @override
@@ -26,7 +30,9 @@ class SelectionItems extends StatelessWidget {
           data: const IconThemeData(opacity: 1.0),
           child: Icon(
             data.icon,
-            color: isSelected ? Colors.white : Colors.black,
+            color: isSelected
+                ? selectedColor ?? Colors.white
+                : unselectedColor ?? Colors.black,
           ),
         ),
         title: Text(
