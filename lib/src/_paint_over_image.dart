@@ -936,7 +936,7 @@ class ImagePainterState extends State<ImagePainter> {
               if (_controller.canFill()) {
                 return Row(
                   children: [
-                    Checkbox.adaptive(
+                    Checkbox(
                       value: _controller.shouldFill,
                       onChanged: (val) {
                         _controller.update(fill: val);
