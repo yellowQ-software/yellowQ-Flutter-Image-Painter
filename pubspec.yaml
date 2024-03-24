@@ -1,11 +1,11 @@
 name: image_painter
 description: A flutter package for drawing over images. Supports color,
   strokeWidth, different paintModes and exporting image.
-version: 0.6.1
+version: 0.7.0
 homepage: https://github.com/yellowQ-software/yellowQ-Flutter-Image-Painter
 
 environment:
-  sdk: ">=2.15.0 <3.0.0"
+  sdk: ">=2.15.0 <4.0.0"
   flutter: ">=1.17.0"
 
 dependencies:

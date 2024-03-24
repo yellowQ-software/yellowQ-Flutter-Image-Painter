@@ -1,3 +1,47 @@
+# 0.7.0
+
+## Breaking Changes
+- `Controller` is exposed out of library. As a result of exposing, it has been renamed to `ImagePainterController` in order to avoid conflict with other `Controller` name objects.
+- `width` and `height` parameters are now required for `ImagePainter.Signature()` constructor.
+- `GlobalKey` is no longer required to extract the image. It can be done through the `ImagePainterController` instance now. 
+```dart
+/// Previously:
+
+final _imageKey = GlobalKey<ImagePainterState>();
+/// Provide key to the painter.
+ImagePainter.network("https://sample_image.png",
+                  key: _imageKey,scalable: true),
+
+/// Export the image:
+Uint8List byteArray = await _imageKey.currentState.exportImage();
+/// Now you use `Uint8List` data and convert it to file.
+File imgFile = new File('directoryPath/fileName.png');
+imgFile.writeAsBytesSync(image);
+
+/// Current:
+
+final imagePainterController = ImagePainterController();
+
+/// Provide controller to the painter.
+ImagePainter.network("https://sample_image.png",
+                  controller: imagePainterController,scalable: true),
+
+///Export the image:
+Uint8List byteArray = await imagePainterController.exportImage();
+//Now you use `Uint8List` data and convert it to file.
+File imgFile = new File('directoryPath/fileName.png');
+imgFile.writeAsBytesSync(image);
+
+```
+- Parameters `initialPaintMode`, `initialStrokeWidth`, `initialColor` has been removed. They can be set while initializing the controller.
+```dart
+final ipController = ImagePainterController(
+    color: Colors.green,
+    strokeWidth: 4,
+    mode: PaintMode.line,
+);
+```
+
 # 0.6.1
 
 - Added parameters for hardcoded values thanks to [eduardokuhn](https://github.com/eduardokuhn).
@@ -28,7 +72,6 @@
 - Added text delegates thanks to [avinath1998](https://github.com/avinath1998). Check example for implementation.
 - Minor fixes.
 
-
 # 0.4.4+1
 
 - Fixed signature field initialization issue.
@@ -47,6 +90,7 @@
 
 - Migrate to null safety.
 - Added `initialPaintMode`.
+
 # 0.3.2
 
 - Bumped up dependencies.
