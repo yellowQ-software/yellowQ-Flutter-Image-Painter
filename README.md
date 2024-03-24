@@ -14,9 +14,9 @@ A flutter implementation of painting over image.
 
 - Seven available paint modes. Line, Box/Rectangle, Circle, Freestyle/Signature, Dotted Line, Arrow and Text.
 - Four constructors for adding image from Network Url, Asset Image, Image from file and from memory.
-- Controls from constructors like strokeWidth and Colors.
 - Export image as memory bytes which can be converted to image. [Implementation provided on example](./example)
 - Ability to undo and clear drawings.
+- Built in control bar. 
 
 [Note]
   Tested and working only on flutter stable channel. Please make sure you are on stable channel of flutter before using the package.
@@ -48,15 +48,24 @@ Basic usage of the libary:
 - `ImagePainter.network`: Painting over image from network url.
 
 ```dart
-final _imageKey = GlobalKey<ImagePainterState>();
-//Provide controller to the painter.
+/// Initialize `ImagePainterController`. 
+final imagePainterController = ImagePainterController();
+
+/// Provide controller to the painter.
 ImagePainter.network("https://sample_image.png",
-                  key: _imageKey,scalable: true),
+                  controller: imagePainterController,scalable: true),
 
 ///Export the image:
-Uint8List byteArray = await _imageKey.currentState.exportImage();
-//Now you use `Uint8List` data and convert it to file.
-File imgFile = new File('directoryPath/fileName.png');
+Uint8List byteArray = await imagePainterController.exportImage();
+
+/// Create a file or create a File instance of existing file. 
+File imgFile =  File('directoryPath/fileName.png');
+
+/// Now you use `Uint8List` data and write it into the file.
 imgFile.writeAsBytesSync(image);
 ```
 **For more thorough implementation guide, check the [example](./example).**
+
+## Issues and Support.
+
+For any issues or support please visit the [Issues](https://github.com/yellowQ-software/yellowQ-Flutter-Image-Painter/issues).

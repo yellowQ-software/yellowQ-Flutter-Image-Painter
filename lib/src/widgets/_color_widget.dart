@@ -28,7 +28,9 @@ class ColorItem extends StatelessWidget {
             ),
           ),
           child: CircleAvatar(
-              radius: isSelected ? 16 : 12, backgroundColor: color),
+            radius: isSelected ? 16 : 12,
+            backgroundColor: color,
+          ),
         ),
       ),
     );

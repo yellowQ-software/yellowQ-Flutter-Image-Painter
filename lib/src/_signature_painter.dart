@@ -3,13 +3,12 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 import '../image_painter.dart';
-import '_controller.dart';
 
 class SignaturePainter extends CustomPainter {
   final Color backgroundColor;
-  late Controller _controller;
+  late ImagePainterController _controller;
   SignaturePainter({
-    required Controller controller,
+    required ImagePainterController controller,
     required this.backgroundColor,
   }) : super(repaint: controller) {
     _controller = controller;

@@ -2,27 +2,19 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart' hide Image;
 
-import '_controller.dart';
+import 'controller.dart';
 
 ///Handles all the painting ongoing on the canvas.
 class DrawImage extends CustomPainter {
-  ///Converted image from [ImagePainter] constructor.
-  final Image? image;
-
-  ///Flag for triggering signature mode.
-  final bool isSignature;
-
   ///The background for signature painting.
   final Color? backgroundColor;
 
   //Controller is a listenable with all of the paint details.
-  late Controller _controller;
+  late ImagePainterController _controller;
 
   ///Constructor for the canvas
   DrawImage({
-    required Controller controller,
-    this.image,
-    this.isSignature = false,
+    required ImagePainterController controller,
     this.backgroundColor,
   }) : super(repaint: controller) {
     _controller = controller;
@@ -30,25 +22,16 @@ class DrawImage extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (isSignature) {
-      ///Paints background for signature.
-      canvas.drawRect(
-          Rect.fromPoints(const Offset(0, 0), Offset(size.width, size.height)),
-          Paint()
-            ..style = PaintingStyle.fill
-            ..color = backgroundColor!);
-    } else {
-      ///paints [ui.Image] on the canvas for reference to draw over it.
-      paintImage(
-        canvas: canvas,
-        image: image!,
-        filterQuality: FilterQuality.high,
-        rect: Rect.fromPoints(
-          const Offset(0, 0),
-          Offset(size.width, size.height),
-        ),
-      );
-    }
+    ///paints [ui.Image] on the canvas for reference to draw over it.
+    paintImage(
+      canvas: canvas,
+      image: _controller.image!,
+      filterQuality: FilterQuality.high,
+      rect: Rect.fromPoints(
+        const Offset(0, 0),
+        Offset(size.width, size.height),
+      ),
+    );
 
     ///paints all the previoud paintInfo history recorded on [PaintHistory]
     for (final item in _controller.paintHistory) {
