@@ -14,9 +14,10 @@ class MobileExample extends StatefulWidget {
 
 class _MobileExampleState extends State<MobileExample> {
   final ImagePainterController _controller = ImagePainterController(
-    color: Colors.green,
+    color: Colors.black,
     strokeWidth: 4,
-    mode: PaintMode.line,
+    mode: PaintMode.rect,
+    fill: true,
   );
 
   @override
@@ -36,6 +37,14 @@ class _MobileExampleState extends State<MobileExample> {
         controller: _controller,
         scalable: true,
         textDelegate: TextDelegate(),
+        imagePainterHideManager: ImagePainterControlsHider(
+          hideShapeControl: true,
+          hideColorControl: true,
+          hideFillControl: false,
+          hideBrushControl: true,
+          hideClearControl: true,
+          hideUndoControl: true,
+        ),
       ),
     );
   }
