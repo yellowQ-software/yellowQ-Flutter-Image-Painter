@@ -19,37 +19,38 @@ export '_image_painter.dart';
 ///[ImagePainter] widget.
 @immutable
 class ImagePainter extends StatefulWidget {
-  const ImagePainter._({
-    Key? key,
-    required this.controller,
-    this.assetPath,
-    this.networkUrl,
-    this.byteArray,
-    this.file,
-    this.height,
-    this.width,
-    this.placeHolder,
-    this.isScalable,
-    this.brushIcon,
-    this.clearAllIcon,
-    this.colorIcon,
-    this.undoIcon,
-    this.isSignature = false,
-    this.controlsAtTop = true,
-    this.signatureBackgroundColor = Colors.white,
-    this.colors,
-    this.onColorChanged,
-    this.onStrokeWidthChanged,
-    this.onPaintModeChanged,
-    this.textDelegate,
-    this.showControls = true,
-    this.controlsBackgroundColor,
-    this.optionSelectedColor,
-    this.optionUnselectedColor,
-    this.optionColor,
-    this.onUndo,
-    this.onClear,
-  }) : super(key: key);
+  const ImagePainter._(
+      {Key? key,
+      required this.controller,
+      this.assetPath,
+      this.networkUrl,
+      this.byteArray,
+      this.file,
+      this.height,
+      this.width,
+      this.placeHolder,
+      this.isScalable,
+      this.brushIcon,
+      this.clearAllIcon,
+      this.colorIcon,
+      this.undoIcon,
+      this.isSignature = false,
+      this.controlsAtTop = true,
+      this.signatureBackgroundColor = Colors.white,
+      this.colors,
+      this.onColorChanged,
+      this.onStrokeWidthChanged,
+      this.onPaintModeChanged,
+      this.textDelegate,
+      this.showControls = true,
+      this.controlsBackgroundColor,
+      this.optionSelectedColor,
+      this.optionUnselectedColor,
+      this.optionColor,
+      this.onUndo,
+      this.onClear,
+      this.imagePainterHideManager})
+      : super(key: key);
 
   ///Constructor for loading image from network url.
   factory ImagePainter.network(
@@ -71,6 +72,7 @@ class ImagePainter extends StatefulWidget {
     TextDelegate? textDelegate,
     bool? controlsAtTop,
     bool? showControls,
+    ImagePainterControlsHider? imagePainterHideManager,
     Color? controlsBackgroundColor,
     Color? selectedColor,
     Color? unselectedColor,
@@ -97,6 +99,7 @@ class ImagePainter extends StatefulWidget {
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
+      imagePainterHideManager: imagePainterHideManager,
       controlsBackgroundColor: controlsBackgroundColor,
       optionSelectedColor: selectedColor,
       optionUnselectedColor: unselectedColor,
@@ -126,6 +129,7 @@ class ImagePainter extends StatefulWidget {
     TextDelegate? textDelegate,
     bool? controlsAtTop,
     bool? showControls,
+    ImagePainterControlsHider? imagePainterHideManager,
     Color? controlsBackgroundColor,
     Color? selectedColor,
     Color? unselectedColor,
@@ -152,6 +156,7 @@ class ImagePainter extends StatefulWidget {
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
+      imagePainterHideManager: imagePainterHideManager,
       controlsBackgroundColor: controlsBackgroundColor,
       optionSelectedColor: selectedColor,
       optionUnselectedColor: unselectedColor,
@@ -181,6 +186,7 @@ class ImagePainter extends StatefulWidget {
     TextDelegate? textDelegate,
     bool? controlsAtTop,
     bool? showControls,
+    ImagePainterControlsHider? imagePainterHideManager,
     Color? controlsBackgroundColor,
     Color? selectedColor,
     Color? unselectedColor,
@@ -207,6 +213,7 @@ class ImagePainter extends StatefulWidget {
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
+      imagePainterHideManager: imagePainterHideManager,
       controlsBackgroundColor: controlsBackgroundColor,
       optionSelectedColor: selectedColor,
       optionUnselectedColor: unselectedColor,
@@ -236,6 +243,7 @@ class ImagePainter extends StatefulWidget {
     TextDelegate? textDelegate,
     bool? controlsAtTop,
     bool? showControls,
+    ImagePainterControlsHider? imagePainterHideManager,
     Color? controlsBackgroundColor,
     Color? selectedColor,
     Color? unselectedColor,
@@ -262,6 +270,7 @@ class ImagePainter extends StatefulWidget {
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
+      imagePainterHideManager: imagePainterHideManager,
       controlsBackgroundColor: controlsBackgroundColor,
       optionSelectedColor: selectedColor,
       optionUnselectedColor: unselectedColor,
@@ -289,6 +298,7 @@ class ImagePainter extends StatefulWidget {
     TextDelegate? textDelegate,
     bool? controlsAtTop,
     bool? showControls,
+    ImagePainterControlsHider? imagePainterHideManager,
     Color? controlsBackgroundColor,
     Color? selectedColor,
     Color? unselectedColor,
@@ -315,6 +325,7 @@ class ImagePainter extends StatefulWidget {
       textDelegate: textDelegate,
       controlsAtTop: controlsAtTop ?? true,
       showControls: showControls ?? true,
+      imagePainterHideManager: imagePainterHideManager,
       controlsBackgroundColor: controlsBackgroundColor,
       optionSelectedColor: selectedColor,
       optionUnselectedColor: unselectedColor,
@@ -401,6 +412,11 @@ class ImagePainter extends StatefulWidget {
 
   final VoidCallback? onClear;
 
+  ///This model can use when you want to hide some of the controls of the toolbar
+  ///Default is null and it means that all controls will show
+  ///[showControls] can hide toolbar totally
+  final ImagePainterControlsHider? imagePainterHideManager;
+
   @override
   ImagePainterState createState() => ImagePainterState();
 }
@@ -416,6 +432,7 @@ class ImagePainterState extends State<ImagePainter> {
 
   int _strokeMultiplier = 1;
   late TextDelegate textDelegate;
+
   @override
   void initState() {
     super.initState();
@@ -823,66 +840,87 @@ class ImagePainterState extends State<ImagePainter> {
 
   Widget _buildControls() {
     return Container(
-      padding: const EdgeInsets.all(4),
+      padding: (widget.imagePainterHideManager != null &&
+              widget.imagePainterHideManager!.allHide)
+          ? EdgeInsets.zero
+          : const EdgeInsets.all(4),
       color: widget.controlsBackgroundColor ?? Colors.grey[200],
       child: Row(
         children: [
-          AnimatedBuilder(
-            animation: _controller,
-            builder: (_, __) {
-              final icon = paintModes(textDelegate)
-                  .firstWhere((item) => item.mode == _controller.mode)
-                  .icon;
-              return PopupMenuButton(
-                tooltip: textDelegate.changeMode,
-                shape: ContinuousRectangleBorder(
-                  borderRadius: BorderRadius.circular(40),
-                ),
-                surfaceTintColor: Colors.transparent,
-                icon: Icon(icon, color: widget.optionColor ?? Colors.grey[700]),
-                itemBuilder: (_) => [_showOptionsRow()],
-              );
-            },
-          ),
-          AnimatedBuilder(
-            animation: _controller,
-            builder: (_, __) {
-              return PopupMenuButton(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                shape: ContinuousRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                surfaceTintColor: Colors.transparent,
-                tooltip: textDelegate.changeColor,
-                icon: widget.colorIcon ??
-                    Container(
-                      padding: const EdgeInsets.all(2.0),
-                      height: 24,
-                      width: 24,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.grey),
-                        color: _controller.color,
+          (widget.imagePainterHideManager != null &&
+                  widget.imagePainterHideManager!.hideShapeControl != null &&
+                  widget.imagePainterHideManager!.hideShapeControl!)
+              ? const SizedBox()
+              : AnimatedBuilder(
+                  animation: _controller,
+                  builder: (_, __) {
+                    final icon = paintModes(textDelegate)
+                        .firstWhere((item) => item.mode == _controller.mode)
+                        .icon;
+                    return PopupMenuButton(
+                      tooltip: textDelegate.changeMode,
+                      shape: ContinuousRectangleBorder(
+                        borderRadius: BorderRadius.circular(40),
                       ),
-                    ),
-                itemBuilder: (_) => [_showColorPicker()],
-              );
-            },
-          ),
-          PopupMenuButton(
-            tooltip: textDelegate.changeBrushSize,
-            surfaceTintColor: Colors.transparent,
-            shape: ContinuousRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            icon:
-                widget.brushIcon ?? Icon(Icons.brush, color: Colors.grey[700]),
-            itemBuilder: (_) => [_showRangeSlider()],
-          ),
+                      surfaceTintColor: Colors.transparent,
+                      icon: Icon(icon,
+                          color: widget.optionColor ?? Colors.grey[700]),
+                      itemBuilder: (_) => [_showOptionsRow()],
+                    );
+                  },
+                ),
+          (widget.imagePainterHideManager != null &&
+                  widget.imagePainterHideManager!.hideColorControl != null &&
+                  widget.imagePainterHideManager!.hideColorControl!)
+              ? const SizedBox()
+              : AnimatedBuilder(
+                  animation: _controller,
+                  builder: (_, __) {
+                    return PopupMenuButton(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      shape: ContinuousRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      surfaceTintColor: Colors.transparent,
+                      tooltip: textDelegate.changeColor,
+                      icon: widget.colorIcon ??
+                          Container(
+                            padding: const EdgeInsets.all(2.0),
+                            height: 24,
+                            width: 24,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.grey),
+                              color: _controller.color,
+                            ),
+                          ),
+                      itemBuilder: (_) => [_showColorPicker()],
+                    );
+                  },
+                ),
+          (widget.imagePainterHideManager != null &&
+                  widget.imagePainterHideManager!.hideBrushControl != null &&
+                  widget.imagePainterHideManager!.hideBrushControl!)
+              ? const SizedBox()
+              : PopupMenuButton(
+                  tooltip: textDelegate.changeBrushSize,
+                  surfaceTintColor: Colors.transparent,
+                  shape: ContinuousRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  icon: widget.brushIcon ??
+                      Icon(Icons.brush, color: Colors.grey[700]),
+                  itemBuilder: (_) => [_showRangeSlider()],
+                ),
           AnimatedBuilder(
             animation: _controller,
             builder: (_, __) {
               if (_controller.canFill()) {
+                if (widget.imagePainterHideManager != null &&
+                    widget.imagePainterHideManager!.hideFillControl != null &&
+                    widget.imagePainterHideManager!.hideFillControl!) {
+                  return const SizedBox();
+                }
                 return Row(
                   children: [
                     Checkbox.adaptive(
@@ -903,25 +941,67 @@ class ImagePainterState extends State<ImagePainter> {
             },
           ),
           const Spacer(),
-          IconButton(
-            tooltip: textDelegate.undo,
-            icon: widget.undoIcon ?? Icon(Icons.reply, color: Colors.grey[700]),
-            onPressed: () {
-              widget.onUndo?.call();
-              _controller.undo();
-            },
-          ),
-          IconButton(
-            tooltip: textDelegate.clearAllProgress,
-            icon: widget.clearAllIcon ??
-                Icon(Icons.clear, color: Colors.grey[700]),
-            onPressed: () {
-              widget.onClear?.call();
-              _controller.clear();
-            },
-          ),
+          (widget.imagePainterHideManager != null &&
+                  widget.imagePainterHideManager!.hideUndoControl != null &&
+                  widget.imagePainterHideManager!.hideUndoControl!)
+              ? const SizedBox()
+              : IconButton(
+                  tooltip: textDelegate.undo,
+                  icon: widget.undoIcon ??
+                      Icon(Icons.phonelink_erase_rounded,
+                          color: Colors.grey[700]),
+                  onPressed: () {
+                    widget.onUndo?.call();
+                    _controller.undo();
+                  },
+                ),
+          (widget.imagePainterHideManager != null &&
+                  widget.imagePainterHideManager!.hideClearControl != null &&
+                  widget.imagePainterHideManager!.hideClearControl!)
+              ? const SizedBox()
+              : IconButton(
+                  tooltip: textDelegate.clearAllProgress,
+                  icon: widget.clearAllIcon ??
+                      Icon(Icons.clear, color: Colors.grey[700]),
+                  onPressed: () {
+                    widget.onClear?.call();
+                    _controller.clear();
+                  },
+                ),
         ],
       ),
     );
   }
+}
+
+class ImagePainterControlsHider {
+  bool? hideShapeControl;
+  bool? hideColorControl;
+  bool? hideBrushControl;
+  bool? hideFillControl;
+  bool? hideUndoControl;
+  bool? hideClearControl;
+  bool? _allHide;
+
+  ImagePainterControlsHider({
+    this.hideShapeControl,
+    this.hideColorControl,
+    this.hideBrushControl,
+    this.hideFillControl,
+    this.hideUndoControl,
+    this.hideClearControl,
+  });
+
+  bool get allHide => (hideShapeControl != null &&
+      hideShapeControl! &&
+      hideColorControl != null &&
+      hideColorControl! &&
+      hideBrushControl != null &&
+      hideBrushControl! &&
+      hideFillControl != null &&
+      hideFillControl! &&
+      hideUndoControl != null &&
+      hideUndoControl! &&
+      hideClearControl != null &&
+      hideClearControl!);
 }
