@@ -42,4 +42,7 @@ class DutchTextDelegate implements TextDelegate {
 
   @override
   String get undo => "ongedaan maken";
+
+  @override
+  String get fill => "Vullen";
 }
