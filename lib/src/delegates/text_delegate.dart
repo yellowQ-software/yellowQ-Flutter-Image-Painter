@@ -13,4 +13,5 @@ class TextDelegate {
   final String undo = "Undo";
   final String done = "Done";
   final String clearAllProgress = "Clear All Progress";
+  final String fill = "Fill";
 }

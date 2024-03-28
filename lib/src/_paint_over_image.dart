@@ -892,7 +892,7 @@ class ImagePainterState extends State<ImagePainter> {
                       },
                     ),
                     Text(
-                      'Fill',
+                      textDelegate.fill,
                       style: Theme.of(context).textTheme.bodyMedium,
                     )
                   ],
