@@ -1,3 +1,7 @@
+# 0.7.1
+
+- Include fill on text delegate thanks to [R4F43Lv](https://github.com/R4F43Lv).
+
 # 0.7.0
 
 ## Breaking Changes
