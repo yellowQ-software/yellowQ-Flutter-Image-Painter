@@ -885,12 +885,12 @@ class ImagePainterState extends State<ImagePainter> {
               if (_controller.canFill()) {
                 return Row(
                   children: [
-                    // Checkbox.adaptive(
-                    //   value: _controller.shouldFill,
-                    //   onChanged: (val) {
-                    //     _controller.update(fill: val);
-                    //   },
-                    // ),
+                    Checkbox(
+                      value: _controller.shouldFill,
+                      onChanged: (val) {
+                        _controller.update(fill: val);
+                      },
+                    ),
                     Text(
                       textDelegate.fill,
                       style: Theme.of(context).textTheme.bodyMedium,
