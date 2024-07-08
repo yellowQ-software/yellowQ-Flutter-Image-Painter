@@ -8,6 +8,7 @@ class SelectionItems extends StatelessWidget {
   final VoidCallback? onTap;
   final Color? selectedColor;
   final Color? unselectedColor;
+  final Color? selectedBackgroundColor;
 
   const SelectionItems({
     required this.data,
@@ -16,6 +17,7 @@ class SelectionItems extends StatelessWidget {
     this.onTap,
     this.selectedColor,
     this.unselectedColor,
+    this.selectedBackgroundColor,
   }) : super(key: key);
 
   @override
@@ -23,8 +25,11 @@ class SelectionItems extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 2.0),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(4.0),
-          color: isSelected ? Colors.blue : Colors.transparent),
+        borderRadius: BorderRadius.circular(4.0),
+        color: isSelected
+            ? selectedBackgroundColor ?? Colors.blue
+            : Colors.transparent,
+      ),
       child: ListTile(
         leading: IconTheme(
           data: const IconThemeData(opacity: 1.0),

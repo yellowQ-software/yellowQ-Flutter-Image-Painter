@@ -49,6 +49,8 @@ class ImagePainter extends StatefulWidget {
     this.optionColor,
     this.onUndo,
     this.onClear,
+    this.optionSelectedBackgroundColor,
+    this.optionsBackgroundColor,
   }) : super(key: key);
 
   ///Constructor for loading image from network url.
@@ -77,6 +79,8 @@ class ImagePainter extends StatefulWidget {
     Color? optionColor,
     VoidCallback? onUndo,
     VoidCallback? onClear,
+    Color? optionsSelectedBackgroundColor,
+    Color? optionsBackgroundColor,
   }) {
     return ImagePainter._(
       key: key,
@@ -103,6 +107,8 @@ class ImagePainter extends StatefulWidget {
       optionColor: optionColor,
       onUndo: onUndo,
       onClear: onClear,
+      optionSelectedBackgroundColor: optionsSelectedBackgroundColor,
+      optionsBackgroundColor: optionsBackgroundColor,
     );
   }
 
@@ -132,6 +138,8 @@ class ImagePainter extends StatefulWidget {
     Color? optionColor,
     VoidCallback? onUndo,
     VoidCallback? onClear,
+    Color? optionsSelectedBackgroundColor,
+    Color? optionsBackgroundColor,
   }) {
     return ImagePainter._(
       controller: controller,
@@ -158,6 +166,8 @@ class ImagePainter extends StatefulWidget {
       optionColor: optionColor,
       onUndo: onUndo,
       onClear: onClear,
+      optionSelectedBackgroundColor: optionsSelectedBackgroundColor,
+      optionsBackgroundColor: optionsBackgroundColor,
     );
   }
 
@@ -187,6 +197,8 @@ class ImagePainter extends StatefulWidget {
     Color? optionColor,
     VoidCallback? onUndo,
     VoidCallback? onClear,
+    Color? optionsSelectedBackgroundColor,
+    Color? optionsBackgroundColor,
   }) {
     return ImagePainter._(
       controller: controller,
@@ -213,6 +225,8 @@ class ImagePainter extends StatefulWidget {
       optionColor: optionColor,
       onUndo: onUndo,
       onClear: onClear,
+      optionSelectedBackgroundColor: optionsSelectedBackgroundColor,
+      optionsBackgroundColor: optionsBackgroundColor,
     );
   }
 
@@ -242,6 +256,8 @@ class ImagePainter extends StatefulWidget {
     Color? optionColor,
     VoidCallback? onUndo,
     VoidCallback? onClear,
+    Color? optionsSelectedBackgroundColor,
+    Color? optionsBackgroundColor,
   }) {
     return ImagePainter._(
       controller: controller,
@@ -268,6 +284,8 @@ class ImagePainter extends StatefulWidget {
       optionColor: optionColor,
       onUndo: onUndo,
       onClear: onClear,
+      optionSelectedBackgroundColor: optionsSelectedBackgroundColor,
+      optionsBackgroundColor: optionsBackgroundColor,
     );
   }
 
@@ -392,6 +410,12 @@ class ImagePainter extends StatefulWidget {
   final Color? controlsBackgroundColor;
 
   final Color? optionSelectedColor;
+
+  /// The background color of the selected option in the options list.
+  final Color? optionSelectedBackgroundColor;
+
+  /// The background color of the options list.
+  final Color? optionsBackgroundColor;
 
   final Color? optionUnselectedColor;
 
@@ -718,6 +742,8 @@ class ImagePainterState extends State<ImagePainter> {
                     data: item,
                     isSelected: _controller.mode == item.mode,
                     selectedColor: widget.optionSelectedColor,
+                    selectedBackgroundColor:
+                        widget.optionSelectedBackgroundColor,
                     unselectedColor: widget.optionUnselectedColor,
                     onTap: () {
                       if (widget.onPaintModeChanged != null) {
@@ -834,6 +860,7 @@ class ImagePainterState extends State<ImagePainter> {
                   .firstWhere((item) => item.mode == _controller.mode)
                   .icon;
               return PopupMenuButton(
+                color: widget.optionsBackgroundColor,
                 tooltip: textDelegate.changeMode,
                 shape: ContinuousRectangleBorder(
                   borderRadius: BorderRadius.circular(40),
