@@ -26,6 +26,7 @@ class ImagePainter extends StatefulWidget {
     this.networkUrl,
     this.byteArray,
     this.file,
+    this.customPaintModes,
     this.height,
     this.width,
     this.placeHolder,
@@ -56,6 +57,7 @@ class ImagePainter extends StatefulWidget {
     String url, {
     required ImagePainterController controller,
     Key? key,
+    List<PaintMode>? customPaintModes,
     double? height,
     double? width,
     Widget? placeholderWidget,
@@ -82,6 +84,7 @@ class ImagePainter extends StatefulWidget {
       key: key,
       controller: controller,
       networkUrl: url,
+      customPaintModes: customPaintModes,
       height: height,
       width: width,
       placeHolder: placeholderWidget,
@@ -111,6 +114,7 @@ class ImagePainter extends StatefulWidget {
     String path, {
     required ImagePainterController controller,
     Key? key,
+    List<PaintMode>? customPaintModes,
     double? height,
     double? width,
     bool? scalable,
@@ -137,6 +141,7 @@ class ImagePainter extends StatefulWidget {
       controller: controller,
       key: key,
       assetPath: path,
+      customPaintModes: customPaintModes,
       height: height,
       width: width,
       isScalable: scalable ?? false,
@@ -166,6 +171,7 @@ class ImagePainter extends StatefulWidget {
     File file, {
     required ImagePainterController controller,
     Key? key,
+    List<PaintMode>? customPaintModes,
     double? height,
     double? width,
     bool? scalable,
@@ -192,6 +198,7 @@ class ImagePainter extends StatefulWidget {
       controller: controller,
       key: key,
       file: file,
+      customPaintModes: customPaintModes,
       height: height,
       width: width,
       placeHolder: placeholderWidget,
@@ -221,6 +228,7 @@ class ImagePainter extends StatefulWidget {
     Uint8List byteArray, {
     required ImagePainterController controller,
     Key? key,
+    List<PaintMode>? customPaintModes,
     double? height,
     double? width,
     bool? scalable,
@@ -247,6 +255,7 @@ class ImagePainter extends StatefulWidget {
       controller: controller,
       key: key,
       byteArray: byteArray,
+      customPaintModes: customPaintModes,
       height: height,
       width: width,
       placeHolder: placeholderWidget,
@@ -276,6 +285,7 @@ class ImagePainter extends StatefulWidget {
     required ImagePainterController controller,
     required double height,
     required double width,
+    List<PaintMode>? customPaintModes,
     Key? key,
     Color? signatureBgColor,
     List<Color>? colors,
@@ -299,6 +309,7 @@ class ImagePainter extends StatefulWidget {
     return ImagePainter._(
       controller: controller,
       key: key,
+      customPaintModes: customPaintModes,
       height: height,
       width: width,
       isSignature: true,
@@ -339,6 +350,10 @@ class ImagePainter extends StatefulWidget {
   ///Only accessible through [ImagePainter.asset] constructor.
   final String? assetPath;
 
+  ///Custom definition and order of available paint modes.
+  ///If not provided, all modes are available in default order.
+  final List<PaintMode>? customPaintModes;
+  
   ///Height of the Widget. Image is subjected to fit within the given height.
   final double? height;
 
@@ -712,7 +727,7 @@ class ImagePainterState extends State<ImagePainter> {
       child: Center(
         child: SizedBox(
           child: Wrap(
-            children: paintModes(textDelegate)
+            children: paintModes(textDelegate, widget.customPaintModes)
                 .map(
                   (item) => SelectionItems(
                     data: item,
@@ -830,7 +845,7 @@ class ImagePainterState extends State<ImagePainter> {
           AnimatedBuilder(
             animation: _controller,
             builder: (_, __) {
-              final icon = paintModes(textDelegate)
+              final icon = paintModes(textDelegate, widget.customPaintModes)
                   .firstWhere((item) => item.mode == _controller.mode)
                   .icon;
               return PopupMenuButton(
