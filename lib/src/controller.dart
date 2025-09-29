@@ -52,11 +52,7 @@ class ImagePainterController extends ChangeNotifier {
 
   Offset? get end => _end;
 
-  bool get onTextUpdateMode =>
-      _mode == PaintMode.text &&
-      _paintHistory
-          .where((element) => element.mode == PaintMode.text)
-          .isNotEmpty;
+  bool get onTextUpdateMode => _mode == PaintMode.text && _paintHistory.where((element) => element.mode == PaintMode.text).isNotEmpty;
 
   ImagePainterController({
     double strokeWidth = 4.0,
@@ -165,6 +161,14 @@ class ImagePainterController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void clearOffsets() {
+    if (_offsets.isEmpty) {
+      return;
+    }
+    _offsets.clear();
+    notifyListeners();
+  }
+
   bool get shouldFill {
     if (mode == PaintMode.circle || mode == PaintMode.rect) {
       return _fill;
@@ -181,28 +185,21 @@ class ImagePainterController extends ChangeNotifier {
     final painter = DrawImage(controller: this);
     final size = Size(_image!.width.toDouble(), _image!.height.toDouble());
     painter.paint(canvas, size);
-    final _convertedImage = await recorder
-        .endRecording()
-        .toImage(size.width.floor(), size.height.floor());
-    final byteData =
-        await _convertedImage.toByteData(format: ui.ImageByteFormat.png);
+    final _convertedImage = await recorder.endRecording().toImage(size.width.floor(), size.height.floor());
+    final byteData = await _convertedImage.toByteData(format: ui.ImageByteFormat.png);
     return byteData?.buffer.asUint8List();
   }
 
   Future<Uint8List?> _renderSignature() async {
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
-    SignaturePainter painter =
-        SignaturePainter(controller: this, backgroundColor: Colors.blue);
+    SignaturePainter painter = SignaturePainter(controller: this, backgroundColor: Colors.blue);
 
     Size size = Size(_rect.width, _rect.height);
 
     painter.paint(canvas, size);
-    final _convertedImage = await recorder
-        .endRecording()
-        .toImage(size.width.floor(), size.height.floor());
-    final byteData =
-        await _convertedImage.toByteData(format: ui.ImageByteFormat.png);
+    final _convertedImage = await recorder.endRecording().toImage(size.width.floor(), size.height.floor());
+    final byteData = await _convertedImage.toByteData(format: ui.ImageByteFormat.png);
     return byteData?.buffer.asUint8List();
   }
 
