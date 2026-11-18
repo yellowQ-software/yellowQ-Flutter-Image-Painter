@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui;
 
-import 'package:flutter/material.dart' hide Image;
+import 'package:material_ui/material_ui.dart' hide Image;
 import 'package:flutter/services.dart';
 
 import '_image_painter.dart';

@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:flutter/material.dart' hide Image;
+import 'package:material_ui/material_ui.dart' hide Image;
 
 import 'controller.dart';
 
