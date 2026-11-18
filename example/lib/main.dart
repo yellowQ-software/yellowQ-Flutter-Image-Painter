@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:image_painter_example/mobile_example.dart';
 
 void main() => runApp(ExampleApp());
